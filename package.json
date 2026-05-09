@@ -1,7 +1,7 @@
 {
   "name": "unidesk-backend",
   "version": "1.0.0",
-  "description": "UniDesk student support ticket system backend",
+  "description": "UniDesk student support ticket system",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

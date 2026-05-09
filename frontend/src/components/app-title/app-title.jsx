@@ -11,9 +11,6 @@ export function AppTitle({ team }) {
         <span>{team.name}</span>
         <small>{team.plan}</small>
       </span>
-      <span className="app-title-toggle" aria-hidden="true">
-        ⇅
-      </span>
     </Link>
   )
 }

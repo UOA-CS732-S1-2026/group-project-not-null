@@ -1,4 +1,4 @@
-app-title,
+.app-title,
 .nav-user {
   display: flex;
   align-items: center;
@@ -16,9 +16,8 @@ app-title,
   background: var(--muted);
 }
 
-.app-title-logo,
-.user-avatar {
-  width: 38px;
+.app-title-logo{
+ width: 38px;
   height: 38px;
   flex: 0 0 38px;
   display: inline-grid;

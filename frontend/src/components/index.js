@@ -14,3 +14,4 @@ export { AppSidebar } from './sidebar/sidebar.jsx';
 export { NavGroup } from './navigation-group';
 export { NavUser } from './navigation-user';
 export { AppTitle } from './app-title';
+export { AuthenticatedLayout } from './authenticated-layout';
