@@ -1,0 +1,52 @@
+.sidebar-group {
+  margin-top: 16px;
+}
+
+.sidebar-group h2 {
+  margin: 0 8px 8px;
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sidebar-nav {
+  display: grid;
+  gap: 4px;
+}
+
+.sidebar-link {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: calc(var(--radius) - 2px);
+  padding: 0 10px;
+  color: var(--primary);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.sidebar-link:hover,
+.sidebar-link-active {
+  background: var(--accent);
+}
+
+.sidebar-link-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--accent);
+}
+
+.nav-badge {
+  margin-left: auto;
+  border-radius: calc(var(--radius) - 4px);
+  padding: 2px 8px;
+  color: var(--primary-foreground);
+  background: var(--primary);
+  font-size: 0.72rem;
+}

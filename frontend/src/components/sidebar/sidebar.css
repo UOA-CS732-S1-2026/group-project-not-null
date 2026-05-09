@@ -1,0 +1,15 @@
+.app-sidebar {
+  position: static;
+  height: auto;
+}
+
+.sidebar-content {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+}
+
+.sidebar-group {
+  min-width: 220px;
+  margin-top: 0;
+}
