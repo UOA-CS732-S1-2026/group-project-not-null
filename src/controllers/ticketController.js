@@ -1,6 +1,6 @@
 // src/controllers/ticketController.js
 const Ticket = require('../models/Ticket');
-const User = require('../models/User');
+const User = require('../models/user');
  
 /**
  * Create a new ticket (Student)

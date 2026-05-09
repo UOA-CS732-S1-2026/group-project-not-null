@@ -127,6 +127,18 @@
   font-weight: 700;
 }
 
+.form-error {
+  margin: 0;
+  border: 1px solid oklch(from var(--destructive) l c h / 0.36);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 10px 12px;
+  color: var(--destructive);
+  background: oklch(from var(--destructive) l c h / 0.08);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: center;
+}
+
 .auth-form-row {
   display: flex;
   align-items: center;
