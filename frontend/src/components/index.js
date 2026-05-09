@@ -9,3 +9,4 @@ export {
 } from './card/Card.jsx';
 export { Button } from './button';
 export { SignInForm } from './auth-forms/sign-in-form.jsx';
+export { SignUpForm } from './auth-forms/sign-up-form.jsx';

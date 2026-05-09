@@ -25,3 +25,9 @@ export function login({ email, password }) {
   })
 }
 
+export function register({ email, password, firstName, lastName, role, department }) {
+  return request('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({ email, password, firstName, lastName, role, department }),
+  })
+}

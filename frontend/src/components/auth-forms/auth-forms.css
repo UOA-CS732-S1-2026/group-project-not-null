@@ -12,6 +12,10 @@
   width: min(100%, 420px);
 }
 
+.sign-up-shell {
+  width: min(100%, 680px);
+}
+
 .auth-brand {
   display: block;
   width: max-content;
@@ -36,7 +40,13 @@
 
 .auth-form {
   display: grid;
-  gap: 16px;
+  gap: 14px;
+}
+
+.auth-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .auth-account-type {
@@ -99,13 +109,23 @@
 
 .field input {
   width: 100%;
-  min-height: 46px;
+  min-height: 44px;
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) - 2px);
   padding: 0 14px;
   color: var(--primary);
   background: var(--background);
   font: inherit;
+}
+
+@media (max-width: 640px) {
+  .sign-up-shell {
+    width: min(100%, 420px);
+  }
+
+  .auth-form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .field input::placeholder {

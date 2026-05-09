@@ -1,6 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
-import LandingPage  from '../pages/landing-page'
-import  SignIn  from '../pages/sign-in'
+import { LandingPage, SignIn, SignUp } from '../pages'
 
 function Main() {
 
@@ -8,6 +7,7 @@ function Main() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/sign-in" element={<SignIn />} />
+      <Route path="/sign-up" element={<SignUp />} />
     </Routes>
   )
 }
