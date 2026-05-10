@@ -48,7 +48,7 @@
   place-items: center;
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) - 2px);
-  color: var(--gold-500);
+  color: var(--border);
   background: transparent;
   font-weight: 900;
   cursor: pointer;
@@ -61,8 +61,8 @@
 
 .urgency-options label:has(input:checked) {
   border-color: transparent;
-  color: white;
-  background: var(--gold-500);
+  color: #003f88;
+  background: var(--border);
 }
 
 .priority-note {

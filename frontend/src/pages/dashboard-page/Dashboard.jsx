@@ -1,4 +1,4 @@
-import { Header, Main } from '../../components'
+import { Main } from '../../components'
 import { Link } from 'react-router-dom'
 import { useMemo, useState } from 'react'
 import { studentTickets, ticketCategories } from './tickets/ticketData.js'
@@ -56,24 +56,6 @@ export default function DashBoard() {
   ]
 
   return (
-    <>
-      {/* <Header>
-        <div className="dashboard-tools">
-          <label className="search-field">
-            <span>Search</span>
-            <input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search tickets..."
-            />
-          </label>
-          <span className="user-avatar" aria-hidden="true">
-            AT
-          </span>
-        </div>
-      </Header> */}
-
       <Main className="home-main">
         <section className="home-title-row">
           <div>
@@ -149,7 +131,6 @@ export default function DashBoard() {
           </article>
         </section>
       </Main>
-    </>
   )
 }
 
