@@ -1,17 +1,63 @@
 import { Link, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { Main } from '../../components'
-import { studentTickets } from '../dashboard-page/tickets/ticketData.js'
+import { getTicket } from '../../services/api.js'
+import { formatTicket } from '../../services/ticket-mappers.js'
 import './ViewTicket.css'
 
 export default function ViewTicket() {
   const { ticketId } = useParams()
-  const ticket = studentTickets.find((item) => item.id === ticketId)
+  const [ticket, setTicket] = useState(null)
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
 
-  if (!ticket) {
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadTicket() {
+      setError('')
+      setIsLoading(true)
+
+      try {
+        const data = await getTicket(ticketId)
+
+        if (isMounted) {
+          setTicket(formatTicket(data.ticket))
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err.message)
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadTicket()
+
+    return () => {
+      isMounted = false
+    }
+  }, [ticketId])
+
+  if (isLoading) {
+    return (
+        <Main>
+          <section className="panel">
+            <h1>Loading ticket...</h1>
+          </section>
+        </Main>
+    )
+  }
+
+  if (error || !ticket) {
     return (
         <Main>
           <section className="panel">
             <h1>Ticket not found</h1>
+            {error && <p className="form-error" role="alert">{error}</p>}
             <Link to="/home">Back to My Support</Link>
           </section>
         </Main>
@@ -24,7 +70,7 @@ export default function ViewTicket() {
           <div>
             <h1>{ticket.title}</h1>
             <p>{ticket.category} · {ticket.urgency} urgency · Priority: {ticket.priority}</p>
-            <p className="page-eyebrow">Ticket #{ticket.id}</p>
+            <p className="page-eyebrow">Ticket #{ticket.ticketNumber || ticket.id}</p>
           </div>
           <span className={`ticket-status ticket-status-${ticket.status.toLowerCase().replace(' ', '-')}`}>
             {ticket.status}

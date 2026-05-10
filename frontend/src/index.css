@@ -138,6 +138,7 @@ button:not(:disabled),
 .button-ghost {
   color: var(--accent-foreground);
   background: var(--accent);
+  max-width: 270px;
 }
 
 .button-ghost:hover {

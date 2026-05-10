@@ -1,18 +1,53 @@
 import { Main } from '../../components'
 import { Link } from 'react-router-dom'
-import { useMemo, useState } from 'react'
-import { studentTickets, ticketCategories } from './tickets/ticketData.js'
+import { useEffect, useMemo, useState } from 'react'
+import { getTickets } from '../../services/api.js'
+import { formatTicket, ticketCategories } from '../../services/ticket-mappers.js'
 import { Square, Ellipsis, CheckCheck, CircleAlert } from 'lucide-react'
 
 export default function DashBoard() {
+  const [tickets, setTickets] = useState([])
   const [statusFilter, setStatusFilter] = useState('All')
   const [categoryFilter, setCategoryFilter] = useState('All')
   const [query, setQuery] = useState('')
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadTickets() {
+      setError('')
+      setIsLoading(true)
+
+      try {
+        const data = await getTickets({ limit: 100 })
+
+        if (isMounted) {
+          setTickets(data.tickets.map(formatTicket))
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err.message)
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadTickets()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const filteredTickets = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
 
-    return studentTickets.filter((ticket) => {
+    return tickets.filter((ticket) => {
       const matchesStatus =
         statusFilter === 'All' || ticket.status === statusFilter
       const matchesCategory =
@@ -26,30 +61,30 @@ export default function DashBoard() {
 
       return matchesStatus && matchesCategory && matchesQuery
     })
-  }, [categoryFilter, query, statusFilter])
+  }, [categoryFilter, query, statusFilter, tickets])
 
   const summary = [
     {
       label: 'Open tickets',
-      value: studentTickets.filter((ticket) => ticket.status === 'Open').length,
+      value: tickets.filter((ticket) => ticket.status === 'Open').length,
       detail: 'Waiting for review',
       icon: <Square size={18} aria-label="Open tickets" />, // Lucide Square
     },
     {
       label: 'In progress',
-      value: studentTickets.filter((ticket) => ticket.status === 'In Progress').length,
+      value: tickets.filter((ticket) => ticket.status === 'In Progress').length,
       detail: 'Staff are working',
       icon: <Ellipsis size={18} aria-label="In progress" />, // Lucide Ellipsis
     },
     {
       label: 'Resolved',
-      value: studentTickets.filter((ticket) => ticket.status === 'Resolved').length,
+      value: tickets.filter((ticket) => ticket.status === 'Resolved').length,
       detail: 'Previous tickets',
       icon: <CheckCheck size={18} aria-label="Resolved" />, // Lucide CheckCheck
     },
     {
       label: 'Urgent tickets',
-      value: studentTickets.filter((ticket) => ticket.urgency === 'High').length,
+      value: tickets.filter((ticket) => ticket.urgency === 'High').length,
       detail: 'High urgency',
       icon: <CircleAlert size={18} aria-label="Urgent tickets" />, // Lucide CircleAlert
     },
@@ -115,8 +150,8 @@ export default function DashBoard() {
                 >
                   <option value="All">All categories</option>
                   {ticketCategories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
+                    <option key={category.value} value={category.label}>
+                      {category.label}
                     </option>
                   ))}
                 </select>
@@ -124,9 +159,16 @@ export default function DashBoard() {
             </div>
 
             <div className="student-ticket-card-list">
-              {filteredTickets.map((ticket) => (
-                <TicketCard ticket={ticket} key={ticket.id} />
-              ))}
+              {isLoading && <p>Loading tickets...</p>}
+              {error && <p className="form-error" role="alert">{error}</p>}
+              {!isLoading && !error && filteredTickets.length === 0 && (
+                <p>No tickets match your filters.</p>
+              )}
+              {!isLoading &&
+                !error &&
+                filteredTickets.map((ticket) => (
+                  <TicketCard ticket={ticket} key={ticket.id} />
+                ))}
             </div>
           </article>
         </section>

@@ -1,25 +1,29 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Main } from '../../components'
+import { createTicket } from '../../services/api.js'
 import {
   assignPriority,
   ticketCategories,
   urgencyLevels,
-} from '../dashboard-page/tickets/ticketData.js'
+} from '../../services/ticket-mappers.js'
 import './CreateTicket.css'
 
 export default function CreateTicket() {
   const [form, setForm] = useState({
     title: '',
     category: 'IT',
-    urgency: 'Medium',
+    urgencyLevel: 'medium',
     description: '',
   })
   const [submitted, setSubmitted] = useState(false)
+  const [createdTicketId, setCreatedTicketId] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const priority = useMemo(
-    () => assignPriority(form.category, form.urgency),
-    [form.category, form.urgency]
+    () => assignPriority(form.category, form.urgencyLevel),
+    [form.category, form.urgencyLevel]
   )
 
   function updateField(event) {
@@ -27,9 +31,26 @@ export default function CreateTicket() {
     setForm((currentForm) => ({ ...currentForm, [name]: value }))
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    setSubmitted(true)
+    setError('')
+    setIsSubmitting(true)
+
+    try {
+      const data = await createTicket({
+        title: form.title,
+        description: form.description,
+        category: form.category,
+        urgencyLevel: form.urgencyLevel,
+      })
+
+      setCreatedTicketId(data.ticket._id)
+      setSubmitted(true)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -45,6 +66,11 @@ export default function CreateTicket() {
           <section className="panel confirmation-panel">
             <h2>Your ticket has been submitted.</h2>
             <p>We’ll notify you when its status changes.</p>
+            {createdTicketId && (
+              <Link className="button button-ghost" to={`/tickets/${createdTicketId}`}>
+                View ticket
+              </Link>
+            )}
             <Link className="button button-primary" to="/home">
               Back to My Support
             </Link>
@@ -66,8 +92,8 @@ export default function CreateTicket() {
               <span>Category</span>
               <select name="category" value={form.category} onChange={updateField}>
                 {ticketCategories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
+                  <option key={category.value} value={category.value}>
+                    {category.label}
                   </option>
                 ))}
               </select>
@@ -79,15 +105,15 @@ export default function CreateTicket() {
 
             <fieldset className="urgency-options">
               {urgencyLevels.map((urgency) => (
-                <label key={urgency}>
+                <label key={urgency.value}>
                   <input
                     type="radio"
-                    name="urgency"
-                    value={urgency}
-                    checked={form.urgency === urgency}
+                    name="urgencyLevel"
+                    value={urgency.value}
+                    checked={form.urgencyLevel === urgency.value}
                     onChange={updateField}
                   />
-                  <span>{urgency}</span>
+                  <span>{urgency.label}</span>
                 </label>
               ))}
             </fieldset>
@@ -109,8 +135,14 @@ export default function CreateTicket() {
               urgency. Current priority: <strong>{priority}</strong>.
             </p>
 
-            <Button className="button-primary auth-submit" type="submit">
-              Submit ticket
+            {error && (
+              <p className="form-error" role="alert">
+                {error}
+              </p>
+            )}
+
+            <Button className="button-primary auth-submit" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Submit ticket'}
             </Button>
           </form>
         )}
