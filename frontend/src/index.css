@@ -604,9 +604,7 @@ button:not(:disabled),
   font-weight: 800;
 }
 
-.student-ticket-filters select,
-.create-ticket-form select,
-.create-ticket-form textarea {
+.student-ticket-filters select {
   min-height: 36px;
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) - 2px);
@@ -614,11 +612,6 @@ button:not(:disabled),
   color: var(--primary);
   background: var(--card);
   font: inherit;
-}
-
-.create-ticket-form textarea {
-  padding-block: 10px;
-  resize: vertical;
 }
 
 .student-ticket-card-list {
@@ -713,68 +706,7 @@ button:not(:disabled),
   background: var(--card);
 }
 
-.create-ticket-form {
-  display: grid;
-  gap: 16px;
-}
 
-.create-ticket-description,
-.priority-note,
-.confirmation-panel {
-  max-width: 760px;
-}
-
-.urgency-options {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  border: 0;
-  margin: 0;
-  padding: 0;
-}
-
-.urgency-options legend {
-  grid-column: 1 / -1;
-  color: var(--primary);
-  font-weight: 800;
-}
-
-.urgency-options label {
-  position: relative;
-  min-height: 52px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) - 2px);
-  color: var(--muted-foreground);
-  background: var(--card);
-  font-weight: 900;
-}
-
-.urgency-options input {
-  position: absolute;
-  opacity: 0;
-}
-
-.urgency-options label:has(input:checked) {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: var(--accent);
-}
-
-.priority-note {
-  margin: 0;
-  color: var(--muted-foreground);
-}
-
-.confirmation-panel {
-  display: grid;
-  gap: 10px;
-}
-
-.confirmation-panel h2 {
-  margin: 0;
-}
 
 .ticket-detail-main {
   display: grid;
@@ -1686,9 +1618,7 @@ button:not(:disabled),
     flex-direction: column;
   }
 
-  .urgency-options {
-    grid-template-columns: 1fr;
-  }
+
 
   .students-title-row,
   .students-actions,

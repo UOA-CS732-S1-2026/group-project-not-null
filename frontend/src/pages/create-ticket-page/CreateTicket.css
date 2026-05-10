@@ -1,0 +1,87 @@
+.create-ticket-form {
+  display: grid;
+  gap: 16px;
+  max-width: 600px;
+}
+
+.create-ticket-form select,
+.create-ticket-form textarea {
+  min-height: 36px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 0 12px;
+  color: var(--primary);
+  background: var(--card);
+  font: inherit;
+}
+
+.create-ticket-form textarea {
+  padding-block: 10px;
+  resize: vertical;
+}
+
+.create-ticket-description,
+.priority-note,
+.confirmation-panel {
+  max-width: 760px;
+}
+
+.urgency-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.urgency-options legend {
+  grid-column: 1 / -1;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.urgency-options label {
+  position: relative;
+  min-height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--gold-500);
+  background: transparent;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.urgency-options input {
+  position: absolute;
+  opacity: 0;
+}
+
+.urgency-options label:has(input:checked) {
+  border-color: transparent;
+  color: white;
+  background: var(--gold-500);
+}
+
+.priority-note {
+  margin: 0;
+  color: var(--muted-foreground);
+}
+
+.confirmation-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.confirmation-panel h2 {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .urgency-options {
+    grid-template-columns: 1fr;
+  }
+}
+
