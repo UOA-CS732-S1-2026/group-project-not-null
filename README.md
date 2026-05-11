@@ -1,6 +1,6 @@
 # UniDesk Backend
 
-Student support ticket management system backend built with Node.js, Express, and MongoDB.
+Student support ticket management system built with React, Node.js, Express, and MongoDB.
 
 ## Quick Start
 
@@ -35,25 +35,47 @@ npm run dev
 Server runs on http://localhost:5000
 
 ## Project Structure
-src/
-├── config/
-│   └── database.js           (MongoDB connection)
-├── controllers/
-│   ├── authController.js     (Authentication logic)
-│   ├── ticketController.js   (Ticket logic)
-│   └── analyticsController.js (Analytics logic)
-├── middleware/
-│   └── auth.js               (JWT verification)
-├── models/
-│   ├── User.js               (User schema)
-│   └── Ticket.js             (Ticket schema)
-├── routes/
-│   ├── auth.js               (Auth endpoints)
-│   ├── tickets.js            (Student ticket endpoints)
-│   └── staff.js              (Staff endpoints)
-├── utils/
-│   └── tokenUtils.js         (Token helpers)
-└── app.js                    (Express setup)
+
+```text
+.
+├── frontend/                  (Frontend application)
+│   ├── public/                (Static public assets)
+│   ├── src/
+│   │   ├── assets/            (Images, icons, fonts)
+│   │   ├── components/        (Reusable UI components)
+│   │   ├── hooks/             (Reusable React hooks)
+│   │   ├── layouts/           (Page layout components)
+│   │   ├── pages/             (Route-level screens)
+│   │   ├── services/          (API client and backend calls)
+│   │   ├── styles/            (Global styles and theme files)
+│   │   ├── utils/             (Frontend helper functions)
+│   │   ├── App.jsx            (Frontend app shell)
+│   │   └── main.jsx           (Frontend entry point)
+│   ├── index.html             (Frontend HTML entry)
+│   └── package.json           (Frontend dependencies/scripts)
+├── src/                       (Backend source)
+│   ├── config/
+│   │   └── database.js        (MongoDB connection)
+│   ├── controllers/
+│   │   ├── authController.js  (Authentication logic)
+│   │   ├── ticketController.js (Ticket logic)
+│   │   └── analyticsController.js (Analytics logic)
+│   ├── middleware/
+│   │   └── auth.js            (JWT verification)
+│   ├── models/
+│   │   ├── user.js            (User schema)
+│   │   └── Ticket.js          (Ticket schema)
+│   ├── routes/
+│   │   ├── auth.js            (Auth endpoints)
+│   │   ├── tickets.js         (Student ticket endpoints)
+│   │   └── staff.js           (Staff endpoints)
+│   └── utils/
+│       └── tokenUtils.js      (Token helpers)
+├── app.js                     (Express app setup)
+├── server.js                  (Backend server entry point)
+├── package.json               (Backend dependencies/scripts)
+└── README.md
+```
 
 ## Technologies
 
