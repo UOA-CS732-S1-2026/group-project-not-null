@@ -77,58 +77,63 @@ export default function CreateTicket() {
           </section>
         ) : (
           <form className="panel create-ticket-form" onSubmit={handleSubmit}>
-            <label className="field">
-              <span>Title</span>
-              <input
-                name="title"
-                value={form.title}
-                onChange={updateField}
-                placeholder="E.g. Unable to access student email"
-                required
-              />
-            </label>
+            <fieldset className="form-section">
+              <legend>Request details</legend>
+              <label className="field">
+                <span>Title</span>
+                <input
+                  name="title"
+                  value={form.title}
+                  onChange={updateField}
+                  placeholder="E.g. Unable to access student email"
+                  required
+                />
+              </label>
 
-            <label className="field">
-              <span>Category</span>
-              <select name="category" value={form.category} onChange={updateField}>
-                {ticketCategories.map((category) => (
-                  <option key={category.value} value={category.value}>
-                    {category.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="field">
-              <span>Urgency level</span>
-            </label>
-
-            <fieldset className="urgency-options">
-              {urgencyLevels.map((urgency) => (
-                <label key={urgency.value}>
-                  <input
-                    type="radio"
-                    name="urgencyLevel"
-                    value={urgency.value}
-                    checked={form.urgencyLevel === urgency.value}
-                    onChange={updateField}
-                  />
-                  <span>{urgency.label}</span>
-                </label>
-              ))}
+              <label className="field">
+                <span>Category</span>
+                <select name="category" value={form.category} onChange={updateField}>
+                  {ticketCategories.map((category) => (
+                    <option key={category.value} value={category.value}>
+                      {category.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </fieldset>
 
-            <label className="field create-ticket-description">
-              <span>Description</span>
-              <textarea
-                name="description"
-                value={form.description}
-                onChange={updateField}
-                placeholder="What happened? When did it happen? Have you tried anything already?"
-                rows="7"
-                required
-              />
-            </label>
+            <fieldset className="form-section">
+              <legend>Urgency level</legend>
+              <div className="urgency-options">
+                {urgencyLevels.map((urgency) => (
+                  <label key={urgency.value}>
+                    <input
+                      type="radio"
+                      name="urgencyLevel"
+                      value={urgency.value}
+                      checked={form.urgencyLevel === urgency.value}
+                      onChange={updateField}
+                    />
+                    <span>{urgency.label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset className="form-section">
+              <legend>Description</legend>
+              <label className="field create-ticket-description">
+                <span>Description</span>
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={updateField}
+                  placeholder="What happened? When did it happen? Have you tried anything already?"
+                  rows="7"
+                  required
+                />
+              </label>
+            </fieldset>
 
             <p className="priority-note">
               Priority is automatically assigned based on your category and

@@ -2,7 +2,7 @@
   min-height: 100svh;
   display: grid;
   place-items: center;
-  padding: 32px 18px;
+  padding: 24px 16px;
   background:
     linear-gradient(180deg, oklch(from var(--muted) l c h / 0.94), oklch(from var(--background) l c h / 0.8) 46%),
     var(--background);
@@ -13,7 +13,7 @@
 }
 
 .sign-up-shell {
-  width: min(100%, 680px);
+  width: min(100%, 480px);
 }
 
 .auth-brand {
@@ -30,12 +30,14 @@
 }
 
 .auth-card {
-  gap: 18px;
+  gap: 16px;
+  border-radius: 8px;
 }
 
 .auth-title {
-  font-size: 1.35rem;
+  font-size: clamp(1.45rem, 7vw, 2rem);
   letter-spacing: 0;
+  font-family: var(--font-landing);
 }
 
 .auth-form {
@@ -45,7 +47,6 @@
 
 .auth-form-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -100,36 +101,49 @@
 }
 
 .field {
-  display: grid;
-  gap: 8px;
+  position: relative;
+  display: block;
   color: var(--primary);
   font-size: 0.9rem;
   font-weight: 600;
 }
 
+.field span:first-child {
+  position: absolute;
+  top: 9px;
+  left: 12px;
+  z-index: 1;
+  padding: 0 6px;
+  color: var(--muted-foreground);
+  font-size: 0.74rem;
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+}
+
 .field input {
   width: 100%;
-  min-height: 44px;
+  min-height: 52px;
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) - 2px);
-  padding: 0 14px;
+  padding: 18px 14px 6px;
   color: var(--primary);
   background: var(--background);
   font: inherit;
 }
 
-@media (max-width: 640px) {
+@media (min-width: 720px) {
   .sign-up-shell {
-    width: min(100%, 420px);
+    width: min(100%, 680px);
   }
-
+  
   .auth-form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 .field input::placeholder {
-  color: var(--muted-foreground);
+  color: color-mix(in srgb, var(--muted-foreground), transparent 26%);
 }
 
 .field input:focus {
@@ -180,7 +194,7 @@
 
 .auth-submit {
   width: 100%;
-  min-height: 48px;
+  min-height: 52px;
   margin-top: 4px;
   gap: 8px;
 }
@@ -234,8 +248,13 @@
 
 .social-auth-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+}
+
+@media (min-width: 520px) {
+  .social-auth-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .button-outline {

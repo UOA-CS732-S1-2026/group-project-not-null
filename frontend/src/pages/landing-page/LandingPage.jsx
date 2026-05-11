@@ -17,17 +17,15 @@ export default function LandingPage() {
       </header>
 
       <main className="landing-hero">
-        <div className="hero-accent" aria-hidden="true" />
-
         <div className="landing-hero-grid">
           <section className="hero-content" aria-labelledby="landing-title">
             <p className="eyebrow">University Support Platform</p>
             <h1 id="landing-title">
-              Manage Campus <span>Support Tickets</span> Easily
+              Campus support that feels clear, fast, and accountable.
             </h1>
             <p className="hero-copy">
-              A secure support system for students and staff to submit, track,
-              and resolve university requests from one shared workspace.
+              Submit requests, track every update, and keep students and staff
+              aligned from first report to resolution.
             </p>
 
             <div className="hero-actions">
@@ -35,7 +33,7 @@ export default function LandingPage() {
                 Sign In
               </Link>
               <Link className="button button-ghost" to="/sign-up">
-                Sign Up
+                Create Account
               </Link>
             </div>
           </section>
