@@ -1,26 +1,49 @@
+.nav-user {
+  background: #ffffff;
+  border: 2px solid #0b2c6f;
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.nav-user-name {
+  color: var(--blue-700);
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.4;
+  
+}
+
+.nav-user-email {
+  color: #5f6b7a;
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.nav-user-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 0.5rem;
+  border-top: 1px solid #eef2f7;
+}
+
 .nav-user-team {
   color: var(--blue-700);
   font-weight: 700;
   margin: 0;
+  font-size: 0.85rem;
 }
 
 .nav-user-year {
   color: var(--blue-700);
   font-weight: 600;
+  font-size: 0.85rem;
 }
 
-.nav-user {
-    height: 42px;
-    display: flex;
-    gap: 6px;
-    background: var(--muted);
-    padding: 10px;
-}
-
-.sign-out-link {
-  margin-left: auto;
-  color: var(--gold-500);
-  font-size: 0.78rem;
-  font-weight: 900;
-  text-decoration: none;
-}
