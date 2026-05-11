@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
-import { LandingPage, SignIn, SignUp } from '../pages'
+import { LandingPage, SignIn, SignUp, BasicPage } from '../pages'
+import { AuthenticatedLayout } from '../components'
 
 function Main() {
 
@@ -8,6 +9,11 @@ function Main() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/sign-in" element={<SignIn />} />
       <Route path="/sign-up" element={<SignUp />} />
+      <Route element={<AuthenticatedLayout />}>
+        {/* Protected routes go here */}
+        <Route path="/dashboard" element={<BasicPage />} />
+
+      </Route>
     </Routes>
   )
 }

@@ -1,0 +1,54 @@
+.app-title,
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.app-title {
+  padding: 10px;
+}
+
+.app-title:hover {
+  background: var(--muted);
+}
+
+.app-title-logo{
+ width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--sidebar-primary-foreground);
+  background: var(--sidebar-primary);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.app-title-copy,
+.user-copy {
+  min-width: 0;
+  display: grid;
+  line-height: 1.15;
+}
+
+.app-title-copy span,
+.user-copy strong {
+  overflow: hidden;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-title-copy small,
+.user-copy small {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

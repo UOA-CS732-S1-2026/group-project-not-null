@@ -1,0 +1,8 @@
+.authenticated-content {
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .authenticated-layout {
+    grid-template-columns: 1fr;
+  }
+}
