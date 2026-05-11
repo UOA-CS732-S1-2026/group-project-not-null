@@ -105,9 +105,20 @@
     line-height: 1;
   }
 
-  .sidebar-header,
-  .sidebar-footer {
+  .sidebar-header {
     display: none !important;
+  }
+
+  .sidebar-footer {
+    display: block !important;
+    flex: 0 0 auto;
+    min-width: 0;
+    padding: 10px 8px 14px;
+    background: var(--border);
+  }
+
+  .sidebar-footer .nav-user {
+    display: grid;
   }
 
   .sidebar-content {
@@ -204,6 +215,10 @@
     pointer-events: auto;
     transform: translateX(0);
   }
+
+  .app-sidebar-expanded .sidebar-footer {
+    padding-inline: 12px;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -258,6 +273,7 @@
   }
 
   .sidebar-footer .nav-user {
+    display: grid;
     color: var(--primary);
     background: transparent;
   }
@@ -271,8 +287,4 @@
     box-shadow: none;
   }
 
-  .sidebar-footer .nav-user-team,
-  .sidebar-footer .nav-user-year {
-    color: var(--primary);
-  }
 }

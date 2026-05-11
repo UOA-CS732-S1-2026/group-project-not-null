@@ -1,8 +1,29 @@
+import { useState } from 'react'
+import { LogOut } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import './navigation-user.css'
 
+function getInitials(user) {
+  if (user?.initials) {
+    return user.initials.slice(0, 2).toUpperCase()
+  }
+
+  if (user?.name) {
+    return user.name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase()
+  }
+
+  return user?.email?.[0]?.toUpperCase() || 'U'
+}
+
 export function NavUser({ user }) {
   const navigate = useNavigate()
+  const [isConfirmingSignOut, setIsConfirmingSignOut] = useState(false)
 
   function handleSignOut() {
     localStorage.removeItem('accessToken')
@@ -14,22 +35,42 @@ export function NavUser({ user }) {
 
   return (
     <div className="nav-user">
-      <p className="nav-user-name">
-        <strong>Name:</strong> {user?.name}
-      </p>
+      <div className="nav-user-avatar" aria-hidden="true">
+        {getInitials(user)}
+      </div>
 
-      <p className="nav-user-email">
-        <strong>Email:</strong> {user?.email}
-      </p>
+      <div className="nav-user-details">
+        <p className="nav-user-name">{user?.name || 'User'}</p>
+        <p className="nav-user-email">{user?.email}</p>
+      </div>
 
-      <button className="button button-primary" onClick={handleSignOut}>
-        Sign Out
+      <button
+        className="nav-user-signout"
+        type="button"
+        aria-label="Sign out"
+        aria-expanded={isConfirmingSignOut}
+        onClick={() => setIsConfirmingSignOut((current) => !current)}
+      >
+        <LogOut size={18} aria-hidden="true" />
       </button>
 
-      <div className="nav-user-footer">
-        <p className="nav-user-team">Team Not Null ·</p>
-        <span className="nav-user-year">2026</span>
-      </div>
+      {isConfirmingSignOut ? (
+        <div className="nav-user-confirm" role="dialog" aria-label="Confirm sign out">
+          <p>Are you sure you want to log out?</p>
+          <div className="nav-user-confirm-actions">
+            <button
+              type="button"
+              className="nav-user-confirm-cancel"
+              onClick={() => setIsConfirmingSignOut(false)}
+            >
+              Cancel
+            </button>
+            <button type="button" className="nav-user-confirm-logout" onClick={handleSignOut}>
+              Log out
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

@@ -314,10 +314,6 @@ button:not(:disabled),
   background: transparent;
 }
 
-.nav-user:hover {
-  background: var(--accent);
-}
-
 .sign-out-link {
   margin-left: auto;
   color: var(--muted-foreground);

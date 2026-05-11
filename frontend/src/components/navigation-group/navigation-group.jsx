@@ -32,6 +32,7 @@ export function NavGroup({ title, items, role, onNavigate }) {
       <nav className="sidebar-nav" aria-label={title}>
         {visibleItems.map((item) => {
           const Icon = item.icon
+          const isGlyph = typeof Icon === 'string'
 
           return (
             <NavLink
@@ -43,7 +44,7 @@ export function NavGroup({ title, items, role, onNavigate }) {
               onClick={onNavigate}
             >
               <span className="sidebar-link-icon" aria-hidden="true">
-                <Icon />
+                {isGlyph ? <span className="sidebar-link-glyph">{Icon}</span> : <Icon />}
               </span>
               <span>{item.title}</span>
               {item.badge ? <span className="nav-badge">{item.badge}</span> : null}
