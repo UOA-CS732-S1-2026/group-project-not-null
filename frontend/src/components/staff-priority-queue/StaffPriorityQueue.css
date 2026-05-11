@@ -1,0 +1,52 @@
+.urgent-panel {
+  box-shadow:
+    -14px 0 28px rgb(44 76 92 / 0.1),
+    0 20px 34px rgb(44 76 92 / 0.13);
+}
+
+.urgent-panel .staff-panel-heading h2 {
+  margin: 0;
+  color: #dc2626;
+  font-family: var(--font-landing);
+  font-size: 1.22rem;
+}
+
+.urgent-list {
+  display: grid;
+  gap: 10px;
+}
+
+.urgent-card {
+  width: 100%;
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--staff-line);
+  border-radius: 14px;
+  padding: 14px;
+  color: var(--staff-teal);
+  background: #fffefe;
+  font: inherit;
+  text-align: left;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.urgent-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--staff-shadow);
+}
+
+.urgent-card:focus-visible {
+  outline: 3px solid rgb(108 132 148 / 0.24);
+  outline-offset: 3px;
+}
+
+.urgent-card span {
+  color: var(--staff-steel);
+  font-size: 0.82rem;
+}
+
+@media (max-width: 767px) {
+  .urgent-panel {
+    order: -1;
+  }
+}
