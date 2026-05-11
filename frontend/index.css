@@ -1,0 +1,199 @@
+
+@font-face {
+  font-family: 'Asap Variable';
+  src: url('./assets/fonts/Asap-Variable.ttf') format('truetype');
+  font-display: swap;
+  font-style: normal;
+  font-weight: 100 900;
+}
+
+:root {
+  --radius: 0.625rem;
+  --navy-950: #00296b;
+  --navy-800: #003f88;
+  --blue-700: #00509d;
+  --gold-500: #fdc500;
+  --gold-400: #ffd500;
+  --background: #f8fbff;
+  --foreground: var(--navy-950);
+  --card: #ffffff;
+  --card-foreground: var(--navy-950);
+  --popover: #ffffff;
+  --popover-foreground: var(--navy-950);
+  --primary: var(--navy-950);
+  --primary-foreground: #ffffff;
+  --secondary: var(--gold-500);
+  --secondary-foreground: var(--navy-950);
+  --muted: #edf5ff;
+  --muted-foreground: var(--navy-800);
+  --accent: #fff6bf;
+  --accent-foreground: var(--navy-950);
+  --destructive: #b42318;
+  --border: #c8d8ee;
+  --input: #c8d8ee;
+  --ring: var(--blue-700);
+  --chart-1: var(--navy-950);
+  --chart-2: var(--blue-700);
+  --chart-3: var(--gold-500);
+  --chart-4: var(--gold-400);
+  --chart-5: var(--navy-800);
+  --sidebar: var(--background);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --font-landing: 'Asap Variable', ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --shadow: 0 1px 2px rgb(0 41 107 / 0.08), 0 10px 24px rgb(0 41 107 / 0.12);
+
+  font: 16px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+  color: var(--foreground);
+  background: var(--background);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  color: var(--foreground);
+  background: var(--background);
+}
+
+#root {
+  min-height: 100svh;
+}
+
+button:not(:disabled),
+[role='button']:not(:disabled) {
+  cursor: pointer;
+}
+
+@media screen and (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+
+.authenticated-layout {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  background: var(--muted);
+}
+
+.app-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  background: var(--sidebar);
+}
+
+.sidebar-header,
+.sidebar-footer {
+  padding: 16px;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow: auto;
+  padding: 8px 12px;
+}
+
+.app-title,
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.app-title {
+  padding: 10px;
+}
+
+.app-title:hover {
+  background: var(--muted);
+}
+
+.app-title-logo,
+.user-avatar {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--sidebar-primary-foreground);
+  background: var(--sidebar-primary);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.app-title-copy,
+.user-copy {
+  min-width: 0;
+  display: grid;
+  line-height: 1.15;
+}
+
+.app-title-copy span,
+.user-copy strong {
+  overflow: hidden;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-title-copy small,
+.user-copy small {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-header {
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid var(--border);
+  padding: 18px clamp(18px, 4vw, 36px);
+  background: oklch(from var(--background) l c h / 0.86);
+  backdrop-filter: blur(18px);
+}
+
+.app-header h1 {
+  max-width: none;
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  line-height: 1.1;
+  text-align: left;
+  text-transform: none;
+}

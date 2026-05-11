@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyAuth } = require('../middleware/auth');
 const Ticket = require('../models/Ticket');
-const User = require('../models/User');
+const User = require('../models/user');
 
 router.get('/tickets', verifyAuth, async (req, res) => {
   try {

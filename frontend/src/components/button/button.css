@@ -1,0 +1,12 @@
+.button-outline {
+  width: 100%;
+  gap: 8px;
+  border: 1px solid var(--border);
+  color: var(--primary);
+  background: var(--background);
+  box-shadow: none;
+}
+
+.button-outline:hover {
+  background: var(--muted);
+}
