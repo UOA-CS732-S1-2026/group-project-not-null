@@ -15,3 +15,5 @@ export { NavGroup } from './navigation-group';
 export { NavUser } from './navigation-user';
 export { AppTitle } from './app-title';
 export { AuthenticatedLayout } from './authenticated-layout';
+export { Header } from './header';
+export { Main } from './main';
