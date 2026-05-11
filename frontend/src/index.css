@@ -489,352 +489,6 @@ button:not(:disabled),
   padding: 20px 16px;
 }
 
-.home-main {
-  display: grid;
-  gap: 14px;
-}
-
-.home-title-row {
-  display: grid;
-  gap: 12px;
-  margin-bottom: 2px;
-}
-
-.home-title-row h1 {
-  max-width: none;
-  margin: 0;
-  font-size: 1.65rem;
-  line-height: 1.2;
-  letter-spacing: 0;
-  text-transform: none;
-  font-family: var(--font-landing);
-}
-
-.home-title-row p:not(.page-eyebrow) {
-  max-width: 720px;
-  margin: 8px 0 0;
-  color: var(--muted-foreground);
-}
-
-.home-title-actions {
-  display: grid;
-  gap: 8px;
-}
-
-.home-title-actions .button {
-  width: 100%;
-}
-
-.home-role-view {
-  display: grid;
-  gap: 16px;
-}
-
-.home-metric-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  width: 100%;
-  max-width: 100vw;
-}
-
-.home-content-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.home-primary-panel {
-  grid-column: span 4;
-}
-
-.home-side-panel {
-  grid-column: span 3;
-}
-
-.home-ticket-list {
-  display: grid;
-  gap: 0;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) - 2px);
-}
-
-.home-ticket-row {
-  min-height: 58px;
-  display: grid;
-  grid-template-columns: 78px minmax(180px, 1fr) minmax(150px, 0.65fr) 118px;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-bottom: 1px solid var(--border);
-  background: var(--card);
-}
-
-.home-ticket-row:last-child {
-  border-bottom: 0;
-}
-
-.home-ticket-row:hover {
-  background: var(--muted);
-}
-
-.home-ticket-row strong {
-  color: var(--primary);
-}
-
-.home-ticket-row span,
-.home-ticket-row small {
-  overflow: hidden;
-  color: var(--muted-foreground);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.home-ticket-row em {
-  justify-self: end;
-  border-radius: calc(var(--radius) - 4px);
-  padding: 4px 10px;
-  color: var(--primary);
-  background: var(--accent);
-  font-size: 0.78rem;
-  font-style: normal;
-  font-weight: 900;
-}
-
-.student-support-layout {
-  gap: 16px;
-}
-
-.student-ticket-panel {
-  min-width: 0;
-}
-
-.student-ticket-filters {
-  display: grid;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.student-ticket-filters label {
-  display: grid;
-  gap: 6px;
-  color: var(--primary);
-  font-size: 0.82rem;
-  font-weight: 800;
-}
-
-.student-ticket-filters select {
-  min-height: 44px;
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) - 2px);
-  padding: 0 12px;
-  color: var(--primary);
-  background: var(--card);
-  font: inherit;
-}
-
-.student-ticket-card-list {
-  display: grid;
-  gap: 12px;
-}
-
-.student-ticket-card {
-  display: grid;
-  gap: 18px;
-  border: 1px solid color-mix(in srgb, var(--border), transparent 18%);
-  border-radius: var(--radius);
-  padding: 16px;
-  background: var(--card);
-}
-
-.ticket-card-heading {
-  display: grid;
-  gap: 12px;
-}
-
-.ticket-card-heading h3 {
-  margin: 0;
-  color: var(--primary);
-  font-size: 1rem;
-  font-family: var(--font-landing);
-}
-
-.ticket-meta,
-.ticket-preview {
-  margin: 7px 0 0;
-  color: var(--muted-foreground);
-}
-
-.student-ticket-card .ticket-dates {
-  margin: 3px 0 0;
-  color: var(--dates-foreground);
-}
-
-.ticket-preview {
-  max-width: 760px;
-}
-
-.ticket-status,
-.ticket-detail-link {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: max-content;
-  border-radius: calc(var(--radius) - 4px);
-  padding: 4px 10px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.ticket-status {
-  color: var(--primary);
-  background: var(--accent);
-}
-
-.ticket-status-in-progress {
-  background: rgb(0 80 157 / 0.12);
-}
-
-.ticket-status-resolved {
-  background: rgb(253 197 0 / 0.18);
-}
-
-.ticket-detail-link {
-  width: 100%;
-  color: var(--primary);
-  background: var(--muted);
-  transition: background 0.18s;
-}
-
-.ticket-detail-link:hover {
-  background: var(--border);
-}
-
-.notification-list {
-  display: grid;
-  gap: 10px;
-}
-
-.notification-list p {
-  margin: 0;
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) - 2px);
-  padding: 12px;
-  color: var(--muted-foreground);
-  background: var(--card);
-}
-
-.metric-grid,
-.content-grid,
-.settings-grid {
-  display: grid;
-  gap: 16px;
-}
-
-.metric-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  width: 100%;
-  max-width: 100vw;
-}
-
-.content-grid,
-.settings-grid {
-  grid-template-columns: 1fr;
-  margin-top: 16px;
-}
-
-.metric-card,
-.panel,
-.student-card {
-  border: 1px solid color-mix(in srgb, var(--border), transparent 22%);
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: none;
-}
-
-.metric-card {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-  height: 100%;
-  padding: 18px;
-}
-
-.metric-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.metric-card-header small {
-  width: 28px;
-  height: 28px;
-  display: inline-grid;
-  place-items: center;
-  border-radius: calc(var(--radius) - 2px);
-  color: var(--primary);
-  background: var(--gold-400);
-}
-
-.metric-card span,
-.metric-card small,
-.queue-row small,
-.data-row small {
-  color: var(--muted-foreground);
-}
-
-.metric-card strong {
-  color: var(--primary);
-  font-size: 1.55rem;
-  line-height: 1;
-}
-
-.metric-card-header span,
-.metric-card small {
-  font-size: 0.78rem;
-}
-
-.panel {
-  padding: 20px;
-}
-
-.panel-muted {
-  background:
-    linear-gradient(180deg, oklch(from var(--muted) l c h / 0.78), transparent),
-    var(--background);
-}
-
-.panel h2,
-.student-card h2 {
-  margin: 0;
-  color: var(--primary);
-  font-size: 1rem;
-  font-family: var(--font-landing);
-}
-
-.panel p,
-.student-card p {
-  margin: 10px 0 0;
-  color: var(--muted-foreground);
-}
-
-.panel-header {
-  display: grid;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.panel-header span {
-  border-radius: calc(var(--radius) - 4px);
-  padding: 4px 10px;
-  color: var(--primary);
-  background: var(--accent);
-  font-size: 0.78rem;
-  font-weight: 900;
-}
 
 .queue-list,
 .data-table,
@@ -1038,7 +692,7 @@ button:not(:disabled),
   resize: vertical;
 }
 
-.students-toolbar select:focus,
+
 .student-dialog-form input:focus,
 .student-dialog-form select:focus,
 .student-dialog-form textarea:focus {
@@ -1146,54 +800,8 @@ button:not(:disabled),
     padding: 24px 24px;
   }
 
-  .home-title-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
-  }
-
-  .home-title-actions {
-    display: flex;
-  }
-
-  .home-title-actions .button,
-  .ticket-detail-link {
-    width: auto;
-  }
-
-  .home-metric-grid,
-  .metric-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .student-ticket-filters {
-    grid-template-columns: repeat(2, minmax(180px, 1fr));
-  }
-
-  .student-ticket-card {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-  }
-
-  .ticket-card-heading,
-  .panel-header {
-    display: flex;
-    align-items: start;
-    justify-content: space-between;
-  }
-
   .queue-row {
     grid-template-columns: 1fr auto 72px;
-  }
-}
-
-@media (min-width: 768px) {
-  .metric-card strong {
-    font-size: 2rem;
-  }
-
-  .metric-card-header span,
-  .metric-card small {
-    font-size: revert;
   }
 }
 
@@ -1277,11 +885,6 @@ button:not(:disabled),
 
   .dashboard-main {
     padding: 28px clamp(28px, 4vw, 40px);
-  }
-
-  .home-metric-grid,
-  .metric-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .content-grid,
@@ -1624,14 +1227,11 @@ button:not(:disabled),
 
   .content-grid,
   .settings-grid,
-  .dashboard-overview-grid,
-  .home-content-grid,
-  .student-support-layout {
+  .dashboard-overview-grid {
     grid-template-columns: 1fr;
   }
 
-  .metric-grid,
-  .home-metric-grid {
+  .metric-grid {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 12px;
@@ -1659,21 +1259,17 @@ button:not(:disabled),
     font-size: 1.35rem;
   }
 
-  .data-row,
-  .home-ticket-row {
+  .data-row {
     grid-template-columns: 1fr;
   }
 
-  .data-row em,
-  .home-ticket-row em {
+  .data-row em {
     justify-self: start;
   }
 
   .app-header,
   .dashboard-tools,
-  .dashboard-title-row,
-  .home-title-row,
-  .home-title-actions {
+  .dashboard-title-row {
     align-items: stretch;
     flex-direction: column;
   }
@@ -1697,11 +1293,6 @@ button:not(:disabled),
     display: block;
   }
 
-  .home-primary-panel,
-  .home-side-panel {
-    grid-column: auto;
-  }
-
   .dashboard-tools {
     width: 100%;
     margin-left: 0;
@@ -1715,12 +1306,6 @@ button:not(:disabled),
   .activity-row {
     grid-template-columns: 1fr;
   }
-
-  .student-ticket-card {
-    flex-direction: column;
-  }
-
-
 
   .students-title-row,
   .students-actions,
