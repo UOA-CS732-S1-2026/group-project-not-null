@@ -86,7 +86,7 @@ export default function ViewTicket() {
           <section className="panel">
             <h1>Ticket not found</h1>
             {error && <p className="form-error" role="alert">{error}</p>}
-            <Link to="/home">Back to My Support</Link>
+            <Link to="/dashboard">Back to My Support</Link>
           </section>
         </Main>
     )
@@ -176,7 +176,7 @@ export default function ViewTicket() {
           </aside>
         </section>
 
-        <Link className="button button-primary" to="/home">
+        <Link className="button button-primary" to="/dashboard">
           Back to My Support
         </Link>
       </Main>

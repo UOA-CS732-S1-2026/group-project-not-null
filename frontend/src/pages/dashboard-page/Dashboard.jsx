@@ -1,319 +1,197 @@
 import { useEffect, useMemo, useState } from 'react'
-import {
-  AlertCircle,
-  BarChart3,
-  Bell,
-  CheckCircle2,
-  CheckCheck,
-  CircleAlert,
-  Clock3,
-  Ellipsis,
-  Filter,
-  Home,
-  LineChart,
-  MessageSquare,
-  MoreHorizontal,
-  PieChart,
-  Square,
-  TicketCheck,
-  UserCircle2,
-  Users,
-} from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { CheckCheck, CircleAlert, Ellipsis, Square } from 'lucide-react'
 
-import { Main } from '../../components'
-import { getTickets } from '../../services/api.js'
+import {
+  Main,
+  StaffActivityFeed,
+  StaffAnalyticsSection,
+  StaffEntryHeader,
+  StaffKpiSummary,
+  StaffNotificationState,
+  StaffPriorityQueue,
+  StaffTicketQueue,
+  StudentMetricGrid,
+  StudentTicketList,
+  StudentWelcomeBanner,
+} from '../../components'
+import {
+  getTickets,
+  getStaffActivity,
+  getStaffDashboardAnalytics,
+  getStaffDashboardSummary,
+  getStaffNotifications,
+  getStaffTickets,
+  getStaffUrgentTickets,
+} from '../../services/api.js'
 import { formatTicket, ticketCategories } from '../../services/ticket-mappers.js'
 import './Dashboard.css'
 
-const staffName = 'Anna'
-
-const kpis = [
-  { label: 'Open Tickets', value: 42, detail: '+8 since yesterday', tone: 'critical' },
-  { label: 'In Progress', value: 18, detail: '6 updated this hour', tone: 'medium' },
-  { label: 'Resolved Today', value: 27, detail: 'Strong morning close rate', tone: 'low' },
-  { label: 'High Priority', value: 9, detail: 'Needs same-day response', tone: 'high' },
-  { label: 'Assigned to Me', value: 14, detail: '4 waiting on staff', tone: 'steel' },
-  { label: 'Avg Response Time', value: '1h 18m', detail: '12 min faster today', tone: 'teal' },
+const summaryCards = [
+  { key: 'openTickets', label: 'Open Tickets', detail: 'Waiting for review', tone: 'critical' },
+  { key: 'inProgressTickets', label: 'In Progress', detail: 'Currently being handled', tone: 'medium' },
+  { key: 'resolvedToday', label: 'Resolved Today', detail: 'Closed since midnight', tone: 'low' },
+  { key: 'highPriorityTickets', label: 'High Priority', detail: 'Needs same-day response', tone: 'high' },
+  { key: 'assignedToMe', label: 'Assigned to Me', detail: 'Active personal queue', tone: 'steel' },
+  { key: 'averageResponseTime', label: 'Avg Response Time', detail: 'Resolved ticket average', tone: 'teal' },
 ]
 
-const filterChips = ['All', 'Open', 'In Progress', 'High Priority', 'Assigned to Me']
-
-const tickets = [
-  {
-    id: 'UD-2841',
-    priority: 'Critical',
-    title: 'Cannot access final exam timetable',
-    student: 'Mia Thompson',
-    category: 'Academic Records',
-    status: 'Open',
-    assigned: 'Anna Taylor',
-    updated: '8 min ago',
-  },
-  {
-    id: 'UD-2838',
-    priority: 'High',
-    title: 'Scholarship payment missing from account',
-    student: 'Noah Singh',
-    category: 'Finance',
-    status: 'In Progress',
-    assigned: 'Moana Reid',
-    updated: '21 min ago',
-  },
-  {
-    id: 'UD-2829',
-    priority: 'Medium',
-    title: 'Course enrolment clash after timetable change',
-    student: 'Grace Chen',
-    category: 'Enrolment',
-    status: 'Assigned',
-    assigned: 'Anna Taylor',
-    updated: '46 min ago',
-  },
-  {
-    id: 'UD-2817',
-    priority: 'Low',
-    title: 'Request for campus wellbeing appointment',
-    student: 'Lucas Brown',
-    category: 'Student Wellbeing',
-    status: 'Open',
-    assigned: 'Unassigned',
-    updated: '1h ago',
-  },
+const filterChips = [
+  { label: 'All', params: {} },
+  { label: 'Open', params: { status: 'open' } },
+  { label: 'In Progress', params: { status: 'in_progress' } },
+  { label: 'High Priority', params: { priority: 'high' } },
+  { label: 'Assigned to Me', params: { assignedTo: 'me' } },
 ]
 
-const urgentTickets = [
-  { title: 'Visa document correction needed today', meta: 'Critical · International Office · 2h aging' },
-  { title: 'Accessibility support plan not visible', meta: 'High · Wellbeing · overdue by 35m' },
-  { title: 'Graduation eligibility appeal', meta: 'High · Academic Records · 11h aging' },
-]
-
-const activities = [
-  { icon: CheckCircle2, text: 'Resolved ticket UD-2794 for Emma Wilson', time: '4 min ago' },
-  { icon: Users, text: 'Assigned UD-2838 to Moana Reid', time: '18 min ago' },
-  { icon: MessageSquare, text: 'New finance ticket submitted by Noah Singh', time: '21 min ago' },
-  { icon: Clock3, text: 'Status changed on UD-2829 to Assigned', time: '46 min ago' },
-]
-
-const categoryBars = [
-  ['Finance', 72],
-  ['Enrolment', 56],
-  ['IT Access', 44],
-  ['Wellbeing', 35],
-]
-
-const statusStats = [
-  ['Open', 42],
-  ['Progress', 18],
-  ['Resolved', 27],
-]
-
-function getAucklandGreeting() {
-  const hour = Number(
-    new Intl.DateTimeFormat('en-NZ', {
-      hour: 'numeric',
-      hour12: false,
-      timeZone: 'Pacific/Auckland',
-    }).format(new Date()),
-  )
-
-  if (hour < 12) {
-    return 'Good morning'
-  }
-
-  if (hour < 18) {
-    return 'Good afternoon'
-  }
-
-  return 'Good evening'
+const categoryLabels = {
+  IT: 'IT',
+  enrolment: 'Enrolment',
+  academic: 'Academic',
+  'accommodation/finance': 'Accommodation/Finance',
 }
 
-function getStoredUser() {
-  try {
-    return JSON.parse(localStorage.getItem('user')) || null
-  } catch {
-    return null
-  }
-}
-
-function getDisplayName(user) {
-  if (!user) {
-    return ''
-  }
-
-  return `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name || user.email || ''
+const statusLabels = {
+  open: 'Open',
+  in_progress: 'In Progress',
+  resolved: 'Resolved',
 }
 
 export default function DashBoard() {
   const user = getStoredUser()
-  const isStaff = user?.role === 'staff'
 
-  return isStaff ? <StaffDashboard user={user} /> : <StudentDashboard user={user} />
+  return user?.role === 'staff' ? <StaffDashboard user={user} /> : <StudentDashboard />
 }
 
 function StaffDashboard({ user }) {
   const greeting = getAucklandGreeting()
-  const displayName = getDisplayName(user) || staffName
+  const staffName = getDisplayName(user) || 'Staff'
+  const [activeFilter, setActiveFilter] = useState(0)
+  const [ticketSearch, setTicketSearch] = useState('')
+
+  const [summaryState, setSummaryState] = useAsyncSection(null)
+  const [ticketsState, setTicketsState] = useAsyncSection([])
+  const [urgentState, setUrgentState] = useAsyncSection([])
+  const [analyticsState, setAnalyticsState] = useAsyncSection({ ticketsByCategory: [], ticketsByStatus: [] })
+  const [activityState, setActivityState] = useAsyncSection([])
+  const [notificationState, setNotificationState] = useAsyncSection({ notifications: [], unreadCount: 0 })
+
+  useEffect(() => {
+    loadSummary()
+    loadUrgentTickets()
+    loadAnalytics()
+    loadActivity()
+    loadNotifications()
+  }, [])
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      loadTickets()
+    }, 250)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [activeFilter, ticketSearch])
+
+  async function loadSummary() {
+    await loadSection(setSummaryState, async () => {
+      const data = await getStaffDashboardSummary()
+      return data.summary
+    })
+  }
+
+  async function loadTickets() {
+    await loadSection(setTicketsState, async () => {
+      const data = await getStaffTickets({
+        ...filterChips[activeFilter].params,
+        search: ticketSearch.trim(),
+        page: 1,
+        limit: 20,
+      })
+      return data.tickets || []
+    })
+  }
+
+  async function loadUrgentTickets() {
+    await loadSection(setUrgentState, async () => {
+      const data = await getStaffUrgentTickets()
+      return data.tickets || []
+    })
+  }
+
+  async function loadAnalytics() {
+    await loadSection(setAnalyticsState, async () => getStaffDashboardAnalytics())
+  }
+
+  async function loadActivity() {
+    await loadSection(setActivityState, async () => {
+      const data = await getStaffActivity()
+      return data.activity || []
+    })
+  }
+
+  async function loadNotifications() {
+    await loadSection(setNotificationState, async () => getStaffNotifications())
+  }
+
+  const tickets = useMemo(() => ticketsState.data.map(formatStaffTicket), [ticketsState.data])
+  const urgentTickets = useMemo(() => urgentState.data.map(formatUrgentTicket), [urgentState.data])
+  const categoryBars = useMemo(
+    () => toChartPercentages(analyticsState.data.ticketsByCategory),
+    [analyticsState.data.ticketsByCategory],
+  )
+  const statusStats = analyticsState.data.ticketsByStatus || []
+  const activeTicketCount = (summaryState.data?.openTickets || 0) + (summaryState.data?.inProgressTickets || 0)
+  const operationalSummary = summaryState.isLoading
+    ? 'Loading active ticket summary.'
+    : `${activeTicketCount} active tickets require attention today.`
 
   return (
     <Main className="staff-dashboard">
-      <section className="staff-entry-row" aria-labelledby="staff-dashboard-title">
-        <div className="staff-greeting">
-          <p className="page-eyebrow">Staff Dashboard</p>
-          <h1 id="staff-dashboard-title">{greeting}, {displayName}</h1>
-          <p>18 active tickets require attention today.</p>
-        </div>
-
-        <div className="staff-alert-row" aria-label="Dashboard alerts">
-          <button className="staff-alert-button notification-button" type="button" aria-label="Notifications">
-            <Bell size={19} aria-hidden="true" />
-            <span className="notification-dot" aria-hidden="true" />
-          </button>
-        </div>
-      </section>
-
-      <section className="staff-kpi-strip" aria-label="Ticket summary">
-        {kpis.map((card) => (
-          <DashboardCard key={card.label} {...card} />
-        ))}
-      </section>
-
+      <StaffEntryHeader
+        greeting={greeting}
+        staffName={staffName}
+        summary={operationalSummary}
+        unreadCount={notificationState.data.unreadCount}
+      />
+      <StaffKpiSummary
+        cards={summaryCards}
+        summary={summaryState.data}
+        isLoading={summaryState.isLoading}
+        error={summaryState.error}
+        onRetry={loadSummary}
+      />
       <section className="staff-dashboard-grid">
-        <article className="staff-panel ticket-queue-panel" aria-labelledby="ticket-queue-title">
-          <div className="staff-panel-heading">
-            <div>
-              <h2 id="ticket-queue-title">Ticket Queue</h2>
-              <p>Prioritised by urgency, aging, and current assignment.</p>
-            </div>
-            <span>{tickets.length} visible</span>
-          </div>
-
-          <div className="ticket-toolbar">
-            <div className="filter-chip-row" aria-label="Ticket status filters">
-              {filterChips.map((chip, index) => (
-                <FilterChip key={chip} active={index === 0}>
-                  {chip}
-                </FilterChip>
-              ))}
-            </div>
-            <div className="ticket-toolbar-actions">
-              <label className="staff-search queue-search">
-                <span>Search queue</span>
-                <input type="search" placeholder="Search queue" />
-              </label>
-              <button className="staff-secondary-button" type="button">
-                <Filter size={17} aria-hidden="true" />
-                Filter
-              </button>
-            </div>
-          </div>
-
-          <div className="ticket-table" role="table" aria-label="Staff ticket queue">
-            <div className="ticket-table-head" role="row">
-              <span>Priority</span>
-              <span>Ticket</span>
-              <span>Student</span>
-              <span>Category</span>
-              <span>Status</span>
-              <span>Assigned</span>
-              <span>Updated</span>
-              <span>Actions</span>
-            </div>
-            {tickets.map((ticket) => (
-              <TicketRow key={ticket.id} ticket={ticket} />
-            ))}
-          </div>
-
-          <div className="mobile-ticket-list">
-            {tickets.map((ticket) => (
-              <MobileTicketCard key={ticket.id} ticket={ticket} />
-            ))}
-          </div>
-        </article>
-
-        <aside className="staff-panel urgent-panel" aria-labelledby="urgent-title">
-          <div className="staff-panel-heading">
-            <div>
-              <h2 id="urgent-title">Priority Queue</h2>
-              <p>Critical, aging, and overdue tickets.</p>
-            </div>
-            <AlertCircle size={20} aria-hidden="true" />
-          </div>
-          <div className="urgent-list">
-            {urgentTickets.map((ticket) => (
-              <button className="urgent-card" type="button" key={ticket.title}>
-                <strong>{ticket.title}</strong>
-                <span>{ticket.meta}</span>
-              </button>
-            ))}
-          </div>
-        </aside>
-
-        <section className="analytics-grid" aria-label="Ticket analytics">
-          <article className="staff-panel chart-panel">
-            <div className="staff-panel-heading">
-              <div>
-                <h2>Tickets by Category</h2>
-                <p>Current week intake.</p>
-              </div>
-              <BarChart3 size={20} aria-hidden="true" />
-            </div>
-            <div className="bar-chart" aria-hidden="true">
-              {categoryBars.map(([label, value]) => (
-                <div className="bar-row" key={label}>
-                  <span>{label}</span>
-                  <div><i style={{ width: `${value}%` }} /></div>
-                </div>
-              ))}
-            </div>
-          </article>
-
-          <article className="staff-panel chart-panel compact-mobile-analytics">
-            <div className="staff-panel-heading">
-              <div>
-                <h2>Tickets by Status</h2>
-                <p>Live operational split.</p>
-              </div>
-              <PieChart size={20} aria-hidden="true" />
-            </div>
-            <div className="status-chart">
-              <div className="doughnut-placeholder" aria-hidden="true" />
-              <div className="status-legend">
-                {statusStats.map(([label, value]) => (
-                  <span key={label}><i />{label} <strong>{value}</strong></span>
-                ))}
-              </div>
-            </div>
-          </article>
-        </section>
-
-        <article className="staff-panel activity-panel" aria-labelledby="activity-title">
-          <div className="staff-panel-heading">
-            <div>
-              <h2 id="activity-title">Recent Activity</h2>
-              <p>Latest support desk movement.</p>
-            </div>
-          </div>
-          <div className="activity-list">
-            {activities.map((item) => (
-              <ActivityItem key={`${item.time}-${item.text}`} {...item} />
-            ))}
-          </div>
-        </article>
+        <StaffTicketQueue
+          tickets={tickets}
+          filters={filterChips}
+          activeFilter={activeFilter}
+          search={ticketSearch}
+          isLoading={ticketsState.isLoading}
+          error={ticketsState.error}
+          onFilterChange={setActiveFilter}
+          onSearchChange={setTicketSearch}
+          onRetry={loadTickets}
+        />
+        <StaffPriorityQueue
+          tickets={urgentTickets}
+          isLoading={urgentState.isLoading}
+          error={urgentState.error}
+          onRetry={loadUrgentTickets}
+        />
+        <StaffAnalyticsSection
+          categoryBars={categoryBars}
+          statusStats={statusStats}
+          isLoading={analyticsState.isLoading}
+          error={analyticsState.error}
+          onRetry={loadAnalytics}
+        />
+        <StaffActivityFeed
+          activity={activityState.data}
+          isLoading={activityState.isLoading}
+          error={activityState.error}
+          onRetry={loadActivity}
+        />
       </section>
-
-      <section className="staff-empty-state" aria-label="Empty state example">
-        <TicketCheck size={22} aria-hidden="true" />
-        <p>No unassigned low-priority tickets are waiting right now.</p>
-      </section>
-
-      <section className="skeleton-panel" aria-label="Loading ticket placeholders">
-        <span />
-        <span />
-        <span />
-      </section>
-
-      <MobileBottomNav />
+      <StaffNotificationState notificationState={notificationState} />
     </Main>
   )
 }
@@ -361,16 +239,11 @@ function StudentDashboard() {
     const normalizedQuery = query.trim().toLowerCase()
 
     return tickets.filter((ticket) => {
-      const matchesStatus =
-        statusFilter === 'All' || ticket.status === statusFilter
-      const matchesCategory =
-        categoryFilter === 'All' || ticket.category === categoryFilter
+      const matchesStatus = statusFilter === 'All' || ticket.status === statusFilter
+      const matchesCategory = categoryFilter === 'All' || ticket.category === categoryFilter
       const matchesQuery =
         !normalizedQuery ||
-        [ticket.title, ticket.category, ticket.description]
-          .join(' ')
-          .toLowerCase()
-          .includes(normalizedQuery)
+        [ticket.title, ticket.category, ticket.description].join(' ').toLowerCase().includes(normalizedQuery)
 
       return matchesStatus && matchesCategory && matchesQuery
     })
@@ -405,205 +278,128 @@ function StudentDashboard() {
 
   return (
     <Main className="home-main">
-      <section className="home-title-row">
-        <div>
-          <h1>My Support</h1>
-          <p>Track your questions from open to resolved.</p>
-        </div>
-        <div className="home-title-actions">
-          <Link className="button button-primary" to="/tickets/new">
-            Create ticket
-          </Link>
-        </div>
-      </section>
-
-      <section className="metric-grid home-metric-grid" aria-label="Ticket summary">
-        {summary.map((metric) => (
-          <article className="metric-card" key={metric.label}>
-            <div className="metric-card-header">
-              <span>{metric.label}</span>
-              <small aria-hidden="true">{metric.icon}</small>
-            </div>
-            <strong>{metric.value}</strong>
-            <small>{metric.detail}</small>
-          </article>
-        ))}
-      </section>
-
-      <section className="student-support-layout">
-        <article className="panel student-ticket-panel">
-          <div className="panel-header">
-            <div>
-              <h2>My Tickets</h2>
-              <p>Active tickets are shown first, followed by resolved tickets.</p>
-            </div>
-            <span>{filteredTickets.length} shown</span>
-          </div>
-
-          <div className="student-ticket-filters" aria-label="Ticket filters">
-            <label>
-              <span>Status</span>
-              <select
-                value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value)}
-              >
-                {['All', 'Open', 'In Progress', 'Resolved'].map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              <span>Category</span>
-              <select
-                value={categoryFilter}
-                onChange={(event) => setCategoryFilter(event.target.value)}
-              >
-                <option value="All">All categories</option>
-                {ticketCategories.map((category) => (
-                  <option key={category.value} value={category.label}>
-                    {category.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div className="student-ticket-card-list">
-            {isLoading && <p>Loading tickets...</p>}
-            {error && <p className="form-error" role="alert">{error}</p>}
-            {!isLoading && !error && filteredTickets.length === 0 && (
-              <p>No tickets match your filters.</p>
-            )}
-            {!isLoading &&
-              !error &&
-              filteredTickets.map((ticket) => (
-                <TicketCard ticket={ticket} key={ticket.id} />
-              ))}
-          </div>
-        </article>
-      </section>
+      <StudentWelcomeBanner />
+      <StudentMetricGrid metrics={summary} />
+      <StudentTicketList
+        tickets={filteredTickets}
+        statusFilter={statusFilter}
+        categoryFilter={categoryFilter}
+        categories={ticketCategories}
+        isLoading={isLoading}
+        error={error}
+        onStatusChange={setStatusFilter}
+        onCategoryChange={setCategoryFilter}
+      />
     </Main>
   )
 }
 
-function TicketCard({ ticket }) {
-  return (
-    <article className="student-ticket-card">
-      <div>
-        <div className="ticket-card-heading">
-          <h3>{ticket.title}</h3>
-          <span className={`ticket-status ticket-status-${ticket.status.toLowerCase().replace(' ', '-')}`}>
-            {ticket.status}
-          </span>
-        </div>
-        <p className="ticket-meta">
-          {ticket.category} · {ticket.urgency} urgency · Priority:{' '}
-          {ticket.priority}
-        </p>
-        <p className="ticket-dates">
-          Submitted {ticket.submitted} · Updated {ticket.updated}
-        </p>
-        <p className="ticket-preview">"{ticket.description}"</p>
-      </div>
-      <Link className="ticket-detail-link" to={`/tickets/${ticket.id}`}>
-        View ticket
-      </Link>
-    </article>
+function useAsyncSection(initialData) {
+  return useState({
+    data: initialData,
+    error: '',
+    isLoading: true,
+  })
+}
+
+async function loadSection(setState, loader) {
+  setState((current) => ({ ...current, error: '', isLoading: true }))
+
+  try {
+    const data = await loader()
+    setState({ data, error: '', isLoading: false })
+  } catch (error) {
+    setState((current) => ({
+      ...current,
+      error: error.message || 'Unable to load dashboard data.',
+      isLoading: false,
+    }))
+  }
+}
+
+function getAucklandGreeting() {
+  const hour = Number(
+    new Intl.DateTimeFormat('en-NZ', {
+      hour: 'numeric',
+      hour12: false,
+      timeZone: 'Pacific/Auckland',
+    }).format(new Date()),
   )
+
+  if (hour < 12) return 'Good morning'
+  if (hour < 18) return 'Good afternoon'
+  return 'Good evening'
 }
 
-function DashboardCard({ label, value, detail, tone }) {
-  return (
-    <article className={`dashboard-card dashboard-card-${tone}`}>
-      <span className="card-accent" aria-hidden="true" />
-      <div>
-        <strong>{value}</strong>
-        <span>{label}</span>
-      </div>
-      <small>{detail}</small>
-    </article>
-  )
+function getStoredUser() {
+  try {
+    return JSON.parse(localStorage.getItem('user')) || null
+  } catch {
+    return null
+  }
 }
 
-function FilterChip({ active, children }) {
-  return (
-    <button className={`filter-chip${active ? ' filter-chip-active' : ''}`} type="button">
-      {children}
-    </button>
-  )
+function getDisplayName(user) {
+  if (!user) return ''
+  return `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name || user.email || ''
 }
 
-function TicketRow({ ticket }) {
-  return (
-    <button className="ticket-row" type="button" role="row" aria-label={`View ${ticket.title}`}>
-      <span><PriorityBadge priority={ticket.priority} /></span>
-      <strong>{ticket.title}<small>{ticket.id}</small></strong>
-      <span>{ticket.student}</span>
-      <span>{ticket.category}</span>
-      <span><StatusPill status={ticket.status} /></span>
-      <span>{ticket.assigned}</span>
-      <span>{ticket.updated}</span>
-      <span className="ticket-actions" aria-label="Quick actions">
-        <i>Assign</i>
-        <i>Status</i>
-        <MoreHorizontal size={18} aria-hidden="true" />
-      </span>
-    </button>
-  )
+function formatStaffTicket(ticket) {
+  return {
+    id: ticket._id,
+    ticketNumber: ticket.ticketNumber || ticket._id,
+    priority: getPriorityLabel(ticket.priority),
+    title: ticket.title,
+    student: getPersonName(ticket.studentId, 'Unknown student'),
+    category: categoryLabels[ticket.category] || ticket.category,
+    status: statusLabels[ticket.status] || ticket.status,
+    assigned: getPersonName(ticket.assignedToStaffId, 'Unassigned'),
+    updated: getTimeAgo(ticket.updatedAt),
+  }
 }
 
-function MobileTicketCard({ ticket }) {
-  return (
-    <button className="mobile-ticket-card" type="button" aria-label={`View ${ticket.title}`}>
-      <div>
-        <PriorityBadge priority={ticket.priority} />
-        <StatusPill status={ticket.status} />
-      </div>
-      <strong>{ticket.title}</strong>
-      <span>{ticket.category} · {ticket.assigned}</span>
-      <small>Updated {ticket.updated}</small>
-    </button>
-  )
+function formatUrgentTicket(ticket) {
+  const formatted = formatStaffTicket(ticket)
+  return {
+    id: formatted.id,
+    title: formatted.title,
+    meta: `${formatted.priority} · ${formatted.category} · updated ${formatted.updated}`,
+  }
 }
 
-function PriorityBadge({ priority }) {
-  return <em className={`priority-badge priority-${priority.toLowerCase()}`}>{priority}</em>
+function getPriorityLabel(priority) {
+  if (priority === 1) return 'Critical'
+  if (priority === 2) return 'High'
+  if (priority === 3) return 'Low'
+  return 'Medium'
 }
 
-function StatusPill({ status }) {
-  return <mark className="status-pill">{status}</mark>
+function getPersonName(user, fallback) {
+  if (!user) return fallback
+  return `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || fallback
 }
 
-function ActivityItem({ icon: Icon, text, time }) {
-  return (
-    <div className="activity-item">
-      <span><Icon size={16} aria-hidden="true" /></span>
-      <p>{text}<small>{time}</small></p>
-    </div>
-  )
+function getTimeAgo(value) {
+  if (!value) return 'Unknown'
+
+  const diffMs = Date.now() - new Date(value).getTime()
+  const minutes = Math.max(1, Math.floor(diffMs / 60000))
+
+  if (minutes < 60) return `${minutes} min ago`
+
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+
+  return `${Math.floor(hours / 24)}d ago`
 }
 
-function MobileBottomNav() {
-  const items = [
-    [Home, 'Home'],
-    [TicketCheck, 'Tickets'],
-    [Bell, 'Notifications'],
-    [LineChart, 'Analytics'],
-    [UserCircle2, 'Profile'],
-  ]
+function toChartPercentages(items = []) {
+  const max = Math.max(...items.map((item) => item.value), 0)
 
-//   return (
-//     <nav className="mobile-bottom-nav" aria-label="Mobile dashboard navigation">
-//       {items.map(([Icon, label], index) => (
-//         <button className={index === 1 ? 'mobile-nav-active' : ''} type="button" key={label}>
-//           <Icon size={19} aria-hidden="true" />
-//           <span>{label}</span>
-//         </button>
-//       ))}
-//     </nav>
-//   )
-// }
+  if (max === 0) return []
+
+  return items.map((item) => ({
+    ...item,
+    percent: Math.max(8, Math.round((item.value / max) * 100)),
+  }))
 }

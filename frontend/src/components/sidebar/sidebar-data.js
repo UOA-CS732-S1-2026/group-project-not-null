@@ -1,7 +1,6 @@
 import {
   BookOpen,
   CircleHelp,
-  Home,
   LayoutDashboard,
   Settings,
   TicketCheck,
@@ -23,7 +22,6 @@ export const sidebarData = {
     {
       title: 'General',
       items: [
-        { title: 'Home', url: '/home', icon: Home },
         { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
         { title: 'Tickets', url: '/tickets', icon: TicketCheck, badge: '12' },
         { title: 'Students', url: '/students', icon: Users },
