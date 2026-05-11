@@ -1,0 +1,17 @@
+.staff-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid color-mix(in srgb, var(--staff-line), transparent 10%);
+  border-radius: 18px;
+  padding: 18px;
+  color: var(--staff-steel);
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(44 76 92 / 0.04), 0 12px 30px rgb(44 76 92 / 0.06);
+  font-weight: 800;
+}
+
+.staff-empty-state p {
+  margin: 0;
+}
