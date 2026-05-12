@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
  
+dotenv.config({ path: '.env.local' });
 dotenv.config();
  
 const app = express();
@@ -20,6 +21,7 @@ app.get('/api/health', (req, res) => {
  
 app.use('/api/auth', require('./src/routes/auth'));
 app.use('/api/tickets', require('./src/routes/tickets'));
+app.use('/api/triage-priority', require('./src/routes/triagePriority'));
 app.use('/api/staff', require('./src/routes/staff'));
  
 app.use((req, res) => {

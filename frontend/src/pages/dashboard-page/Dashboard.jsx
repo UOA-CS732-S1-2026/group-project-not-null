@@ -370,7 +370,8 @@ function formatUrgentTicket(ticket) {
 function getPriorityLabel(priority) {
   if (priority === 1) return 'Critical'
   if (priority === 2) return 'High'
-  if (priority === 3) return 'Low'
+  if (priority === 3) return 'Medium'
+  if (priority === 4) return 'Low'
   return 'Medium'
 }
 
