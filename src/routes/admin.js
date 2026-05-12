@@ -103,4 +103,23 @@ router.patch('/staff/:id/status', verifyAuth, verifyAdmin, async (req, res) => {
   }
 });
 
+// GET /api/admin/users — list students or admins; optional ?role=student|admin
+router.get('/users', verifyAuth, verifyAdmin, async (req, res) => {
+  try {
+    const { role } = req.query;
+    const filter = { role: { $in: ['student', 'admin'] } };
+    if (role && ['student', 'admin'].includes(role)) filter.role = role;
+
+    const users = await User.find(
+      filter,
+      '_id firstName lastName email role createdAt'
+    ).sort({ createdAt: -1 });
+
+    res.status(200).json({ users });
+  } catch (error) {
+    console.error('Get users error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

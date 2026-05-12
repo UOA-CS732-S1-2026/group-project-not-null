@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import {
   getAdminPendingStaff,
   getAdminAllStaff,
+  getAdminUsers,
   approveStaff,
   rejectStaff,
   updateStaffStatus,
@@ -21,9 +22,15 @@ export default function AdminPage() {
   const [allStaff, setAllStaff] = useState([])
   const [pendingLoading, setPendingLoading] = useState(true)
   const [staffLoading, setStaffLoading] = useState(true)
+  const [studentsLoading, setStudentsLoading] = useState(true)
+  const [adminsLoading, setAdminsLoading] = useState(true)
   const [pendingError, setPendingError] = useState('')
   const [staffError, setStaffError] = useState('')
+  const [studentsError, setStudentsError] = useState('')
+  const [adminsError, setAdminsError] = useState('')
   const [actionError, setActionError] = useState('')
+  const [students, setStudents] = useState([])
+  const [admins, setAdmins] = useState([])
 
   const loadPending = useCallback(() => {
     setPendingLoading(true)
@@ -43,10 +50,30 @@ export default function AdminPage() {
       .finally(() => setStaffLoading(false))
   }, [])
 
+  const loadStudents = useCallback(() => {
+    setStudentsLoading(true)
+    setStudentsError('')
+    getAdminUsers({ role: 'student' })
+      .then((data) => setStudents(data.users))
+      .catch((err) => setStudentsError(err.message))
+      .finally(() => setStudentsLoading(false))
+  }, [])
+
+  const loadAdmins = useCallback(() => {
+    setAdminsLoading(true)
+    setAdminsError('')
+    getAdminUsers({ role: 'admin' })
+      .then((data) => setAdmins(data.users))
+      .catch((err) => setAdminsError(err.message))
+      .finally(() => setAdminsLoading(false))
+  }, [])
+
   useEffect(() => {
     loadPending()
     loadAllStaff()
-  }, [loadPending, loadAllStaff])
+    loadStudents()
+    loadAdmins()
+  }, [loadPending, loadAllStaff, loadStudents, loadAdmins])
 
   async function handleApprove(id) {
     setActionError('')
@@ -202,6 +229,81 @@ export default function AdminPage() {
                       </button>
                     )}
                   </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+      {/* Students */}
+      <section className="admin-section" aria-labelledby="students-heading">
+        <h2 id="students-heading">Students</h2>
+
+        {studentsLoading && <p className="admin-loading">Loading...</p>}
+        {studentsError && (
+          <p className="admin-section-error" role="alert">
+            {studentsError}{' '}
+            <button type="button" onClick={loadStudents}>Retry</button>
+          </p>
+        )}
+
+        {!studentsLoading && !studentsError && students.length === 0 && (
+          <p className="admin-empty">No students found.</p>
+        )}
+
+        {!studentsLoading && students.length > 0 && (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              {students.map((u) => (
+                <tr key={u._id}>
+                  <td>{`${u.firstName} ${u.lastName}`}</td>
+                  <td>{u.email}</td>
+                  <td>{new Date(u.createdAt).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      {/* Admins */}
+      <section className="admin-section" aria-labelledby="admins-heading">
+        <h2 id="admins-heading">Admins</h2>
+
+        {adminsLoading && <p className="admin-loading">Loading...</p>}
+        {adminsError && (
+          <p className="admin-section-error" role="alert">
+            {adminsError}{' '}
+            <button type="button" onClick={loadAdmins}>Retry</button>
+          </p>
+        )}
+
+        {!adminsLoading && !adminsError && admins.length === 0 && (
+          <p className="admin-empty">No admins found.</p>
+        )}
+
+        {!adminsLoading && admins.length > 0 && (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              {admins.map((u) => (
+                <tr key={u._id}>
+                  <td>{`${u.firstName} ${u.lastName}`}</td>
+                  <td>{u.email}</td>
+                  <td>{new Date(u.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>

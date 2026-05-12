@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
 
 /**
  * @typedef {Object} StaffDashboardSummary
@@ -161,4 +161,8 @@ export function updateStaffStatus(id, status) {
     method: 'PATCH',
     body: JSON.stringify({ status }),
   })
+}
+
+export function getAdminUsers(params = {}) {
+  return request(`/admin/users${buildQuery(params)}`)
 }
