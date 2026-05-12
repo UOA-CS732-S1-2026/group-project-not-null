@@ -1,3 +1,6 @@
+
+require('dotenv').config();
+//require('./src/utils/sendEmail')
 const app = require('./app');
 const connectDB = require('./src/config/database');
 require('dotenv').config();
