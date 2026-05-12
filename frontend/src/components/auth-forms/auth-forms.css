@@ -206,6 +206,18 @@
   transform: none;
 }
 
+.form-info {
+  margin: 0;
+  border: 1px solid oklch(0.75 0.12 85 / 0.5);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 10px 12px;
+  color: oklch(0.45 0.1 75);
+  background: oklch(0.97 0.04 90);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: center;
+}
+
 .form-success {
   margin: 0;
   border: 1px solid var(--border);

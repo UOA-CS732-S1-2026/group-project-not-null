@@ -66,7 +66,9 @@ async function request(path, options = {}) {
   const data = await response.json().catch(() => ({}))
 
   if (!response.ok) {
-    throw new Error(data.error || 'Something went wrong')
+    const err = new Error(data.error || 'Something went wrong')
+    if (data.pendingApproval) err.pendingApproval = true
+    throw err
   }
 
   return data
