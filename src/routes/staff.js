@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { verifyAuth } = require('../middleware/auth');
 const Ticket = require('../models/Ticket');
-const User = require('../models/user');
 
 const CATEGORY_LABELS = {
   IT: 'IT',
@@ -64,22 +63,19 @@ function formatAverageResponseTime(hours) {
   return minutes > 0 ? `${wholeHours}h ${minutes}m` : `${wholeHours}h`;
 }
 
-async function requireStaff(req, res) {
-  const user = await User.findById(req.user.userId);
-
-  if (!user || user.role !== 'staff') {
-    res.status(403).json({ error: 'Only staff can access this resource' });
-    return null;
+function requireActiveStaff(req, res, next) {
+  if (req.user.role !== 'staff') {
+    return res.status(403).json({ error: 'Only staff can access this resource' });
   }
-
-  return user;
+  // null = pre-existing staff without staffStatus (treat as active)
+  if (req.user.staffStatus === 'pending' || req.user.staffStatus === 'inactive') {
+    return res.status(403).json({ error: 'Active staff account required' });
+  }
+  next();
 }
 
-router.get('/tickets', verifyAuth, async (req, res) => {
+router.get('/tickets', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const {
       status,
       priority,
@@ -145,11 +141,8 @@ router.get('/tickets', verifyAuth, async (req, res) => {
   }
 });
 
-router.get('/tickets/urgent', verifyAuth, async (req, res) => {
+router.get('/tickets/urgent', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const agingThreshold = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     const tickets = await Ticket.find({
@@ -172,11 +165,8 @@ router.get('/tickets/urgent', verifyAuth, async (req, res) => {
   }
 });
 
-router.get('/dashboard/summary', verifyAuth, async (req, res) => {
+router.get('/dashboard/summary', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const today = startOfToday();
 
     const [
@@ -219,11 +209,8 @@ router.get('/dashboard/summary', verifyAuth, async (req, res) => {
   }
 });
 
-router.get('/dashboard/analytics', verifyAuth, async (req, res) => {
+router.get('/dashboard/analytics', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const [byCategory, byStatus] = await Promise.all([
       Ticket.aggregate([{ $group: { _id: '$category', value: { $sum: 1 } } }, { $sort: { value: -1 } }]),
       Ticket.aggregate([{ $group: { _id: '$status', value: { $sum: 1 } } }, { $sort: { value: -1 } }])
@@ -245,11 +232,8 @@ router.get('/dashboard/analytics', verifyAuth, async (req, res) => {
   }
 });
 
-router.get('/activity', verifyAuth, async (req, res) => {
+router.get('/activity', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const tickets = await Ticket.find()
       .populate('studentId', 'email firstName lastName')
       .populate('assignedToStaffId', 'email firstName lastName')
@@ -292,11 +276,8 @@ router.get('/activity', verifyAuth, async (req, res) => {
   }
 });
 
-router.get('/notifications', verifyAuth, async (req, res) => {
+router.get('/notifications', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const tickets = await Ticket.find({
       status: { $ne: 'resolved' },
       $or: [{ priority: 1 }, { urgencyLevel: 'high' }]
@@ -322,13 +303,8 @@ router.get('/notifications', verifyAuth, async (req, res) => {
   }
 });
 
-router.patch('/tickets/:id', verifyAuth, async (req, res) => {
+router.patch('/tickets/:id', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId);
-    if (user.role !== 'staff') {
-      return res.status(403).json({ error: 'Only staff can update tickets' });
-    }
-
     const { status, assignedToStaffId } = req.body;
 
     const updateData = {};
@@ -358,13 +334,8 @@ router.patch('/tickets/:id', verifyAuth, async (req, res) => {
   }
 });
 
-router.post('/tickets/:id/notes', verifyAuth, async (req, res) => {
+router.post('/tickets/:id/notes', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId);
-    if (user.role !== 'staff') {
-      return res.status(403).json({ error: 'Only staff can add notes' });
-    }
-
     const { content } = req.body;
     if (!content) {
       return res.status(400).json({ error: 'Note content required' });
@@ -402,13 +373,8 @@ router.post('/tickets/:id/notes', verifyAuth, async (req, res) => {
   }
 });
 
-router.get('/analytics/summary', verifyAuth, async (req, res) => {
+router.get('/analytics/summary', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId);
-    if (user.role !== 'staff') {
-      return res.status(403).json({ error: 'Only staff can view analytics' });
-    }
-
     const tickets = await Ticket.find();
     const openTickets = await Ticket.countDocuments({ status: 'open' });
     const inProgressTickets = await Ticket.countDocuments({ status: 'in_progress' });
