@@ -33,7 +33,7 @@ export function SignInForm() {
       localStorage.setItem('refreshToken', data.refreshToken)
       localStorage.setItem('user', JSON.stringify(data.user))
 
-      navigate('/dashboard')
+      navigate(data.user.role === 'admin' ? '/admin' : '/dashboard')
     } catch (err) {
       if (err.pendingApproval) {
         setPendingMessage(err.message)
