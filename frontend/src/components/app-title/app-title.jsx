@@ -3,7 +3,7 @@ import './app-title.css'
 
 export function AppTitle({ team }) {
   return (
-    <Link className="app-title" to="/home">
+    <Link className="app-title" to="/dashboard">
       <span className="app-title-logo" aria-hidden="true">
         {team.initials}
       </span>

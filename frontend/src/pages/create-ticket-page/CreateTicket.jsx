@@ -71,7 +71,7 @@ export default function CreateTicket() {
                 View ticket
               </Link>
             )}
-            <Link className="button button-primary" to="/home">
+            <Link className="button button-primary" to="/dashboard">
               Back to My Support
             </Link>
           </section>

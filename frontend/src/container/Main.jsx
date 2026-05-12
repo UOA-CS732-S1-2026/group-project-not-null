@@ -11,7 +11,6 @@ function Main() {
       <Route path="/sign-up" element={<SignUp />} />
       <Route element={<AuthenticatedLayout />}>
         {/* Protected routes go here */}
-        <Route path="/home" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/tickets/new" element={<CreateTicket />} />
         <Route path="/tickets/:ticketId" element={<ViewTicket />} />

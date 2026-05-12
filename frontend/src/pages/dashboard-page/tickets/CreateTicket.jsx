@@ -11,7 +11,7 @@ import {
 } from './ticketData.js'
 
 const topNav = [
-  { title: 'Home', href: '/home' },
+  { title: 'Dashboard', href: '/dashboard' },
   { title: 'Tickets', href: '/tickets' },
   { title: 'Create Ticket', href: '/tickets/new' },
 ]
@@ -58,7 +58,7 @@ export default function CreateTicket() {
           <section className="panel confirmation-panel">
             <h2>Your ticket has been submitted.</h2>
             <p>We’ll notify you when its status changes.</p>
-            <Link className="button button-primary" to="/home">
+            <Link className="button button-primary" to="/dashboard">
               Back to My Support
             </Link>
           </section>

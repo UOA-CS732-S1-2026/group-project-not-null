@@ -17,3 +17,19 @@ export { AppTitle } from './app-title';
 export { AuthenticatedLayout } from './authenticated-layout';
 export { Header } from './header';
 export { Main } from './main';
+export {
+  DashboardSkeleton,
+  EmptyState,
+  SectionError,
+  SectionSkeleton,
+} from './dashboard-section-state';
+export { default as StaffActivityFeed } from './staff-activity-feed';
+export { default as StaffAnalyticsSection } from './staff-analytics-section';
+export { default as StaffEntryHeader } from './staff-entry-header';
+export { default as StaffKpiSummary } from './staff-kpi-summary';
+export { default as StaffNotificationState } from './staff-notification-state';
+export { default as StaffPriorityQueue } from './staff-priority-queue';
+export { default as StaffTicketQueue } from './staff-ticket-queue';
+export { default as StudentMetricGrid } from './student-metric-grid';
+export { default as StudentTicketList } from './student-ticket-list';
+export { default as StudentWelcomeBanner } from './student-welcome-banner';
