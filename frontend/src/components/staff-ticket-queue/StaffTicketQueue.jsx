@@ -1,4 +1,5 @@
 import { Filter, MoreHorizontal } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { EmptyState, SectionError, SectionSkeleton } from '../dashboard-section-state'
 import './StaffTicketQueue.css'
 
@@ -13,6 +14,8 @@ export default function StaffTicketQueue({
   onSearchChange,
   onRetry,
 }) {
+  const navigate = useNavigate()
+
   return (
     <article className="staff-panel ticket-queue-panel" aria-labelledby="ticket-queue-title">
       <div className="staff-panel-heading">
@@ -73,13 +76,13 @@ export default function StaffTicketQueue({
               <span>Actions</span>
             </div>
             {tickets.map((ticket) => (
-              <TicketRow key={ticket.id} ticket={ticket} />
+              <TicketRow key={ticket.id} ticket={ticket} onSelect={() => navigate(`/tickets/${ticket.id}`)} />
             ))}
           </div>
 
           <div className="mobile-ticket-list">
             {tickets.map((ticket) => (
-              <MobileTicketCard key={ticket.id} ticket={ticket} />
+              <MobileTicketCard key={ticket.id} ticket={ticket} onSelect={() => navigate(`/tickets/${ticket.id}`)} />
             ))}
           </div>
         </>
@@ -88,9 +91,9 @@ export default function StaffTicketQueue({
   )
 }
 
-function TicketRow({ ticket }) {
+function TicketRow({ ticket, onSelect }) {
   return (
-    <button className="ticket-row" type="button" role="row" aria-label={`View ${ticket.title}`}>
+    <button className="ticket-row" type="button" role="row" aria-label={`View ${ticket.title}`} onClick={onSelect}>
       <span><PriorityBadge priority={ticket.priority} /></span>
       <strong>{ticket.title}<small>{ticket.ticketNumber}</small></strong>
       <span>{ticket.student}</span>
@@ -107,9 +110,9 @@ function TicketRow({ ticket }) {
   )
 }
 
-function MobileTicketCard({ ticket }) {
+function MobileTicketCard({ ticket, onSelect }) {
   return (
-    <button className="mobile-ticket-card" type="button" aria-label={`View ${ticket.title}`}>
+    <button className="mobile-ticket-card" type="button" aria-label={`View ${ticket.title}`} onClick={onSelect}>
       <div>
         <PriorityBadge priority={ticket.priority} />
         <StatusPill status={ticket.status} />
