@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api'
 
 /**
  * @typedef {Object} StaffDashboardSummary
@@ -138,4 +138,27 @@ export function getStaffActivity() {
 
 export function getStaffNotifications() {
   return request('/staff/notifications')
+}
+
+export function getAdminPendingStaff() {
+  return request('/admin/staff/pending')
+}
+
+export function getAdminAllStaff(params = {}) {
+  return request(`/admin/staff${buildQuery(params)}`)
+}
+
+export function approveStaff(id) {
+  return request(`/admin/staff/${id}/approve`, { method: 'PATCH' })
+}
+
+export function rejectStaff(id) {
+  return request(`/admin/staff/${id}/reject`, { method: 'PATCH' })
+}
+
+export function updateStaffStatus(id, status) {
+  return request(`/admin/staff/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  })
 }

@@ -1,0 +1,141 @@
+.admin-page {
+  padding: 32px;
+  max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.admin-page-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.admin-page-header p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+}
+
+.admin-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-section h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 8px 12px;
+  color: var(--muted-foreground);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-btn {
+  padding: 4px 12px;
+  border-radius: calc(var(--radius) - 2px);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.admin-btn:hover {
+  opacity: 0.8;
+}
+
+.admin-btn-approve {
+  background: oklch(0.55 0.15 145);
+  color: #fff;
+}
+
+.admin-btn-reject,
+.admin-btn-deactivate {
+  background: oklch(from var(--destructive) l c h / 0.12);
+  color: var(--destructive);
+  border-color: oklch(from var(--destructive) l c h / 0.3);
+}
+
+.admin-status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.admin-status-active {
+  background: oklch(0.55 0.15 145 / 0.12);
+  color: oklch(0.4 0.12 145);
+}
+
+.admin-status-pending {
+  background: oklch(0.75 0.12 85 / 0.2);
+  color: oklch(0.45 0.1 75);
+}
+
+.admin-status-inactive {
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.admin-status-unknown {
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.admin-loading,
+.admin-empty {
+  color: var(--muted-foreground);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.admin-action-error,
+.admin-section-error {
+  color: var(--destructive);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.admin-section-error button {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: inherit;
+  text-decoration: underline;
+  padding: 0;
+}

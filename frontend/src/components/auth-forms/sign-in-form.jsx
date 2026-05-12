@@ -69,6 +69,16 @@ export function SignInForm() {
           />
           <span>Staff</span>
         </label>
+        <label>
+          <input
+            type="radio"
+            name="accountType"
+            value="admin"
+            checked={accountType === 'admin'}
+            onChange={(event) => setAccountType(event.target.value)}
+          />
+          <span>Admin</span>
+        </label>
       </fieldset>
 
       <label className="field">
@@ -117,7 +127,7 @@ export function SignInForm() {
       <Button className="button-primary auth-submit" type="submit" disabled={isSubmitting}>
         {isSubmitting
           ? 'Signing in...'
-          : `Sign in as ${accountType === 'student' ? 'Student' : 'Staff'}`}
+          : `Sign in as ${accountType === 'student' ? 'Student' : accountType === 'staff' ? 'Staff' : 'Admin'}`}
       </Button>
     </form>
   )
