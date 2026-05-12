@@ -104,7 +104,7 @@ export function SignUpForm() {
         localStorage.setItem('refreshToken', data.refreshToken)
         localStorage.setItem('user', JSON.stringify(data.user))
         setSuccessMessage(`Account created for ${data.user.email}.`)
-        navigate('/')
+        navigate('/dashboard')
       })
       .catch((error) => {
         setSubmitError(error.message)
