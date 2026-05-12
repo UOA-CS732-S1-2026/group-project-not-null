@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
   staffStatus: {
     type: String,
     enum: ['pending', 'active', 'inactive'],
-    default: null
+    default: undefined
   },
   createdAt: {
     type: Date,

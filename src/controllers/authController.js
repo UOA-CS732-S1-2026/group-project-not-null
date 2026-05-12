@@ -40,7 +40,7 @@ const register = async (req, res) => {
       lastName,
       role: userRole,
       department: userRole === 'staff' ? department : undefined,
-      staffStatus: userRole === 'staff' ? 'pending' : null
+      staffStatus: userRole === 'staff' ? 'pending' : undefined
     });
 
     await user.save();
