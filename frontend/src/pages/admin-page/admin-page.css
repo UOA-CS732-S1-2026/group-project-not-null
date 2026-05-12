@@ -34,6 +34,7 @@
 
 .admin-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.88rem;
 }
@@ -44,12 +45,18 @@
   color: var(--muted-foreground);
   font-weight: 600;
   border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .admin-table td {
   padding: 10px 12px;
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .admin-table tr:last-child td {
@@ -58,7 +65,8 @@
 
 .admin-table-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
+  align-items: center;
 }
 
 .admin-btn {
@@ -149,3 +157,20 @@
   text-decoration: underline;
   padding: 0;
 }
+
+/* Column widths — 5-column tables (Pending + All Staff) */
+section[aria-labelledby="pending-heading"] .admin-table th:nth-child(1),
+section[aria-labelledby="staff-heading"] .admin-table th:nth-child(1) { width: 18%; }
+
+section[aria-labelledby="pending-heading"] .admin-table th:nth-child(2),
+section[aria-labelledby="staff-heading"] .admin-table th:nth-child(2) { width: 22%; }
+
+section[aria-labelledby="pending-heading"] .admin-table th:nth-child(3),
+section[aria-labelledby="staff-heading"] .admin-table th:nth-child(3) { width: 15%; }
+
+section[aria-labelledby="pending-heading"] .admin-table th:nth-child(4),
+section[aria-labelledby="staff-heading"] .admin-table th:nth-child(4) { width: 13%; }
+
+/* Column widths — 3-column Admins table (Name + Email match 5-col tables) */
+section[aria-labelledby="admins-heading"] .admin-table th:nth-child(1) { width: 18%; }
+section[aria-labelledby="admins-heading"] .admin-table th:nth-child(2) { width: 22%; }

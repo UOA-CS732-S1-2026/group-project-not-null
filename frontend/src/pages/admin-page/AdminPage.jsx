@@ -157,21 +157,23 @@ export default function AdminPage() {
                   <td>{member.email}</td>
                   <td>{member.department || '—'}</td>
                   <td>{new Date(member.createdAt).toLocaleDateString()}</td>
-                  <td className="admin-table-actions">
-                    <button
-                      type="button"
-                      className="admin-btn admin-btn-approve"
-                      onClick={() => handleApprove(member._id)}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      type="button"
-                      className="admin-btn admin-btn-reject"
-                      onClick={() => handleReject(member._id)}
-                    >
-                      Reject
-                    </button>
+                  <td>
+                    <div className="admin-table-actions">
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn-approve"
+                        onClick={() => handleApprove(member._id)}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn-reject"
+                        onClick={() => handleReject(member._id)}
+                      >
+                        Reject
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -218,25 +220,27 @@ export default function AdminPage() {
                   <td>
                     <StatusBadge status={member.staffStatus} />
                   </td>
-                  <td className="admin-table-actions">
-                    {(member.staffStatus === 'active' || member.staffStatus === 'inactive') && (
-                      <button
-                        type="button"
-                        className={`admin-btn ${member.staffStatus === 'active' ? 'admin-btn-deactivate' : 'admin-btn-approve'}`}
-                        onClick={() => handleToggleStatus(member._id, member.staffStatus)}
-                      >
-                        {member.staffStatus === 'active' ? 'Deactivate' : 'Activate'}
-                      </button>
-                    )}
-                    {member.staffStatus === 'active' && (
-                      <button
-                        type="button"
-                        className="admin-btn admin-btn-promote"
-                        onClick={() => handlePromote(member._id)}
-                      >
-                        Promote to Admin
-                      </button>
-                    )}
+                  <td>
+                    <div className="admin-table-actions">
+                      {(member.staffStatus === 'active' || member.staffStatus === 'inactive') && (
+                        <button
+                          type="button"
+                          className={`admin-btn ${member.staffStatus === 'active' ? 'admin-btn-deactivate' : 'admin-btn-approve'}`}
+                          onClick={() => handleToggleStatus(member._id, member.staffStatus)}
+                        >
+                          {member.staffStatus === 'active' ? 'Deactivate' : 'Activate'}
+                        </button>
+                      )}
+                      {member.staffStatus === 'active' && (
+                        <button
+                          type="button"
+                          className="admin-btn admin-btn-promote"
+                          onClick={() => handlePromote(member._id)}
+                        >
+                          Promote to Admin
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
