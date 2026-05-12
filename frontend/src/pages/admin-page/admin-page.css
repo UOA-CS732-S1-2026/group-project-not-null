@@ -80,6 +80,16 @@
   color: #fff;
 }
 
+.admin-btn-promote {
+  background: oklch(0.45 0.15 260);
+  color: #fff;
+}
+
+.admin-btn-promote:hover {
+  background: oklch(0.38 0.15 260);
+  opacity: 1;
+}
+
 .admin-btn-reject,
 .admin-btn-deactivate {
   background: oklch(from var(--destructive) l c h / 0.12);

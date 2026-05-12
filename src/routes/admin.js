@@ -122,4 +122,24 @@ router.get('/users', verifyAuth, verifyAdmin, async (req, res) => {
   }
 });
 
+// PATCH /api/admin/staff/:id/promote — promote active staff to admin
+router.patch('/staff/:id/promote', verifyAuth, verifyAdmin, async (req, res) => {
+  try {
+    const user = await User.findOneAndUpdate(
+      { _id: req.params.id, role: 'staff', staffStatus: 'active' },
+      { role: 'admin', $unset: { staffStatus: 1 } },
+      { new: true, select: '_id firstName lastName email role' }
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: 'Active staff member not found' });
+    }
+
+    res.status(200).json({ message: 'Staff promoted to admin', user });
+  } catch (error) {
+    console.error('Promote staff error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

@@ -163,6 +163,10 @@ export function updateStaffStatus(id, status) {
   })
 }
 
+export function promoteStaff(id) {
+  return request(`/admin/staff/${id}/promote`, { method: 'PATCH' })
+}
+
 export function getAdminUsers(params = {}) {
   return request(`/admin/users${buildQuery(params)}`)
 }
