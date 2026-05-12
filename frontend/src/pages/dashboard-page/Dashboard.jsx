@@ -187,7 +187,6 @@ function StudentDashboard() {
   const [tickets, setTickets] = useState([])
   const [statusFilter, setStatusFilter] = useState('All')
   const [categoryFilter, setCategoryFilter] = useState('All')
-  const [query] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(true)
 
@@ -223,18 +222,12 @@ function StudentDashboard() {
   }, [])
 
   const filteredTickets = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase()
-
     return tickets.filter((ticket) => {
       const matchesStatus = statusFilter === 'All' || ticket.status === statusFilter
       const matchesCategory = categoryFilter === 'All' || ticket.category === categoryFilter
-      const matchesQuery =
-        !normalizedQuery ||
-        [ticket.title, ticket.category, ticket.description].join(' ').toLowerCase().includes(normalizedQuery)
-
-      return matchesStatus && matchesCategory && matchesQuery
+      return matchesStatus && matchesCategory
     })
-  }, [categoryFilter, query, statusFilter, tickets])
+  }, [categoryFilter, statusFilter, tickets])
 
   const summary = [
     {

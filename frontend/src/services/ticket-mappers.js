@@ -62,6 +62,7 @@ export function formatStaffTicket(ticket) {
     student: getPersonName(ticket.studentId, 'Unknown student'),
     category: categoryLabels[ticket.category] || ticket.category,
     status: statusLabels[ticket.status] || ticket.status,
+    statusValue: ticket.status,
     assigned: getPersonName(ticket.assignedToStaffId, 'Unassigned'),
     isAssigned: !!ticket.assignedToStaffId,
     updated: getTimeAgo(ticket.updatedAt),
