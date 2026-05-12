@@ -48,10 +48,11 @@ const createTicket = async (req, res) => {
     await ticket.populate('studentId', 'firstName lastName email');
 
     //Email sending
-    await sendEmail({
-      to: ticket.studentId.email,
-      subject: 'UniDesk Ticket Created',
-      text: `Hello ${ticket.studentId.firstName},
+    try {
+      await sendEmail({
+        to: ticket.studentId.email,
+        subject: 'UniDesk Ticket Created',
+        text: `Hello ${ticket.studentId.firstName},
 
     Your support ticket has been created successfully.
 
@@ -62,7 +63,10 @@ const createTicket = async (req, res) => {
     We will update you once the ticket status changes.
 
     - UniDesk Support Team`,
-    });
+      });
+    } catch (emailErr) {
+      console.error('Email notification failed:', emailErr.message);
+    }
  
     res.status(201).json({
       message: 'Ticket created successfully',

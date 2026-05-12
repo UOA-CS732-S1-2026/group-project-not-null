@@ -9,11 +9,11 @@ export default function StaffKpiSummary({ cards, summary, isLoading, error, onRe
       ) : error ? (
         <SectionError message="Unable to load dashboard data." onRetry={onRetry} />
       ) : (
-        cards.map((card) => (
+        cards.map(({ key, ...cardProps }) => (
           <DashboardCard
-            key={card.key}
-            {...card}
-            value={formatSummaryValue(summary, card.key)}
+            key={key}
+            {...cardProps}
+            value={formatSummaryValue(summary, key)}
           />
         ))
       )}

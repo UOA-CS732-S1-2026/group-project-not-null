@@ -25,20 +25,6 @@ function startOfToday() {
   return date;
 }
 
-function getTimeAgo(date) {
-  if (!date) return 'Unknown';
-
-  const diffMs = Date.now() - new Date(date).getTime();
-  const minutes = Math.max(1, Math.floor(diffMs / 60000));
-
-  if (minutes < 60) return `${minutes} min ago`;
-
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
 
 function getPersonName(user, fallback = 'Unassigned') {
   if (!user) return fallback;
@@ -112,10 +98,8 @@ router.get('/tickets', verifyAuth, async (req, res) => {
     } else if (priority) {
       filter.priority = Number(priority);
     }
-    if (assignedTo === 'me') filter.assignedToStaffId = req.user.userId;
-    if (assignedTo && assignedTo !== 'me' && assignedTo !== 'all') {
-      filter.assignedToStaffId = assignedTo;
-    }
+    if (assignedTo === 'me') filter.assignedToStaffId = user._id;
+    else if (assignedTo && assignedTo !== 'all') filter.assignedToStaffId = assignedTo;
 
     const normalizedSearch = search || searchQuery;
     if (normalizedSearch) {

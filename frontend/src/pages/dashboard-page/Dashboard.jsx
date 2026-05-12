@@ -23,7 +23,7 @@ import {
   getStaffTickets,
   getStaffUrgentTickets,
 } from '../../services/api.js'
-import { formatTicket, ticketCategories } from '../../services/ticket-mappers.js'
+import { formatStaffTicket, formatTicket, ticketCategories } from '../../services/ticket-mappers.js'
 import './Dashboard.css'
 
 const summaryCards = [
@@ -42,19 +42,6 @@ const filterChips = [
   { label: 'High Priority', params: { priority: 'high' } },
   { label: 'Assigned to Me', params: { assignedTo: 'me' } },
 ]
-
-const categoryLabels = {
-  IT: 'IT',
-  enrolment: 'Enrolment',
-  academic: 'Academic',
-  'accommodation/finance': 'Accommodation/Finance',
-}
-
-const statusLabels = {
-  open: 'Open',
-  in_progress: 'In Progress',
-  resolved: 'Resolved',
-}
 
 export default function DashBoard() {
   const user = getStoredUser()
@@ -344,20 +331,6 @@ function getDisplayName(user) {
   return `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name || user.email || ''
 }
 
-function formatStaffTicket(ticket) {
-  return {
-    id: ticket._id,
-    ticketNumber: ticket.ticketNumber || ticket._id,
-    priority: getPriorityLabel(ticket.priority),
-    title: ticket.title,
-    student: getPersonName(ticket.studentId, 'Unknown student'),
-    category: categoryLabels[ticket.category] || ticket.category,
-    status: statusLabels[ticket.status] || ticket.status,
-    assigned: getPersonName(ticket.assignedToStaffId, 'Unassigned'),
-    updated: getTimeAgo(ticket.updatedAt),
-  }
-}
-
 function formatUrgentTicket(ticket) {
   const formatted = formatStaffTicket(ticket)
   return {
@@ -365,32 +338,6 @@ function formatUrgentTicket(ticket) {
     title: formatted.title,
     meta: `${formatted.priority} · ${formatted.category} · updated ${formatted.updated}`,
   }
-}
-
-function getPriorityLabel(priority) {
-  if (priority === 1) return 'Critical'
-  if (priority === 2) return 'High'
-  if (priority === 3) return 'Low'
-  return 'Medium'
-}
-
-function getPersonName(user, fallback) {
-  if (!user) return fallback
-  return `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || fallback
-}
-
-function getTimeAgo(value) {
-  if (!value) return 'Unknown'
-
-  const diffMs = Date.now() - new Date(value).getTime()
-  const minutes = Math.max(1, Math.floor(diffMs / 60000))
-
-  if (minutes < 60) return `${minutes} min ago`
-
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-
-  return `${Math.floor(hours / 24)}d ago`
 }
 
 function toChartPercentages(items = []) {

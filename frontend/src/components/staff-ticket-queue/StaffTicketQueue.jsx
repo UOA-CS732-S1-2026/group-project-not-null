@@ -1,4 +1,4 @@
-import { Filter, MoreHorizontal } from 'lucide-react'
+import { Filter } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { EmptyState, SectionError, SectionSkeleton } from '../dashboard-section-state'
 import './StaffTicketQueue.css'
@@ -73,7 +73,6 @@ export default function StaffTicketQueue({
               <span>Status</span>
               <span>Assigned</span>
               <span>Updated</span>
-              <span>Actions</span>
             </div>
             {tickets.map((ticket) => (
               <TicketRow key={ticket.id} ticket={ticket} onSelect={() => navigate(`/tickets/${ticket.id}`)} />
@@ -93,7 +92,7 @@ export default function StaffTicketQueue({
 
 function TicketRow({ ticket, onSelect }) {
   return (
-    <button className="ticket-row" type="button" role="row" aria-label={`View ${ticket.title}`} onClick={onSelect}>
+    <button className={`ticket-row${ticket.isAssigned ? ' ticket-row-assigned' : ''}`} type="button" role="row" aria-label={`View ${ticket.title}`} onClick={onSelect}>
       <span><PriorityBadge priority={ticket.priority} /></span>
       <strong>{ticket.title}<small>{ticket.ticketNumber}</small></strong>
       <span>{ticket.student}</span>
@@ -101,18 +100,13 @@ function TicketRow({ ticket, onSelect }) {
       <span><StatusPill status={ticket.status} /></span>
       <span>{ticket.assigned}</span>
       <span>{ticket.updated}</span>
-      <span className="ticket-actions" aria-label="Quick actions">
-        <i>Assign</i>
-        <i>Status</i>
-        <MoreHorizontal size={18} aria-hidden="true" />
-      </span>
     </button>
   )
 }
 
 function MobileTicketCard({ ticket, onSelect }) {
   return (
-    <button className="mobile-ticket-card" type="button" aria-label={`View ${ticket.title}`} onClick={onSelect}>
+    <button className={`mobile-ticket-card${ticket.isAssigned ? ' mobile-ticket-card-assigned' : ''}`} type="button" aria-label={`View ${ticket.title}`} onClick={onSelect}>
       <div>
         <PriorityBadge priority={ticket.priority} />
         <StatusPill status={ticket.status} />
@@ -128,6 +122,12 @@ function PriorityBadge({ priority }) {
   return <em className={`priority-badge priority-${priority.toLowerCase()}`}>{priority}</em>
 }
 
+const STATUS_CLASS = {
+  'Open': 'status-open',
+  'In Progress': 'status-in-progress',
+  'Resolved': 'status-resolved',
+}
+
 function StatusPill({ status }) {
-  return <mark className="status-pill">{status}</mark>
+  return <mark className={`status-pill ${STATUS_CLASS[status] || ''}`}>{status}</mark>
 }
