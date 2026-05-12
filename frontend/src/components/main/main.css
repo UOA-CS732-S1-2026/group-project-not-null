@@ -1,0 +1,5 @@
+.dashboard-main {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  padding: 8px clamp(18px, 4vw, 36px) clamp(18px, 4vw, 36px);
+}

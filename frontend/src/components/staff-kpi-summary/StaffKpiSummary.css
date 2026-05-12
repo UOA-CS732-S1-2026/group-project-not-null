@@ -1,0 +1,106 @@
+.staff-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.dashboard-card {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  display: grid;
+  gap: 16px;
+  border: 1px solid color-mix(in srgb, var(--staff-line), transparent 10%);
+  border-radius: 18px;
+  padding: 18px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(44 76 92 / 0.04), 0 12px 30px rgb(44 76 92 / 0.06);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--staff-shadow);
+}
+
+.card-accent {
+  width: 34px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--staff-steel);
+}
+
+.dashboard-card strong {
+  display: block;
+  color: var(--staff-teal);
+  font-size: clamp(1.65rem, 2vw, 2.2rem);
+  line-height: 1;
+}
+
+.dashboard-card span:not(.card-accent) {
+  display: block;
+  margin-top: 8px;
+  color: var(--staff-steel);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.dashboard-card small {
+  color: color-mix(in srgb, var(--staff-steel), #ffffff 12%);
+  font-size: 0.78rem;
+}
+
+.dashboard-card-critical .card-accent,
+.priority-critical {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.dashboard-card-high .card-accent,
+.priority-high {
+  background: #fff6bf;
+  color: #d9a900;
+}
+
+.dashboard-card-medium .card-accent,
+.priority-medium {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.dashboard-card-low .card-accent,
+.priority-low {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.dashboard-card-steel .card-accent {
+  background: var(--staff-steel);
+}
+
+.dashboard-card-teal .card-accent {
+  background: var(--staff-teal);
+}
+
+@media (max-width: 1180px) {
+  .staff-kpi-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .staff-kpi-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .dashboard-card {
+    min-width: 0;
+    border-radius: 16px;
+    padding: 16px;
+  }
+
+  .dashboard-card strong {
+    font-size: 1.65rem;
+  }
+}

@@ -8,7 +8,6 @@ const FORM_MESSAGES = {
   firstNameEmpty: 'Please enter your first name.',
   lastNameEmpty: 'Please enter your last name.',
   emailEmpty: 'Please enter your email.',
-  emailInvalid: 'Please enter a valid email.',
   passwordEmpty: 'Please enter your password.',
   passwordShort: 'Password must be at least 7 characters long.',
   confirmPasswordEmpty: 'Please confirm your password.',
@@ -28,8 +27,29 @@ function getFormErrors(values) {
 
   if (!values.email.trim()) {
     errors.email = FORM_MESSAGES.emailEmpty
-  } else if (!values.email.includes('@')) {
-    errors.email = FORM_MESSAGES.emailInvalid
+  } else {
+    const email = values.email.toLowerCase()
+
+    // Staff validation
+    if (
+      values.accountType === 'staff' &&
+      !email.endsWith('@staff.unidesk.com')
+    ) {
+      errors.email =
+        'Staff accounts must use @staff.unidesk.com email addresses.'
+    }
+
+    // Student validation
+    if (
+      values.accountType === 'student' &&
+      (
+        !email.endsWith('@unidesk.com') ||
+        email.endsWith('@staff.unidesk.com')
+      )
+    ) {
+      errors.email =
+        'Student accounts must use @unidesk.com email addresses.'
+    }
   }
 
   if (!values.password) {
@@ -39,9 +59,13 @@ function getFormErrors(values) {
   }
 
   if (!values.confirmPassword) {
-    errors.confirmPassword = FORM_MESSAGES.confirmPasswordEmpty
-  } else if (values.password !== values.confirmPassword) {
-    errors.confirmPassword = FORM_MESSAGES.passwordMismatch
+    errors.confirmPassword =
+      FORM_MESSAGES.confirmPasswordEmpty
+  } else if (
+    values.password !== values.confirmPassword
+  ) {
+    errors.confirmPassword =
+      FORM_MESSAGES.passwordMismatch
   }
 
   return errors
@@ -49,6 +73,7 @@ function getFormErrors(values) {
 
 export function SignUpForm() {
   const navigate = useNavigate()
+
   const [values, setValues] = useState({
     accountType: 'student',
     firstName: '',
@@ -58,10 +83,16 @@ export function SignUpForm() {
     password: '',
     confirmPassword: '',
   })
+
   const [errors, setErrors] = useState({})
-  const [isLoading, setIsLoading] = useState(false)
-  const [successMessage, setSuccessMessage] = useState('')
-  const [submitError, setSubmitError] = useState('')
+  const [isLoading, setIsLoading] =
+    useState(false)
+
+  const [successMessage, setSuccessMessage] =
+    useState('')
+
+  const [submitError, setSubmitError] =
+    useState('')
 
   function updateField(event) {
     const { name, value } = event.target
@@ -80,12 +111,16 @@ export function SignUpForm() {
   function handleSubmit(event) {
     event.preventDefault()
 
-    const nextErrors = getFormErrors(values)
+    const nextErrors =
+      getFormErrors(values)
+
     setErrors(nextErrors)
     setSuccessMessage('')
     setSubmitError('')
 
-    if (Object.keys(nextErrors).length > 0) {
+    if (
+      Object.keys(nextErrors).length > 0
+    ) {
       return
     }
 
@@ -97,43 +132,73 @@ export function SignUpForm() {
       email: values.email.trim(),
       password: values.password,
       role: values.accountType,
-      department: values.accountType === 'staff' ? values.department.trim() : undefined,
+      department:
+        values.accountType === 'staff'
+          ? values.department.trim()
+          : undefined,
     })
       .then((data) => {
-        localStorage.setItem('accessToken', data.accessToken)
-        localStorage.setItem('refreshToken', data.refreshToken)
-        localStorage.setItem('user', JSON.stringify(data.user))
-        setSuccessMessage(`Account created for ${data.user.email}.`)
+        localStorage.setItem(
+          'accessToken',
+          data.accessToken
+        )
+
+        localStorage.setItem(
+          'refreshToken',
+          data.refreshToken
+        )
+
+        localStorage.setItem(
+          'user',
+          JSON.stringify(data.user)
+        )
+
+        setSuccessMessage(
+          `Account created for ${data.user.email}.`
+        )
+
         navigate('/')
       })
+
       .catch((error) => {
         setSubmitError(error.message)
       })
+
       .finally(() => {
         setIsLoading(false)
       })
   }
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit} noValidate>
+    <form
+      className="auth-form"
+      onSubmit={handleSubmit}
+      noValidate
+    >
       <fieldset className="auth-account-type">
         <legend>Sign up as</legend>
+
         <label>
           <input
             type="radio"
             name="accountType"
             value="student"
-            checked={values.accountType === 'student'}
+            checked={
+              values.accountType === 'student'
+            }
             onChange={updateField}
           />
           <span>Student</span>
         </label>
+
         <label>
           <input
             type="radio"
             name="accountType"
             value="staff"
-            checked={values.accountType === 'staff'}
+            checked={
+              values.accountType === 'staff'
+            }
             onChange={updateField}
           />
           <span>Staff</span>
@@ -143,6 +208,7 @@ export function SignUpForm() {
       <div className="auth-form-grid">
         <label className="field">
           <span>First Name</span>
+
           <input
             type="text"
             name="firstName"
@@ -150,18 +216,18 @@ export function SignUpForm() {
             onChange={updateField}
             placeholder="Enter your first name"
             autoComplete="given-name"
-            aria-invalid={Boolean(errors.firstName)}
-            aria-describedby={errors.firstName ? 'sign-up-first-name-error' : undefined}
           />
-          {errors.firstName ? (
-            <span className="field-error" id="sign-up-first-name-error">
+
+          {errors.firstName && (
+            <span className="field-error">
               {errors.firstName}
             </span>
-          ) : null}
+          )}
         </label>
 
         <label className="field">
           <span>Last Name</span>
+
           <input
             type="text"
             name="lastName"
@@ -169,110 +235,122 @@ export function SignUpForm() {
             onChange={updateField}
             placeholder="Enter your last name"
             autoComplete="family-name"
-            aria-invalid={Boolean(errors.lastName)}
-            aria-describedby={errors.lastName ? 'sign-up-last-name-error' : undefined}
           />
-          {errors.lastName ? (
-            <span className="field-error" id="sign-up-last-name-error">
+
+          {errors.lastName && (
+            <span className="field-error">
               {errors.lastName}
             </span>
-          ) : null}
+          )}
         </label>
       </div>
 
       <label className="field">
         <span>Email</span>
+
         <input
           type="email"
           name="email"
           value={values.email}
           onChange={updateField}
-          placeholder="name@university.edu"
+          placeholder={
+            values.accountType === 'staff'
+              ? 'name@staff.unidesk.com'
+              : 'name@unidesk.com'
+          }
           autoComplete="email"
-          aria-invalid={Boolean(errors.email)}
-          aria-describedby={errors.email ? 'sign-up-email-error' : undefined}
         />
-        {errors.email ? (
-          <span className="field-error" id="sign-up-email-error">
+
+        {errors.email && (
+          <span className="field-error">
             {errors.email}
           </span>
-        ) : null}
+        )}
       </label>
 
-      {values.accountType === 'staff' ? (
+      {values.accountType === 'staff' && (
         <label className="field">
           <span>Department</span>
+
           <input
             type="text"
             name="department"
             value={values.department}
             onChange={updateField}
             placeholder="e.g. IT Support"
-            autoComplete="organization"
           />
         </label>
-      ) : null}
+      )}
 
       <div className="auth-form-grid">
         <label className="field">
           <span>Password</span>
+
           <input
             type="password"
             name="password"
             value={values.password}
             onChange={updateField}
             placeholder="Enter your password"
-            autoComplete="new-password"
-            aria-invalid={Boolean(errors.password)}
-            aria-describedby={errors.password ? 'sign-up-password-error' : undefined}
           />
-          {errors.password ? (
-            <span className="field-error" id="sign-up-password-error">
+
+          {errors.password && (
+            <span className="field-error">
               {errors.password}
             </span>
-          ) : null}
+          )}
         </label>
 
         <label className="field">
           <span>Confirm Password</span>
+
           <input
             type="password"
             name="confirmPassword"
             value={values.confirmPassword}
             onChange={updateField}
             placeholder="Confirm your password"
-            autoComplete="new-password"
-            aria-invalid={Boolean(errors.confirmPassword)}
-            aria-describedby={
-              errors.confirmPassword ? 'sign-up-confirm-password-error' : undefined
-            }
           />
-          {errors.confirmPassword ? (
-            <span className="field-error" id="sign-up-confirm-password-error">
+
+          {errors.confirmPassword && (
+            <span className="field-error">
               {errors.confirmPassword}
             </span>
-          ) : null}
+          )}
         </label>
       </div>
 
-      {submitError ? (
-        <p className="form-error" role="alert">
+      {submitError && (
+        <p
+          className="form-error"
+          role="alert"
+        >
           {submitError}
         </p>
-      ) : null}
+      )}
 
-      <Button className="button-primary auth-submit" type="submit" disabled={isLoading}>
-        <span aria-hidden="true">{isLoading ? '○' : '+'}</span>
+      <Button
+        className="button-primary auth-submit"
+        type="submit"
+        disabled={isLoading}
+      >
         {isLoading
           ? 'Creating account...'
-          : `Create ${values.accountType === 'student' ? 'Student' : 'Staff'} Account`}
+          : `Create ${
+              values.accountType === 'student'
+                ? 'Student'
+                : 'Staff'
+            } Account`}
       </Button>
 
-      {successMessage ? (
-        <p className="form-success" role="status">
+      {successMessage && (
+        <p
+          className="form-success"
+          role="status"
+        >
           {successMessage}
         </p>
-      ) : null}
+      )}
     </form>
   )
 }

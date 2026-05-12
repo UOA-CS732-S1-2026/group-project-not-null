@@ -1,0 +1,116 @@
+.create-ticket-form {
+  display: grid;
+  gap: 18px;
+  max-width: 720px;
+}
+
+.form-section {
+  display: grid;
+  gap: 14px;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.form-section legend {
+  margin-bottom: 2px;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.create-ticket-form select,
+.create-ticket-form textarea {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 18px 14px 6px;
+  color: var(--primary);
+  background: var(--background);
+  font: inherit;
+}
+
+.create-ticket-form textarea {
+  min-height: 164px;
+  padding-block: 24px 12px;
+  resize: vertical;
+}
+
+.create-ticket-form select:focus,
+.create-ticket-form textarea:focus {
+  border-color: var(--ring);
+  outline: 3px solid oklch(from var(--ring) l c h / 0.28);
+}
+
+.create-ticket-description,
+.priority-note,
+.confirmation-panel {
+  max-width: 760px;
+}
+
+.urgency-options {
+  display: grid;
+  gap: 10px;
+}
+
+.urgency-options label {
+  position: relative;
+  min-height: 52px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--muted-foreground);
+  background: var(--background);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.urgency-options input {
+  position: absolute;
+  opacity: 0;
+}
+
+.urgency-options label:has(input:checked) {
+  border-color: transparent;
+  color: var(--primary);
+  background: var(--gold-500);
+  box-shadow: var(--shadow);
+}
+
+.urgency-options label:has(input:focus-visible) {
+  outline: 3px solid oklch(from var(--ring) l c h / 0.28);
+  outline-offset: 2px;
+}
+
+.priority-note {
+  margin: 0;
+  border-radius: calc(var(--radius) - 2px);
+  padding: 12px 14px;
+  color: var(--muted-foreground);
+  background: var(--muted);
+}
+
+.confirmation-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.confirmation-panel h2 {
+  margin: 0;
+}
+
+.confirmation-panel .button {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .urgency-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .confirmation-panel .button {
+    width: max-content;
+  }
+}

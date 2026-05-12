@@ -4,42 +4,87 @@ const { generateTokenPair } = require('../utils/tokenUtils');
 
 const register = async (req, res) => {
   try {
-    const { email, password, firstName, lastName, role, department } = req.body;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      role,
+      department
+    } = req.body;
 
     if (!email || !password || !firstName || !lastName) {
       return res.status(400).json({
-        error: 'Please provide all required fields: email, password, firstName, lastName'
+        error:
+          'Please provide all required fields: email, password, firstName, lastName'
+      });
+    }
+
+    const normalizedEmail = email.toLowerCase();
+    const userRole = role || 'student';
+
+    // Staff emails restriction
+    if (
+      userRole === 'staff' &&
+      !normalizedEmail.endsWith('@staff.unidesk.com')
+    ) {
+      return res.status(400).json({
+        error:
+          'Staff accounts must use @staff.unidesk.com email addresses.'
+      });
+    }
+
+    // Student emails restriction
+    if (
+      userRole !== 'staff' &&
+      (
+        !normalizedEmail.endsWith('@unidesk.com') ||
+        normalizedEmail.endsWith('@staff.unidesk.com')
+      )
+    ) {
+      return res.status(400).json({
+        error:
+          'Student accounts must use @unidesk.com email addresses.'
       });
     }
 
     if (password.length < 6) {
       return res.status(400).json({
-        error: 'Password must be at least 6 characters long'
+        error:
+          'Password must be at least 6 characters long'
       });
     }
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({
+      email: normalizedEmail
+    });
+
     if (existingUser) {
       return res.status(400).json({
-        error: 'User with this email already exists'
+        error:
+          'User with this email already exists'
       });
     }
 
     const validRoles = ['student', 'staff'];
-    const userRole = role || 'student';
+
     if (!validRoles.includes(userRole)) {
       return res.status(400).json({
-        error: 'Invalid role. Must be "student" or "staff"'
+        error:
+          'Invalid role. Must be "student" or "staff"'
       });
     }
 
     const user = new User({
-      email: email.toLowerCase(),
+      email: normalizedEmail,
       passwordHash: password,
       firstName,
       lastName,
       role: userRole,
-      department: userRole === 'staff' ? department : undefined
+      department:
+        userRole === 'staff'
+          ? department
+          : undefined
     });
 
     await user.save();
@@ -54,8 +99,10 @@ const register = async (req, res) => {
 
   } catch (error) {
     console.error('Register error:', error);
+
     res.status(500).json({
-      error: error.message || 'Registration failed'
+      error:
+        error.message || 'Registration failed'
     });
   }
 };
@@ -66,29 +113,38 @@ const login = async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({
-        error: 'Please provide email and password'
+        error:
+          'Please provide email and password'
       });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+passwordHash');
+    const normalizedEmail = email.toLowerCase();
+
+    const user = await User.findOne({
+      email: normalizedEmail
+    }).select('+passwordHash');
 
     if (!user) {
       return res.status(401).json({
-        error: 'Invalid email or password'
+        error:
+          'Invalid email or password'
       });
     }
 
     if (!user.isActive) {
       return res.status(401).json({
-        error: 'This account has been deactivated'
+        error:
+          'This account has been deactivated'
       });
     }
 
-    const isPasswordMatch = await user.comparePassword(password);
+    const isPasswordMatch =
+      await user.comparePassword(password);
 
     if (!isPasswordMatch) {
       return res.status(401).json({
-        error: 'Invalid email or password'
+        error:
+          'Invalid email or password'
       });
     }
 
@@ -102,15 +158,19 @@ const login = async (req, res) => {
 
   } catch (error) {
     console.error('Login error:', error);
+
     res.status(500).json({
-      error: error.message || 'Login failed'
+      error:
+        error.message || 'Login failed'
     });
   }
 };
 
 const getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId);
+    const user = await User.findById(
+      req.user.userId
+    );
 
     if (!user) {
       return res.status(404).json({
@@ -124,8 +184,10 @@ const getCurrentUser = async (req, res) => {
 
   } catch (error) {
     console.error('Get user error:', error);
+
     res.status(500).json({
-      error: error.message || 'Failed to fetch user'
+      error:
+        error.message || 'Failed to fetch user'
     });
   }
 };
@@ -136,21 +198,29 @@ const refreshToken = async (req, res) => {
 
     if (!refreshToken) {
       return res.status(400).json({
-        error: 'Refresh token is required'
+        error:
+          'Refresh token is required'
       });
     }
 
-    const { verifyToken } = require('../utils/tokenUtils');
-    const decoded = verifyToken(refreshToken);
+    const {
+      verifyToken
+    } = require('../utils/tokenUtils');
 
-    const user = await User.findById(decoded.userId);
+    const decoded =
+      verifyToken(refreshToken);
+
+    const user =
+      await User.findById(decoded.userId);
+
     if (!user) {
       return res.status(401).json({
         error: 'User not found'
       });
     }
 
-    const newTokens = generateTokenPair(user);
+    const newTokens =
+      generateTokenPair(user);
 
     res.status(200).json({
       message: 'Token refreshed',
@@ -158,9 +228,15 @@ const refreshToken = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Refresh token error:', error);
+    console.error(
+      'Refresh token error:',
+      error
+    );
+
     res.status(401).json({
-      error: error.message || 'Token refresh failed'
+      error:
+        error.message ||
+        'Token refresh failed'
     });
   }
 };

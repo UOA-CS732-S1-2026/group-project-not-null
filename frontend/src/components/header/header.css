@@ -1,0 +1,25 @@
+.app-header {
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid var(--border);
+  padding: 18px clamp(18px, 4vw, 36px);
+  background: oklch(from var(--background) l c h / 0.86);
+  backdrop-filter: blur(18px);
+}
+
+.app-header h1 {
+  max-width: none;
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  line-height: 1.1;
+  text-align: left;
+  text-transform: none;
+  font-family: var(--font-landing);
+}
+
+.header-actions {
+  flex: 0 0 auto;
+}
