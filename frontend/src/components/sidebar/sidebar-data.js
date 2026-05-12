@@ -40,6 +40,7 @@ export const sidebarData = {
       title: 'Admin',
       items: [
         { title: 'Admin Panel', url: '/admin', icon: ShieldCheck },
+        { title: 'Tickets', url: '/admin/tickets', icon: TicketCheck },
       ],
     },
   ],

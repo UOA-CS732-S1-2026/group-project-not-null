@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyAuth, verifyAdmin } = require('../middleware/auth');
 const User = require('../models/user');
+const Ticket = require('../models/Ticket');
 
 // GET /api/admin/staff/pending — list all pending staff signup requests
 router.get('/staff/pending', verifyAuth, verifyAdmin, async (req, res) => {
@@ -138,6 +139,52 @@ router.patch('/staff/:id/promote', verifyAuth, verifyAdmin, async (req, res) => 
     res.status(200).json({ message: 'Staff promoted to admin', user });
   } catch (error) {
     console.error('Promote staff error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/admin/tickets — list all tickets with optional filters
+router.get('/tickets', verifyAuth, verifyAdmin, async (req, res) => {
+  try {
+    const { status, category, search, page = 1, limit = 50 } = req.query;
+    const filter = {};
+    if (status) filter.status = status;
+    if (category) filter.category = category;
+    if (search) {
+      const re = new RegExp(search, 'i');
+      filter.$or = [{ title: re }, { ticketNumber: re }];
+    }
+    const skip = (Number(page) - 1) * Number(limit);
+    const [tickets, total] = await Promise.all([
+      Ticket.find(filter)
+        .populate('studentId', 'firstName lastName email')
+        .populate('assignedToStaffId', 'firstName lastName email')
+        .sort({ priority: 1, updatedAt: -1 })
+        .skip(skip)
+        .limit(Number(limit)),
+      Ticket.countDocuments(filter),
+    ]);
+    res.status(200).json({ tickets, total });
+  } catch (error) {
+    console.error('Get admin tickets error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PATCH /api/admin/tickets/:id/assign — assign or unassign a ticket
+router.patch('/tickets/:id/assign', verifyAuth, verifyAdmin, async (req, res) => {
+  try {
+    const { staffId } = req.body;
+    const ticket = await Ticket.findByIdAndUpdate(
+      req.params.id,
+      { assignedToStaffId: staffId || null, updatedAt: new Date() },
+      { new: true }
+    ).populate('assignedToStaffId', 'firstName lastName email');
+
+    if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
+    res.status(200).json({ ticket });
+  } catch (error) {
+    console.error('Assign ticket error:', error);
     res.status(500).json({ error: error.message });
   }
 });
