@@ -20,13 +20,13 @@
   display: inline-grid;
   place-items: center;
   border-radius: 12px;
-  color: var(--staff-teal);
+  color: var(--blue-900);
   background: var(--staff-soft);
 }
 
 .activity-item p {
   margin: 0;
-  color: var(--staff-teal);
+  color: var(--blue-900);
   font-weight: 800;
 }
 

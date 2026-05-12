@@ -32,7 +32,7 @@
 
 .dashboard-card strong {
   display: block;
-  color: var(--staff-teal);
+  color: var(--blue-900);
   font-size: clamp(1.65rem, 2vw, 2.2rem);
   line-height: 1;
 }
@@ -79,7 +79,7 @@
 }
 
 .dashboard-card-teal .card-accent {
-  background: var(--staff-teal);
+  background: var(--blue-900);
 }
 
 @media (max-width: 1180px) {

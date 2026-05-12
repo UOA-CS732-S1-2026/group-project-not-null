@@ -4,7 +4,6 @@
 }
 
 .staff-dashboard {
-  --staff-teal: #2C4C5C;
   --staff-steel: #6C8494;
   --staff-soft: #f5f8fa;
   --staff-line: #e4ebef;
@@ -13,7 +12,7 @@
   display: grid;
   gap: 22px;
   padding-bottom: 34px;
-  color: var(--staff-teal);
+  color: var(--blue-900);
 }
 
 .staff-dashboard-grid {

@@ -27,21 +27,13 @@ import { formatTicket, ticketCategories } from '../../services/ticket-mappers.js
 import './Dashboard.css'
 
 const summaryCards = [
-  { key: 'openTickets', label: 'Open Tickets', detail: 'Waiting for review', tone: 'critical' },
-  { key: 'inProgressTickets', label: 'In Progress', detail: 'Currently being handled', tone: 'medium' },
-  { key: 'resolvedToday', label: 'Resolved Today', detail: 'Closed since midnight', tone: 'low' },
+  { key: 'resolvedToday', label: 'Resolved Today', detail: 'Closed by you since midnight', tone: 'low' },
   { key: 'highPriorityTickets', label: 'High Priority', detail: 'Needs same-day response', tone: 'high' },
   { key: 'assignedToMe', label: 'Assigned to Me', detail: 'Active personal queue', tone: 'steel' },
-  { key: 'averageResponseTime', label: 'Avg Response Time', detail: 'Resolved ticket average', tone: 'teal' },
+  { key: 'averageResponseTime', label: 'Your Avg Response Time', detail: 'Your resolved ticket average', tone: 'teal' },
 ]
 
-const filterChips = [
-  { label: 'All', params: {} },
-  { label: 'Open', params: { status: 'open' } },
-  { label: 'In Progress', params: { status: 'in_progress' } },
-  { label: 'High Priority', params: { priority: 'high' } },
-  { label: 'Assigned to Me', params: { assignedTo: 'me' } },
-]
+const filterChips = [{ label: 'Assigned to Me', params: { assignedTo: 'me' } }]
 
 const categoryLabels = {
   IT: 'IT',
@@ -139,10 +131,10 @@ function StaffDashboard({ user }) {
     [analyticsState.data.ticketsByCategory],
   )
   const statusStats = analyticsState.data.ticketsByStatus || []
-  const activeTicketCount = (summaryState.data?.openTickets || 0) + (summaryState.data?.inProgressTickets || 0)
+  const assignedTicketCount = summaryState.data?.assignedToMe || 0
   const operationalSummary = summaryState.isLoading
-    ? 'Loading active ticket summary.'
-    : `${activeTicketCount} active tickets require attention today.`
+    ? 'Loading assigned ticket summary.'
+    : `${assignedTicketCount} tickets are currently assigned to you.`
 
   return (
     <Main className="staff-dashboard">

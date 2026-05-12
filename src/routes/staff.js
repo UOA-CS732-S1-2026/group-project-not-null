@@ -233,7 +233,6 @@ router.get('/dashboard/summary', verifyAuth, async (req, res) => {
 
     const [
       openTickets,
-      inProgressTickets,
       resolvedToday,
       highPriorityTickets,
       assignedToMe,
@@ -241,10 +240,18 @@ router.get('/dashboard/summary', verifyAuth, async (req, res) => {
     ] = await Promise.all([
       Ticket.countDocuments({ status: 'open' }),
       Ticket.countDocuments({ status: 'in_progress' }),
-      Ticket.countDocuments({ status: 'resolved', resolvedAt: { $gte: today } }),
+      Ticket.countDocuments({
+        status: 'resolved',
+        resolvedAt: { $gte: today },
+        assignedToStaffId: req.user.userId
+      }),
       Ticket.countDocuments({ priority: { $in: [1, 2] }, status: { $ne: 'resolved' } }),
       Ticket.countDocuments({ assignedToStaffId: req.user.userId, status: { $ne: 'resolved' } }),
-      Ticket.find({ status: 'resolved', resolvedAt: { $ne: null } }).select('createdAt resolvedAt')
+      Ticket.find({
+        status: 'resolved',
+        resolvedAt: { $ne: null },
+        assignedToStaffId: req.user.userId
+      }).select('createdAt resolvedAt')
     ]);
 
     const averageMs = resolvedTickets.length
@@ -256,7 +263,6 @@ router.get('/dashboard/summary', verifyAuth, async (req, res) => {
     res.status(200).json({
       summary: {
         openTickets,
-        inProgressTickets,
         resolvedToday,
         highPriorityTickets,
         assignedToMe,
@@ -497,7 +503,6 @@ router.get('/analytics/summary', verifyAuth, async (req, res) => {
 
     const tickets = await Ticket.find();
     const openTickets = await Ticket.countDocuments({ status: 'open' });
-    const inProgressTickets = await Ticket.countDocuments({ status: 'in_progress' });
     const resolvedTickets = await Ticket.countDocuments({ status: 'resolved' });
 
     const ticketsByCategory = {};
@@ -513,7 +518,6 @@ router.get('/analytics/summary', verifyAuth, async (req, res) => {
     res.status(200).json({
       totalTickets: tickets.length,
       openTickets,
-      inProgressTickets,
       resolvedTickets,
       ticketsByCategory,
       ticketsByUrgency,
