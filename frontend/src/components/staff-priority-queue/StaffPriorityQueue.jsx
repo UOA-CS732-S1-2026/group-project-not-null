@@ -1,8 +1,11 @@
 import { AlertCircle } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { EmptyState, SectionError, SectionSkeleton } from '../dashboard-section-state'
 import './StaffPriorityQueue.css'
 
 export default function StaffPriorityQueue({ tickets, isLoading, error, onRetry }) {
+  const navigate = useNavigate()
+
   return (
     <aside className="staff-panel urgent-panel" aria-labelledby="urgent-title">
       <div className="staff-panel-heading">
@@ -22,7 +25,12 @@ export default function StaffPriorityQueue({ tickets, isLoading, error, onRetry 
       ) : (
         <div className="urgent-list">
           {tickets.map((ticket) => (
-            <button className="urgent-card" type="button" key={ticket.id}>
+            <button
+              className="urgent-card"
+              type="button"
+              key={ticket.id}
+              onClick={() => navigate(`/tickets/${ticket.id}`)}
+            >
               <strong>{ticket.title}</strong>
               <span>{ticket.meta}</span>
             </button>
