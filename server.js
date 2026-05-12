@@ -1,7 +1,5 @@
-// server.js
 const app = require('./app');
 const connectDB = require('./src/config/database');
-require('dotenv').config({ path: '.env.local' });
 require('dotenv').config();
  
 const PORT = process.env.PORT || 5000;

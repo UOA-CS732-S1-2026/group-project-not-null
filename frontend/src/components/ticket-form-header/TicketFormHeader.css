@@ -5,11 +5,13 @@
 
 .ticket-form-header h1 {
   margin: 0;
+  font-family: var(--font-landing);
 }
 
 .ticket-form-header p {
   margin: 0;
   color: var(--muted-foreground);
+  font-family: var(--font-landing);
 }
 
 .ticket-form-breadcrumbs {
