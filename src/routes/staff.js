@@ -13,6 +13,13 @@ const CATEGORY_LABELS = {
   'accommodation/finance': 'Accommodation/Finance'
 };
 
+const DEPT_TO_CATEGORY = {
+  'IT': 'IT',
+  'Enrolment': 'enrolment',
+  'Academic': 'academic',
+  'Accommodation & Finance': 'accommodation/finance',
+};
+
 const STATUS_LABELS = {
   open: 'Open',
   in_progress: 'In Progress',
@@ -105,7 +112,6 @@ router.get('/tickets', verifyAuth, requireActiveStaff, async (req, res) => {
     const {
       status,
       priority,
-      category,
       assignedTo,
       search,
       searchQuery,
@@ -115,8 +121,16 @@ router.get('/tickets', verifyAuth, requireActiveStaff, async (req, res) => {
 
     const filter = {};
 
-    if (status) filter.status = status;
-    if (category) filter.category = category;
+    // Always exclude archived tickets; allow further filtering by a specific status
+    filter.status = { $ne: 'archived' };
+    if (status && status !== 'archived') filter.status = status;
+
+    // Restrict to department unless viewing tickets assigned to this staff member
+    if (assignedTo !== 'me') {
+      const staffUser = await User.findById(req.user.userId).select('department');
+      const deptCategory = DEPT_TO_CATEGORY[staffUser?.department];
+      if (deptCategory) filter.category = deptCategory;
+    }
     if (priority === 'high') {
       filter.priority = { $in: [1, 2] };
     } else if (priority) {
@@ -171,8 +185,13 @@ router.get('/tickets/urgent', verifyAuth, requireActiveStaff, async (req, res) =
   try {
     const agingThreshold = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
+    const staffUser = await User.findById(req.user.userId).select('department');
+    const deptCategory = DEPT_TO_CATEGORY[staffUser?.department];
+    const deptFilter = deptCategory ? { category: deptCategory } : {};
+
     const tickets = await Ticket.find({
-      status: { $ne: 'resolved' },
+      ...deptFilter,
+      status: { $nin: ['resolved', 'archived'] },
       $or: [
         { priority: 1 },
         { urgencyLevel: 'high' },

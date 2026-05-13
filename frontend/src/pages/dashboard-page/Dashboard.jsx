@@ -34,8 +34,6 @@ const summaryCards = [
   { key: 'averageResponseTime', label: 'Your Avg Response Time', detail: 'Your resolved ticket average', tone: 'teal' },
 ]
 
-const filterChips = [{ label: 'Assigned to Me', params: { assignedTo: 'me' } }]
-
 const categoryLabels = {
   IT: 'IT',
   enrolment: 'Enrolment',
@@ -66,6 +64,10 @@ export default function DashBoard() {
 function StaffDashboard({ user }) {
   const greeting = getAucklandGreeting()
   const staffName = getDisplayName(user) || 'Staff'
+  const filterChips = [
+    { label: 'All', params: {} },
+    { label: 'Assigned to Me', params: { assignedTo: 'me' } },
+  ]
   const [activeFilter, setActiveFilter] = useState(0)
   const [ticketSearch, setTicketSearch] = useState('')
 
