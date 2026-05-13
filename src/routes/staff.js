@@ -3,6 +3,7 @@ const router = express.Router();
 const { verifyAuth } = require('../middleware/auth');
 const Ticket = require('../models/Ticket');
 const User = require('../models/user');
+const { getTicketsAssignedToStaff } = require('../services/staffTicketService');
 
 const CATEGORY_LABELS = {
   IT: 'IT',
@@ -48,7 +49,8 @@ function getPersonName(user, fallback = 'Unassigned') {
 function getPriorityLabel(priority) {
   if (priority === 1) return 'Critical';
   if (priority === 2) return 'High';
-  if (priority === 3) return 'Low';
+  if (priority === 3) return 'Medium';
+  if (priority === 4) return 'Low';
   return 'Medium';
 }
 
@@ -75,6 +77,28 @@ function requireActiveStaff(req, res, next) {
     return res.status(403).json({ error: 'Active staff account required' });
   }
   next();
+}
+
+async function requireStaff(req, res) {
+  if (req.user.role !== 'staff') {
+    res.status(403).json({ error: 'Only staff can access this resource' });
+    return null;
+  }
+
+  const user = await User.findById(req.user.userId)
+    .select('email firstName lastName department role staffStatus isActive');
+
+  if (!user || !user.isActive) {
+    res.status(403).json({ error: 'Active staff account required' });
+    return null;
+  }
+
+  if (user.staffStatus === 'pending' || user.staffStatus === 'inactive') {
+    res.status(403).json({ error: 'Active staff account required' });
+    return null;
+  }
+
+  return user;
 }
 
 async function findAssignableStaff(staffId) {
@@ -186,13 +210,36 @@ router.get('/users', verifyAuth, requireActiveStaff, async (req, res) => {
   }
 });
 
-router.get('/tickets/:id', verifyAuth, requireActiveStaff, async (req, res) => {
+router.get('/my-tickets', verifyAuth, async (req, res) => {
+  try {
+    const user = await requireStaff(req, res);
+    if (!user) return;
+
+    const { tickets, summary } = await getTicketsAssignedToStaff(req.user.userId);
+
+    res.status(200).json({
+      message: 'Assigned tickets retrieved',
+      tickets,
+      summary
+    });
+  } catch (error) {
+    console.error('Get my tickets error:', error);
+    res.status(500).json({ error: error.message || 'Failed to fetch assigned tickets' });
+  }
+});
+
+router.get('/tickets/:id', verifyAuth, async (req, res) => {
   try {
     const ticket = await Ticket.findById(req.params.id)
       .populate('studentId', 'email firstName lastName')
       .populate('assignedToStaffId', 'email firstName lastName department')
-      .populate('internalNotes.staffId', 'email firstName lastName department');
-    if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
+      .populate('internalNotes.staffId', 'email firstName lastName department')
+      .populate('studentNotes.staffId', 'email firstName lastName department');
+
+    if (!ticket) {
+      return res.status(404).json({ error: 'Ticket not found' });
+    }
+
     res.status(200).json({ ticket });
   } catch (error) {
     console.error('Get staff ticket error:', error);
@@ -214,10 +261,22 @@ router.get('/dashboard/summary', verifyAuth, requireActiveStaff, async (req, res
     ] = await Promise.all([
       Ticket.countDocuments({ status: 'open' }),
       Ticket.countDocuments({ status: 'in_progress' }),
-      Ticket.countDocuments({ status: 'resolved', resolvedAt: { $gte: today } }),
-      Ticket.countDocuments({ priority: { $in: [1, 2] }, status: { $ne: 'resolved' } }),
+      Ticket.countDocuments({
+        status: 'resolved',
+        resolvedAt: { $gte: today },
+        assignedToStaffId: req.user.userId
+      }),
+      Ticket.countDocuments({
+        priority: { $in: [1, 2] },
+        status: { $ne: 'resolved' },
+        assignedToStaffId: req.user.userId
+      }),
       Ticket.countDocuments({ assignedToStaffId: req.user.userId, status: { $ne: 'resolved' } }),
-      Ticket.find({ status: 'resolved', resolvedAt: { $ne: null } }).select('createdAt resolvedAt')
+      Ticket.find({
+        status: 'resolved',
+        resolvedAt: { $ne: null },
+        assignedToStaffId: req.user.userId
+      }).select('createdAt resolvedAt')
     ]);
 
     const averageMs = resolvedTickets.length
@@ -228,6 +287,7 @@ router.get('/dashboard/summary', verifyAuth, requireActiveStaff, async (req, res
 
     res.status(200).json({
       summary: {
+        openTickets,
         openTickets,
         inProgressTickets,
         resolvedToday,
@@ -246,9 +306,22 @@ router.get('/dashboard/summary', verifyAuth, requireActiveStaff, async (req, res
 
 router.get('/dashboard/analytics', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
+    const user = await requireStaff(req, res);
+    if (!user) return;
+
+    const matchAssigned = { $match: { assignedToStaffId: req.user.userId } };
+
     const [byCategory, byStatus] = await Promise.all([
-      Ticket.aggregate([{ $group: { _id: '$category', value: { $sum: 1 } } }, { $sort: { value: -1 } }]),
-      Ticket.aggregate([{ $group: { _id: '$status', value: { $sum: 1 } } }, { $sort: { value: -1 } }])
+      Ticket.aggregate([
+        matchAssigned,
+        { $group: { _id: '$category', value: { $sum: 1 } } },
+        { $sort: { value: -1 } }
+      ]),
+      Ticket.aggregate([
+        matchAssigned,
+        { $group: { _id: '$status', value: { $sum: 1 } } },
+        { $sort: { value: -1 } }
+      ])
     ]);
 
     res.status(200).json({
@@ -354,6 +427,24 @@ router.patch('/tickets/:id', verifyAuth, requireActiveStaff, async (req, res) =>
       });
     }
 
+    if (hasStatusUpdate && status === 'resolved') {
+      const existingTicket = await Ticket.findById(req.params.id).select('studentNotes');
+
+      if (!existingTicket) {
+        return res.status(404).json({ error: 'Ticket not found' });
+      }
+
+      const hasResolvingComment = existingTicket.studentNotes?.some((note) => (
+        note.isResolvingComment
+      ));
+
+      if (!hasResolvingComment) {
+        return res.status(400).json({
+          error: 'Add a student note marked as the resolving comment before resolving this ticket.'
+        });
+      }
+    }
+
     const updateData = {};
 
     if (hasStatusUpdate) {
@@ -391,7 +482,8 @@ router.patch('/tickets/:id', verifyAuth, requireActiveStaff, async (req, res) =>
     )
       .populate('studentId', 'email firstName lastName')
       .populate('assignedToStaffId', 'email firstName lastName department')
-      .populate('internalNotes.staffId', 'email firstName lastName department');
+      .populate('internalNotes.staffId', 'email firstName lastName department')
+      .populate('studentNotes.staffId', 'email firstName lastName department');
 
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket not found' });
@@ -430,7 +522,8 @@ router.post('/tickets/:id/notes', verifyAuth, requireActiveStaff, async (req, re
     )
       .populate('studentId', 'email firstName lastName')
       .populate('assignedToStaffId', 'email firstName lastName department')
-      .populate('internalNotes.staffId', 'email firstName lastName department');
+      .populate('internalNotes.staffId', 'email firstName lastName department')
+      .populate('studentNotes.staffId', 'email firstName lastName department');
 
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket not found' });
@@ -446,11 +539,63 @@ router.post('/tickets/:id/notes', verifyAuth, requireActiveStaff, async (req, re
   }
 });
 
-router.get('/analytics/summary', verifyAuth, requireActiveStaff, async (req, res) => {
+router.post('/tickets/:id/student-notes', verifyAuth, async (req, res) => {
+  try {
+    const user = await requireStaff(req, res);
+    if (!user) return;
+
+    const content = req.body.content?.trim();
+    const isResolvingComment = Boolean(req.body.isResolvingComment);
+
+    if (!content) {
+      return res.status(400).json({ error: 'Student note content required' });
+    }
+
+    const updateData = {
+      $push: {
+        studentNotes: {
+          staffId: req.user.userId,
+          content,
+          isResolvingComment,
+          createdAt: new Date()
+        }
+      },
+      updatedAt: new Date()
+    };
+
+    if (isResolvingComment) {
+      updateData.status = 'resolved';
+      updateData.resolvedAt = new Date();
+    }
+
+    const ticket = await Ticket.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { returnDocument: 'after', runValidators: true }
+    )
+      .populate('studentId', 'email firstName lastName')
+      .populate('assignedToStaffId', 'email firstName lastName department')
+      .populate('internalNotes.staffId', 'email firstName lastName department')
+      .populate('studentNotes.staffId', 'email firstName lastName department');
+
+    if (!ticket) {
+      return res.status(404).json({ error: 'Ticket not found' });
+    }
+
+    res.status(200).json({
+      message: 'Student note added successfully',
+      ticket
+    });
+  } catch (error) {
+    console.error('Add student note error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/analytics/summary', verifyAuth, async (req, res) => {
   try {
     const tickets = await Ticket.find();
     const openTickets = await Ticket.countDocuments({ status: 'open' });
-    const inProgressTickets = await Ticket.countDocuments({ status: 'in_progress' });
     const resolvedTickets = await Ticket.countDocuments({ status: 'resolved' });
 
     const ticketsByCategory = {};
@@ -466,7 +611,6 @@ router.get('/analytics/summary', verifyAuth, requireActiveStaff, async (req, res
     res.status(200).json({
       totalTickets: tickets.length,
       openTickets,
-      inProgressTickets,
       resolvedTickets,
       ticketsByCategory,
       ticketsByUrgency,

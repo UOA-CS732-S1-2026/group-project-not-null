@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
-import { LandingPage, SignIn, SignUp, Dashboard, CreateTicket, ViewTicket, AdminPage, AdminTicketsPage } from '../pages'
+import { LandingPage, SignIn, SignUp, Dashboard, CreateTicket, ViewTicket, AdminPage, AdminTicketsPage, StaffTickets } from '../pages'
 import { AuthenticatedLayout, AdminLayout } from '../components'
 
 function Main() {
@@ -11,6 +11,7 @@ function Main() {
       <Route path="/sign-up" element={<SignUp />} />
       <Route element={<AuthenticatedLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/staff/tickets" element={<StaffTickets />} />
         <Route path="/tickets/new" element={<CreateTicket />} />
         <Route path="/tickets/:ticketId" element={<ViewTicket />} />
       </Route>

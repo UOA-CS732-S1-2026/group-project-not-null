@@ -285,7 +285,6 @@ button:not(:disabled),
 .sidebar-link:hover,
 .sidebar-link-active {
   color: var(--accent-foreground);
-  background: var(--accent);
 }
 
 .sidebar-link-icon {
@@ -296,15 +295,6 @@ button:not(:disabled),
   color: var(--muted-foreground);
   background: transparent;
   font-size: 0.9rem;
-}
-
-.nav-badge {
-  margin-left: auto;
-  border-radius: 999px;
-  padding: 0 6px;
-  color: var(--primary-foreground);
-  background: var(--primary);
-  font-size: 0.7rem;
 }
 
 .nav-user {

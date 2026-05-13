@@ -133,6 +133,10 @@ export function getStaffTickets(params = {}) {
   return request(`/staff/tickets${buildQuery(params)}`)
 }
 
+export function getMyStaffTickets() {
+  return request('/staff/my-tickets')
+}
+
 export function getStaffUrgentTickets() {
   return request('/staff/tickets/urgent')
 }
@@ -152,6 +156,13 @@ export function addStaffTicketNote(ticketId, { content }) {
   return request(`/staff/tickets/${ticketId}/notes`, {
     method: 'POST',
     body: JSON.stringify({ content }),
+  })
+}
+
+export function addStaffTicketStudentNote(ticketId, { content, isResolvingComment }) {
+  return request(`/staff/tickets/${ticketId}/student-notes`, {
+    method: 'POST',
+    body: JSON.stringify({ content, isResolvingComment }),
   })
 }
 

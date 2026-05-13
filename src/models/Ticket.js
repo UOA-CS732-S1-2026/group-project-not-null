@@ -66,6 +66,23 @@ const ticketSchema = new mongoose.Schema({
       }
     }
   ],
+  studentNotes: [
+    {
+      staffId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      },
+      content: String,
+      isResolvingComment: {
+        type: Boolean,
+        default: false
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now
+      }
+    }
+  ],
   resolvedAt: {
     type: Date,
     default: null
