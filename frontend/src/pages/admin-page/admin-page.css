@@ -1,6 +1,8 @@
 .admin-page {
   padding: 32px;
   max-width: 960px;
+  width: 100%;
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: 40px;
@@ -40,24 +42,33 @@
   font-size: 0.88rem;
 }
 
+.admin-table thead {
+  background: var(--primary);
+}
+
 .admin-table th {
-  text-align: left;
+  text-align: center;
   padding: 8px 12px;
-  color: var(--muted-foreground);
-  font-weight: 600;
-  border-bottom: 1px solid var(--border);
+  color: var(--background);
+  font-weight: 700;
+  border-bottom: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .admin-table td {
+  text-align: left;
   padding: 10px 12px;
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.admin-table tbody tr:nth-child(even) {
+  background: #f3f4f6;
 }
 
 .admin-table tr:last-child td {
