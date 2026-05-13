@@ -16,11 +16,16 @@
   min-height: 164px;
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) - 2px);
-  padding: 18px 14px 12px;
+  padding: 16px 14px;
   color: var(--primary);
   background: var(--background);
   font: inherit;
+  line-height: 1.5;
   resize: vertical;
+}
+
+.description-area textarea::placeholder {
+  color: color-mix(in srgb, var(--muted-foreground), transparent 26%);
 }
 
 .description-area textarea:focus {

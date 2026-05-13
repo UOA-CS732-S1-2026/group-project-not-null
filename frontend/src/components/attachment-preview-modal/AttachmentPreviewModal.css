@@ -1,0 +1,96 @@
+.attachment-preview-backdrop {
+  background:
+    linear-gradient(180deg, rgb(0 41 107 / 0.72), rgb(0 19 47 / 0.82));
+  backdrop-filter: blur(8px);
+}
+
+.attachment-preview-dialog {
+  width: min(100%, 980px);
+  max-height: calc(100svh - 40px);
+  display: grid;
+  gap: 18px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border), transparent 12%);
+  border-radius: 20px;
+  padding: 22px;
+  background: rgb(251 253 255 / 0.98);
+  box-shadow: 0 28px 80px rgb(0 19 47 / 0.34);
+}
+
+.attachment-preview-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.attachment-preview-header h2 {
+  margin: 0;
+  color: var(--primary);
+  font-size: clamp(1.35rem, 3vw, 1.9rem);
+  line-height: 1.1;
+  text-transform: none;
+}
+
+.attachment-preview-header p:not(.page-eyebrow) {
+  margin: 8px 0 0;
+  color: var(--muted-foreground);
+}
+
+.attachment-preview-close {
+  min-height: 40px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 0 14px;
+  color: var(--primary);
+  background: var(--background);
+  font: inherit;
+  font-weight: 800;
+}
+
+.attachment-preview-stage {
+  min-height: 360px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--border), transparent 12%);
+  border-radius: 16px;
+  padding: 20px;
+  background:
+    radial-gradient(circle at top, rgb(255 213 0 / 0.16), transparent 30%),
+    linear-gradient(180deg, rgb(243 247 252 / 0.96), rgb(255 255 255 / 0.98));
+}
+
+.attachment-preview-stage p {
+  margin: 0;
+}
+
+.attachment-preview-stage img {
+  max-width: 100%;
+  max-height: calc(100svh - 240px);
+  border-radius: 12px;
+  object-fit: contain;
+  box-shadow: 0 14px 32px rgb(0 41 107 / 0.12);
+}
+
+.attachment-preview-actions {
+  display: flex;
+  justify-content: end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 639px) {
+  .attachment-preview-dialog {
+    padding: 18px;
+  }
+
+  .attachment-preview-header {
+    flex-direction: column;
+  }
+
+  .attachment-preview-actions .button,
+  .attachment-preview-close {
+    width: 100%;
+    max-width: none;
+  }
+}

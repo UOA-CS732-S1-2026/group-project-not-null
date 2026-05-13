@@ -11,7 +11,7 @@ export default function DescriptionArea({
 }) {
   return (
     <label className="description-area">
-      <span>{label}</span>
+      {label ? <span>{label}</span> : null}
       <textarea
         name={name}
         value={value}

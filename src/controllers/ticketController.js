@@ -7,6 +7,91 @@ const {
   getPriorityValue,
   normalizePriorityTier
 } = require('../services/priorityUtils');
+const {
+  deleteTicketAttachment,
+  findTicketAttachmentFile,
+  openTicketAttachmentDownloadStream,
+  serializeTicketWithAttachment,
+  uploadTicketAttachment
+} = require('../services/ticketAttachmentService');
+
+const MAX_ATTACHMENT_SIZE_BYTES = 25 * 1024 * 1024;
+const IMAGE_DATA_URL_PATTERN = /^data:(image\/[a-z0-9.+-]+);base64,([a-z0-9+/=]+)$/i;
+
+function canAccessTicket(ticket, user) {
+  if (!ticket || !user) {
+    return false;
+  }
+
+  if (user.role === 'admin' || user.role === 'staff') {
+    return true;
+  }
+
+  const studentId = ticket.studentId?._id || ticket.studentId;
+  return studentId?.toString() === user.userId;
+}
+
+function normalizeAttachmentPayload(input) {
+  if (!input) {
+    return { attachment: null };
+  }
+
+  if (typeof input !== 'object' || Array.isArray(input)) {
+    return { error: 'Attachment upload was malformed. Please try again with a single image file.' };
+  }
+
+  const fileName = String(input.fileName || '').trim();
+  const mimeType = String(input.mimeType || '').trim().toLowerCase();
+  const dataUrl = String(input.dataUrl || '').trim();
+  const declaredSize = Number(input.sizeBytes);
+
+  if (!fileName || !mimeType || !dataUrl) {
+    return { error: 'Attachment upload was incomplete. Please choose the image again.' };
+  }
+
+  const dataUrlMatch = dataUrl.match(IMAGE_DATA_URL_PATTERN);
+  if (!dataUrlMatch) {
+    return { error: 'Attachment upload was malformed. Please choose a valid image file.' };
+  }
+
+  const actualMimeType = dataUrlMatch[1].toLowerCase();
+  if (!actualMimeType.startsWith('image/')) {
+    return { error: 'Only image attachments are supported.' };
+  }
+
+  if (mimeType !== actualMimeType) {
+    return { error: 'Attachment type did not match the uploaded image.' };
+  }
+
+  let buffer = null;
+
+  try {
+    buffer = Buffer.from(dataUrlMatch[2], 'base64');
+  } catch (error) {
+    return { error: 'Attachment upload was malformed. Please choose the image again.' };
+  }
+
+  if (!buffer.length) {
+    return { error: 'Attachment upload was empty. Please choose the image again.' };
+  }
+
+  if (Number.isFinite(declaredSize) && declaredSize > 0 && declaredSize !== buffer.length) {
+    return { error: 'Attachment size did not match the uploaded file. Please try again.' };
+  }
+
+  if (buffer.length > MAX_ATTACHMENT_SIZE_BYTES) {
+    return { error: 'Image attachments must be 25 MB or smaller.' };
+  }
+
+  return {
+    attachment: {
+      fileName,
+      mimeType: actualMimeType,
+      sizeBytes: buffer.length,
+      buffer
+    }
+  };
+}
  
 /**
  * Create a new ticket (Student)
@@ -14,7 +99,7 @@ const {
  */
 const createTicket = async (req, res) => {
   try {
-    const { title, description, category, urgencyLevel, priority } = req.body;
+    const { title, description, category, urgencyLevel, priority, attachment: rawAttachment } = req.body;
  
     // Validation
     if (!title || !description || !category) {
@@ -39,24 +124,64 @@ const createTicket = async (req, res) => {
     }
 
     const priorityTier = normalizePriorityTier(priority) || getFallbackPriorityTier(urgency);
+    const { attachment: normalizedAttachment, error: attachmentError } = normalizeAttachmentPayload(rawAttachment);
+
+    if (attachmentError) {
+      return res.status(400).json({ error: attachmentError });
+    }
+
+    let savedAttachment = null;
+
+    if (normalizedAttachment) {
+      savedAttachment = await uploadTicketAttachment({
+        buffer: normalizedAttachment.buffer,
+        fileName: normalizedAttachment.fileName,
+        mimeType: normalizedAttachment.mimeType,
+        metadata: {
+          uploadedByUserId: req.user.userId
+        }
+      });
+    }
  
-    // Create ticket
-    const ticket = new Ticket({
-      studentId: req.user.userId,
-      title,
-      description,
-      category,
-      urgencyLevel: urgency,
-      priority: getPriorityValue(priorityTier)
-    });
+    let ticket = null;
+
+    try {
+      ticket = new Ticket({
+        studentId: req.user.userId,
+        title,
+        description,
+        category,
+        urgencyLevel: urgency,
+        priority: getPriorityValue(priorityTier),
+        attachment: savedAttachment ? {
+          fileName: savedAttachment.fileName,
+          mimeType: savedAttachment.mimeType,
+          sizeBytes: savedAttachment.sizeBytes,
+          gridFsFileId: savedAttachment.fileId,
+          uploadedAt: new Date()
+        } : null
+      });
  
-    await ticket.save();
+      await ticket.save();
+    } catch (error) {
+      if (savedAttachment?.fileId) {
+        await deleteTicketAttachment(savedAttachment.fileId).catch((cleanupError) => {
+          console.error('Attachment cleanup error after ticket save failure:', cleanupError);
+        });
+      }
+
+      throw error;
+    }
  
     // Populate student info before returning
     await ticket.populate('studentId', 'firstName lastName email');
+ 
+    res.status(201).json({
+      message: 'Ticket created successfully',
+      ticket: serializeTicketWithAttachment(ticket)
+    });
 
-    //Email sending
-    await sendEmail({
+    sendEmail({
       to: ticket.studentId.email,
       subject: 'UniDesk Ticket Created',
       text: `Hello ${ticket.studentId.firstName},
@@ -70,11 +195,8 @@ const createTicket = async (req, res) => {
     We will update you once the ticket status changes.
 
     - UniDesk Support Team`,
-    });
- 
-    res.status(201).json({
-      message: 'Ticket created successfully',
-      ticket
+    }).catch((emailError) => {
+      console.error('Ticket creation email failed:', emailError);
     });
  
   } catch (error) {
@@ -161,12 +283,67 @@ const getTicketDetails = async (req, res) => {
       });
     }
  
-    res.status(200).json({ ticket });
+    res.status(200).json({ ticket: serializeTicketWithAttachment(ticket) });
  
   } catch (error) {
     console.error('Get ticket error:', error);
     res.status(500).json({
       error: error.message || 'Failed to fetch ticket'
+    });
+  }
+};
+
+/**
+ * Stream a ticket attachment to an authorized viewer
+ * GET /api/tickets/:id/attachment
+ */
+const getTicketAttachment = async (req, res) => {
+  try {
+    const ticket = await Ticket.findById(req.params.id).select('studentId attachment');
+
+    if (!ticket) {
+      return res.status(404).json({ error: 'Ticket not found' });
+    }
+
+    if (!canAccessTicket(ticket, req.user)) {
+      return res.status(403).json({
+        error: 'You do not have permission to view this attachment'
+      });
+    }
+
+    if (!ticket.attachment?.gridFsFileId) {
+      return res.status(404).json({ error: 'No attachment found for this ticket' });
+    }
+
+    const file = await findTicketAttachmentFile(ticket.attachment.gridFsFileId);
+
+    if (!file) {
+      return res.status(404).json({ error: 'Attachment file could not be found' });
+    }
+
+    res.setHeader('Content-Type', file.contentType || ticket.attachment.mimeType || 'application/octet-stream');
+    res.setHeader('Content-Length', String(file.length || ticket.attachment.sizeBytes || 0));
+    res.setHeader(
+      'Content-Disposition',
+      `inline; filename="${encodeURIComponent(ticket.attachment.fileName || 'attachment')}"`
+    );
+    res.setHeader('Cache-Control', 'private, max-age=300');
+
+    openTicketAttachmentDownloadStream(ticket.attachment.gridFsFileId)
+      .on('error', (error) => {
+        console.error('Attachment stream error:', error);
+
+        if (!res.headersSent) {
+          res.status(500).json({ error: 'Unable to stream attachment' });
+        } else {
+          res.destroy(error);
+        }
+      })
+      .pipe(res);
+  } catch (error) {
+    console.error('Get ticket attachment error:', error);
+    res.status(500).json({
+      error: error.message || 'Failed to fetch attachment'
     });
   }
 };
@@ -355,6 +532,7 @@ module.exports = {
   createTicket,
   getStudentTickets,
   getTicketDetails,
+  getTicketAttachment,
   getStaffTickets,
   updateTicketStatus,
   addInternalNote

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Main } from '../../components'
+import { AttachmentPreviewModal, Main } from '../../components'
 import {
   addStaffTicketNote,
   addStaffTicketStudentNote,
@@ -9,6 +9,7 @@ import {
   getStaffTicket,
   getStaffUsers,
   getTicket,
+  getTicketAttachmentBlob,
   updateStaffTicket,
 } from '../../services/api.js'
 import './ViewTicket.css'
@@ -64,6 +65,10 @@ export default function ViewTicket() {
   const [pendingStaffId, setPendingStaffId] = useState('')
   const [isAssigning, setIsAssigning] = useState(false)
   const [assignError, setAssignError] = useState('')
+  const [attachmentPreviewUrl, setAttachmentPreviewUrl] = useState('')
+  const [isAttachmentLoading, setIsAttachmentLoading] = useState(false)
+  const [attachmentLoadError, setAttachmentLoadError] = useState('')
+  const [isAttachmentPreviewOpen, setIsAttachmentPreviewOpen] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -107,6 +112,71 @@ export default function ViewTicket() {
       isMounted = false
     }
   }, [isAdmin, isStaff, ticketId])
+
+  useEffect(() => {
+    let isMounted = true
+    let nextObjectUrl = ''
+
+    if (!ticket?.attachment?.gridFsFileId) {
+      setAttachmentLoadError('')
+      setIsAttachmentLoading(false)
+      setAttachmentPreviewUrl((currentUrl) => {
+        if (currentUrl) {
+          URL.revokeObjectURL(currentUrl)
+        }
+
+        return ''
+      })
+      return undefined
+    }
+
+    async function loadAttachmentPreview() {
+      setAttachmentLoadError('')
+      setIsAttachmentLoading(true)
+
+      try {
+        const blob = await getTicketAttachmentBlob(ticket._id)
+
+        if (!isMounted) {
+          return
+        }
+
+        nextObjectUrl = URL.createObjectURL(blob)
+        setAttachmentPreviewUrl((currentUrl) => {
+          if (currentUrl) {
+            URL.revokeObjectURL(currentUrl)
+          }
+
+          return nextObjectUrl
+        })
+      } catch (err) {
+        if (isMounted) {
+          setAttachmentLoadError(err.message || 'Unable to load the attachment preview.')
+          setAttachmentPreviewUrl((currentUrl) => {
+            if (currentUrl) {
+              URL.revokeObjectURL(currentUrl)
+            }
+
+            return ''
+          })
+        }
+      } finally {
+        if (isMounted) {
+          setIsAttachmentLoading(false)
+        }
+      }
+    }
+
+    loadAttachmentPreview()
+
+    return () => {
+      isMounted = false
+
+      if (nextObjectUrl) {
+        URL.revokeObjectURL(nextObjectUrl)
+      }
+    }
+  }, [ticket?._id, ticket?.attachment?.gridFsFileId])
 
   async function handleSaveChanges(event) {
     event.preventDefault()
@@ -290,6 +360,7 @@ export default function ViewTicket() {
     resolvedAt: ticket.resolvedAt ? formatDateTime(ticket.resolvedAt) : '',
     internalNotes: Array.isArray(ticket.internalNotes) ? ticket.internalNotes : [],
     studentNotes: Array.isArray(ticket.studentNotes) ? ticket.studentNotes : [],
+    attachment: ticket.attachment || null,
   }
 
   return (
@@ -389,6 +460,49 @@ export default function ViewTicket() {
                 <span>{displayTicket.submitted}</span>
               </div>
               <p>{displayTicket.description}</p>
+              {displayTicket.attachment ? (
+                <section className="ticket-attachment-card">
+                  <div className="ticket-attachment-summary">
+                    <button
+                      className="ticket-attachment-trigger"
+                      disabled={isAttachmentLoading || Boolean(attachmentLoadError)}
+                      type="button"
+                      onClick={() => setIsAttachmentPreviewOpen(true)}
+                    >
+                      {attachmentPreviewUrl ? (
+                        <img
+                          alt=""
+                          className="ticket-attachment-thumb"
+                          src={attachmentPreviewUrl}
+                        />
+                      ) : (
+                        <span aria-hidden="true" className="ticket-attachment-icon" />
+                      )}
+
+                      <span className="ticket-attachment-copy">
+                        <strong>Attachment</strong>
+                        <span>{displayTicket.attachment.fileName}</span>
+                        <small>{formatFileSize(displayTicket.attachment.sizeBytes)}</small>
+                      </span>
+                    </button>
+
+                    <div className="ticket-attachment-actions">
+                      <button
+                        className="button button-primary"
+                        disabled={isAttachmentLoading || Boolean(attachmentLoadError)}
+                        type="button"
+                        onClick={() => setIsAttachmentPreviewOpen(true)}
+                      >
+                        {isAttachmentLoading ? 'Loading preview...' : 'Preview image'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {attachmentLoadError ? (
+                    <p className="form-error" role="alert">{attachmentLoadError}</p>
+                  ) : null}
+                </section>
+              ) : null}
             </article>
 
             {displayTicket.studentNotes
@@ -664,6 +778,16 @@ export default function ViewTicket() {
       <Link className="button button-primary" to={isAdmin ? '/admin/tickets' : '/dashboard'}>
         {isAdmin ? 'Back to tickets' : 'Back to dashboard'}
       </Link>
+
+      <AttachmentPreviewModal
+        error={attachmentLoadError}
+        fileName={displayTicket.attachment?.fileName}
+        fileSizeLabel={displayTicket.attachment ? formatFileSize(displayTicket.attachment.sizeBytes) : ''}
+        imageUrl={attachmentPreviewUrl}
+        isLoading={isAttachmentLoading}
+        isOpen={isAttachmentPreviewOpen}
+        onClose={() => setIsAttachmentPreviewOpen(false)}
+      />
     </Main>
   )
 }
@@ -746,4 +870,16 @@ function getStudentFacingStatusMessage(ticket) {
   }
 
   return 'No staff response yet.'
+}
+
+function formatFileSize(sizeBytes) {
+  if (!sizeBytes) {
+    return '0 KB'
+  }
+
+  if (sizeBytes < 1024 * 1024) {
+    return `${Math.max(1, Math.round(sizeBytes / 1024))} KB`
+  }
+
+  return `${(sizeBytes / (1024 * 1024)).toFixed(1)} MB`
 }

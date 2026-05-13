@@ -7,6 +7,31 @@ const generateTicketNumber = () => {
   return `TKT-${timestamp}-${random}`;
 };
 
+const attachmentSchema = new mongoose.Schema({
+  fileName: {
+    type: String,
+    trim: true,
+    required: true
+  },
+  mimeType: {
+    type: String,
+    trim: true,
+    required: true
+  },
+  sizeBytes: {
+    type: Number,
+    required: true
+  },
+  gridFsFileId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true
+  },
+  uploadedAt: {
+    type: Date,
+    default: Date.now
+  }
+}, { _id: false });
+
 const ticketSchema = new mongoose.Schema({
   ticketNumber: {
     type: String,
@@ -27,6 +52,10 @@ const ticketSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true
+  },
+  attachment: {
+    type: attachmentSchema,
+    default: null
   },
   category: {
     type: String,

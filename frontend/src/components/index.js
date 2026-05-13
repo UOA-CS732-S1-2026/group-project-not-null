@@ -40,3 +40,4 @@ export { default as StaffTicketQueue } from './staff-ticket-queue';
 export { default as StudentMetricGrid } from './student-metric-grid';
 export { default as StudentTicketList } from './student-ticket-list';
 export { default as StudentWelcomeBanner } from './student-welcome-banner';
+export { default as AttachmentPreviewModal } from './attachment-preview-modal/AttachmentPreviewModal.jsx';

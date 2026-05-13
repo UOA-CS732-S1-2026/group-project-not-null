@@ -3,6 +3,7 @@ const router = express.Router();
 const { verifyAuth, verifyAdmin } = require('../middleware/auth');
 const User = require('../models/user');
 const Ticket = require('../models/Ticket');
+const { serializeTicketWithAttachment } = require('../services/ticketAttachmentService');
 
 // GET /api/admin/staff/pending — list all pending staff signup requests
 router.get('/staff/pending', verifyAuth, verifyAdmin, async (req, res) => {
@@ -182,7 +183,7 @@ router.patch('/tickets/:id/assign', verifyAuth, verifyAdmin, async (req, res) =>
     ).populate('assignedToStaffId', 'firstName lastName email');
 
     if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
-    res.status(200).json({ ticket });
+    res.status(200).json({ ticket: serializeTicketWithAttachment(ticket) });
   } catch (error) {
     console.error('Assign ticket error:', error);
     res.status(500).json({ error: error.message });
