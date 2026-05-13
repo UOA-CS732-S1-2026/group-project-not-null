@@ -27,7 +27,7 @@
 
 .staff-greeting h1 {
   margin: 0;
-  color: var(--staff-teal);
+  color: var(--blue-900);
   font-family: var(--font-landing);
   font-size: clamp(2rem, 4vw, 3.35rem);
   line-height: 1;
@@ -47,7 +47,7 @@
   place-items: center;
   border: 1px solid var(--staff-line);
   border-radius: 14px;
-  color: var(--staff-teal);
+  color: var(--blue-900);
   background: #ffffff;
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }

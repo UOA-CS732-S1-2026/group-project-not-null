@@ -137,7 +137,7 @@ const getTicketDetails = async (req, res) => {
     const ticket = await Ticket.findById(req.params.id)
       .populate('studentId', 'firstName lastName email')
       .populate('assignedToStaffId', 'firstName lastName email department')
-      .populate('internalNotes.staffId', 'firstName lastName email');
+      .populate('studentNotes.staffId', 'firstName lastName email');
  
     if (!ticket) {
       return res.status(404).json({

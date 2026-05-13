@@ -1,12 +1,21 @@
 import { Bell } from 'lucide-react'
 import './StaffEntryHeader.css'
 
-export default function StaffEntryHeader({ greeting, staffName, summary, unreadCount }) {
+export default function StaffEntryHeader({
+  greeting,
+  staffName,
+  summary,
+  unreadCount,
+  eyebrow = 'Staff Dashboard',
+  title,
+}) {
+  const heading = title || `${greeting}, ${staffName}`
+
   return (
     <section className="staff-entry-row" aria-labelledby="staff-dashboard-title">
       <div className="staff-greeting">
-        <p className="page-eyebrow">Staff Dashboard</p>
-        <h1 id="staff-dashboard-title">{greeting}, {staffName}</h1>
+        <p className="page-eyebrow">{eyebrow}</p>
+        <h1 id="staff-dashboard-title">{heading}</h1>
         <p>{summary}</p>
       </div>
 

@@ -2,7 +2,7 @@ export const ticketCategories = [
   'IT',
   'Enrolment',
   'Academic',
-  'Accommodation/Finance',
+  'Accommodation',
 ]
 
 export const urgencyLevels = ['Low', 'Medium', 'High']

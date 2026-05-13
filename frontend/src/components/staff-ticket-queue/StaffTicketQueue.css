@@ -12,7 +12,7 @@
 
 .staff-panel-heading h2 {
   margin: 0;
-  color: var(--staff-teal);
+  color: var(--blue-900);
   font-family: var(--font-landing);
   font-size: 1.22rem;
 }
@@ -25,7 +25,7 @@
 .staff-panel-heading > span {
   border-radius: 999px;
   padding: 5px 10px;
-  color: var(--staff-teal);
+  color: var(--blue-900);
   background: var(--staff-soft);
   font-size: 0.78rem;
   font-weight: 900;
@@ -97,7 +97,7 @@
   min-height: 46px;
   border: 0;
   outline: 0;
-  color: var(--staff-teal);
+  color: var(--blue-900);
   background: transparent;
   font: inherit;
 }
@@ -170,7 +170,7 @@
 .ticket-row strong {
   display: grid;
   gap: 4px;
-  color: var(--staff-teal);
+  color: var(--blue-900);
   font-size: 0.95rem;
 }
 
@@ -197,7 +197,7 @@
 }
 
 .status-pill {
-  color: var(--staff-teal);
+  color: var(--blue-900);
   background: var(--staff-soft);
 }
 
@@ -208,7 +208,7 @@
 }
 
 .ticket-actions i {
-  color: var(--staff-teal);
+  color: var(--blue-900);
   background: #eef3f5;
 }
 
@@ -266,7 +266,7 @@
   }
 
   .mobile-ticket-card strong {
-    color: var(--staff-teal);
+    color: var(--blue-900);
     font-size: 1rem;
   }
 

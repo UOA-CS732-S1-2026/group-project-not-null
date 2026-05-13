@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
-import {LayoutDashboard, PlusIcon } from 'lucide-react'
+
+import { LayoutDashboard, PlusIcon } from 'lucide-react'
 import './navigation-group.css'
 
 const STUDENT_NAV_ITEMS = [
@@ -8,8 +9,13 @@ const STUDENT_NAV_ITEMS = [
 ]
 
 function getVisibleItems({ title, items, role }) {
+  if (role === 'admin') {
+    if (title === 'Admin') return items
+    return []
+  }
+
   if (role !== 'student') {
-    return items
+    return title === 'Admin' ? [] : items
   }
 
   if (title !== 'General') {
@@ -46,8 +52,7 @@ export function NavGroup({ title, items, role, onNavigate }) {
               <span className="sidebar-link-icon" aria-hidden="true">
                 {isGlyph ? <span className="sidebar-link-glyph">{Icon}</span> : <Icon />}
               </span>
-              <span>{item.title}</span>
-              {item.badge ? <span className="nav-badge">{item.badge}</span> : null}
+              <span className="sidebar-link-label">{item.title}</span>
             </NavLink>
           )
         })}

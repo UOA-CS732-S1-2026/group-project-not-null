@@ -29,7 +29,7 @@ export default function StaffAnalyticsSection({
           <div className="bar-chart" aria-hidden="true">
             {categoryBars.map((item) => (
               <div className="bar-row" key={item.name}>
-                <span>{item.name}</span>
+                <span>{item.name === 'Accommodation/Finance' ? 'Accommodation' : item.name}</span>
                 <div><i style={{ width: `${item.percent}%` }} /></div>
               </div>
             ))}

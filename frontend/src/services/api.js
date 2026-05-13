@@ -75,7 +75,9 @@ async function request(path, options = {}) {
   const data = await response.json().catch(() => ({}))
 
   if (!response.ok) {
-    throw new Error(data.error || 'Something went wrong')
+    const err = new Error(data.error || 'Something went wrong')
+    if (data.pendingApproval) err.pendingApproval = true
+    throw err
   }
 
   return data
@@ -131,6 +133,10 @@ export function getStaffTickets(params = {}) {
   return request(`/staff/tickets${buildQuery(params)}`)
 }
 
+export function getMyStaffTickets() {
+  return request('/staff/my-tickets')
+}
+
 export function getStaffUrgentTickets() {
   return request('/staff/tickets/urgent')
 }
@@ -153,6 +159,13 @@ export function addStaffTicketNote(ticketId, { content }) {
   })
 }
 
+export function addStaffTicketStudentNote(ticketId, { content, isResolvingComment }) {
+  return request(`/staff/tickets/${ticketId}/student-notes`, {
+    method: 'POST',
+    body: JSON.stringify({ content, isResolvingComment }),
+  })
+}
+
 export function getStaffUsers() {
   return request('/staff/users')
 }
@@ -167,4 +180,46 @@ export function getStaffActivity() {
 
 export function getStaffNotifications() {
   return request('/staff/notifications')
+}
+
+export function getAdminPendingStaff() {
+  return request('/admin/staff/pending')
+}
+
+export function getAdminAllStaff(params = {}) {
+  return request(`/admin/staff${buildQuery(params)}`)
+}
+
+export function approveStaff(id) {
+  return request(`/admin/staff/${id}/approve`, { method: 'PATCH' })
+}
+
+export function rejectStaff(id) {
+  return request(`/admin/staff/${id}/reject`, { method: 'PATCH' })
+}
+
+export function updateStaffStatus(id, status) {
+  return request(`/admin/staff/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  })
+}
+
+export function promoteStaff(id) {
+  return request(`/admin/staff/${id}/promote`, { method: 'PATCH' })
+}
+
+export function getAdminUsers(params = {}) {
+  return request(`/admin/users${buildQuery(params)}`)
+}
+
+export function getAdminTickets(params = {}) {
+  return request(`/admin/tickets${buildQuery(params)}`)
+}
+
+export function assignTicket(ticketId, staffId) {
+  return request(`/admin/tickets/${ticketId}/assign`, {
+    method: 'PATCH',
+    body: JSON.stringify({ staffId: staffId || null }),
+  })
 }
