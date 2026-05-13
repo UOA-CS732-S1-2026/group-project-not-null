@@ -15,7 +15,7 @@
   display: grid;
   grid-template-columns: 108px minmax(0, 1fr);
   align-items: center;
-  gap: 12px;
+  gap: 30px;
   color: var(--staff-steel);
   font-size: 0.86rem;
   font-weight: 800;

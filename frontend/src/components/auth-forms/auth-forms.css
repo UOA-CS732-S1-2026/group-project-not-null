@@ -52,7 +52,7 @@
 
 .auth-account-type {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
   gap: 8px;
   border: 0;
   margin: 0;
@@ -121,7 +121,8 @@
   pointer-events: none;
 }
 
-.field input {
+.field input,
+.field select {
   width: 100%;
   min-height: 52px;
   border: 1px solid var(--border);
@@ -130,6 +131,19 @@
   color: var(--primary);
   background: var(--background);
   font: inherit;
+}
+
+.field select {
+  cursor: pointer;
+  appearance: auto;
+}
+
+.field select:has(option[value=""]:checked) {
+  color: color-mix(in srgb, var(--muted-foreground), transparent 26%);
+}
+
+.field select option {
+  color: var(--primary);
 }
 
 @media (min-width: 720px) {
@@ -146,12 +160,14 @@
   color: color-mix(in srgb, var(--muted-foreground), transparent 26%);
 }
 
-.field input:focus {
+.field input:focus,
+.field select:focus {
   border-color: var(--ring);
   outline: 3px solid oklch(from var(--ring) l c h / 0.28);
 }
 
-.field input[aria-invalid='true'] {
+.field input[aria-invalid='true'],
+.field select[aria-invalid='true'] {
   border-color: var(--destructive);
 }
 
@@ -204,6 +220,18 @@
   cursor: wait;
   opacity: 0.72;
   transform: none;
+}
+
+.form-info {
+  margin: 0;
+  border: 1px solid oklch(0.75 0.12 85 / 0.5);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 10px 12px;
+  color: oklch(0.45 0.1 75);
+  background: oklch(0.97 0.04 90);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: center;
 }
 
 .form-success {

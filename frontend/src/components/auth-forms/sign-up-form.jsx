@@ -4,8 +4,11 @@ import { Button } from '../../components'
 import { register } from '../../services/api'
 import './auth-forms.css'
 
+const DEPARTMENTS = ['IT', 'Enrolment', 'Academic', 'Accommodation & Finance']
+
 const FORM_MESSAGES = {
   firstNameEmpty: 'Please enter your first name.',
+  departmentEmpty: 'Please select your department.',
   lastNameEmpty: 'Please enter your last name.',
   emailEmpty: 'Please enter your email.',
   emailInvalid: 'Please enter a valid email.',
@@ -42,6 +45,10 @@ function getFormErrors(values) {
     errors.confirmPassword = FORM_MESSAGES.confirmPasswordEmpty
   } else if (values.password !== values.confirmPassword) {
     errors.confirmPassword = FORM_MESSAGES.passwordMismatch
+  }
+
+  if (values.accountType === 'staff' && !values.department) {
+    errors.department = FORM_MESSAGES.departmentEmpty
   }
 
   return errors
@@ -100,10 +107,13 @@ export function SignUpForm() {
       department: values.accountType === 'staff' ? values.department.trim() : undefined,
     })
       .then((data) => {
+        if (data.pendingApproval) {
+          setSuccessMessage('Your account has been submitted for approval. You can log in once an admin approves it.')
+          return
+        }
         localStorage.setItem('accessToken', data.accessToken)
         localStorage.setItem('refreshToken', data.refreshToken)
         localStorage.setItem('user', JSON.stringify(data.user))
-        setSuccessMessage(`Account created for ${data.user.email}.`)
         navigate('/dashboard')
       })
       .catch((error) => {
@@ -202,14 +212,23 @@ export function SignUpForm() {
       {values.accountType === 'staff' ? (
         <label className="field">
           <span>Department</span>
-          <input
-            type="text"
+          <select
             name="department"
             value={values.department}
             onChange={updateField}
-            placeholder="e.g. IT Support"
-            autoComplete="organization"
-          />
+            aria-invalid={Boolean(errors.department)}
+            aria-describedby={errors.department ? 'sign-up-department-error' : undefined}
+          >
+            <option value="">Select a department</option>
+            {DEPARTMENTS.map((d) => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+          {errors.department ? (
+            <span className="field-error" id="sign-up-department-error">
+              {errors.department}
+            </span>
+          ) : null}
         </label>
       ) : null}
 

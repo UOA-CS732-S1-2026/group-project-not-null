@@ -23,6 +23,7 @@ app.use('/api/auth', require('./src/routes/auth'));
 app.use('/api/tickets', require('./src/routes/tickets'));
 app.use('/api/triage-priority', require('./src/routes/triagePriority'));
 app.use('/api/staff', require('./src/routes/staff'));
+app.use('/api/admin', require('./src/routes/admin'));
  
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });

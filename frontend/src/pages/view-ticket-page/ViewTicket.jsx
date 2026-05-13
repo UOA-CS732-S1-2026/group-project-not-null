@@ -3,6 +3,9 @@ import { Link, useParams } from 'react-router-dom'
 import { Main } from '../../components'
 import {
   addStaffTicketNote,
+  addStaffTicketStudentNote,
+  assignTicket,
+  getAdminAllStaff,
   getStaffTicket,
   getStaffUsers,
   getTicket,
@@ -38,7 +41,9 @@ const priorityLabels = {
 export default function ViewTicket() {
   const { ticketId } = useParams()
   const user = getStoredUser()
-  const isStaff = user?.role === 'staff'
+  const role = user?.role || user?.user_role
+  const isAdmin = role === 'admin'
+  const isStaff = role === 'staff' || role === 'admin'
 
   const [ticket, setTicket] = useState(null)
   const [staffUsers, setStaffUsers] = useState([])
@@ -48,10 +53,17 @@ export default function ViewTicket() {
   const [statusValue, setStatusValue] = useState('open')
   const [assignmentValue, setAssignmentValue] = useState('')
   const [noteContent, setNoteContent] = useState('')
+  const [studentNoteContent, setStudentNoteContent] = useState('')
+  const [isResolvingComment, setIsResolvingComment] = useState(false)
   const [actionError, setActionError] = useState('')
   const [actionSuccess, setActionSuccess] = useState('')
   const [isSavingChanges, setIsSavingChanges] = useState(false)
   const [isSavingNote, setIsSavingNote] = useState(false)
+  const [isSavingStudentNote, setIsSavingStudentNote] = useState(false)
+  const [selectedDept, setSelectedDept] = useState('')
+  const [pendingStaffId, setPendingStaffId] = useState('')
+  const [isAssigning, setIsAssigning] = useState(false)
+  const [assignError, setAssignError] = useState('')
 
   useEffect(() => {
     let isMounted = true
@@ -63,7 +75,7 @@ export default function ViewTicket() {
       try {
         const [ticketResponse, staffUsersResponse] = await Promise.all([
           isStaff ? getStaffTicket(ticketId) : getTicket(ticketId),
-          isStaff ? getStaffUsers() : Promise.resolve(null),
+          isAdmin ? getAdminAllStaff({ status: 'active' }) : isStaff ? getStaffUsers() : Promise.resolve(null),
         ])
 
         if (!isMounted) {
@@ -71,7 +83,7 @@ export default function ViewTicket() {
         }
 
         hydrateTicketState(ticketResponse.ticket)
-        setStaffUsers(staffUsersResponse?.users || [])
+        setStaffUsers(staffUsersResponse?.users || staffUsersResponse?.staff || [])
       } catch (err) {
         if (isMounted) {
           setError(err.message || 'Unable to load ticket.')
@@ -94,7 +106,7 @@ export default function ViewTicket() {
     return () => {
       isMounted = false
     }
-  }, [isStaff, ticketId])
+  }, [isAdmin, isStaff, ticketId])
 
   async function handleSaveChanges(event) {
     event.preventDefault()
@@ -108,6 +120,12 @@ export default function ViewTicket() {
 
     if (statusValue !== ticket.status) {
       updates.status = statusValue
+    }
+
+    if (updates.status === 'resolved' && !hasResolvingStudentNote(ticket)) {
+      setActionSuccess('')
+      setActionError('Add a student note marked as the resolving comment before resolving this ticket.')
+      return
     }
 
     if (assignmentValue !== currentAssignment) {
@@ -163,6 +181,75 @@ export default function ViewTicket() {
     }
   }
 
+  async function handleAddStudentNote(event) {
+    event.preventDefault()
+
+    const trimmedContent = studentNoteContent.trim()
+    if (!trimmedContent || !ticket) {
+      setActionSuccess('')
+      setActionError('Enter a student note before saving.')
+      return
+    }
+
+    setActionError('')
+    setActionSuccess('')
+    setIsSavingStudentNote(true)
+
+    try {
+      const response = await addStaffTicketStudentNote(ticket._id, {
+        content: trimmedContent,
+        isResolvingComment,
+      })
+      setTicket(response.ticket)
+      setStatusValue(response.ticket.status || 'open')
+      setAssignmentValue(response.ticket.assignedToStaffId?._id || '')
+      setStudentNoteContent('')
+      setIsResolvingComment(false)
+      setActionSuccess('Student note added.')
+    } catch (err) {
+      setActionError(err.message || 'Unable to add student note.')
+    } finally {
+      setIsSavingStudentNote(false)
+    }
+  }
+
+  async function handleReopenTicket() {
+    if (!ticket) {
+      return
+    }
+
+    setActionError('')
+    setActionSuccess('')
+    setIsSavingChanges(true)
+
+    try {
+      const response = await updateStaffTicket(ticket._id, { status: 'open' })
+      setTicket(response.ticket)
+      setStatusValue(response.ticket.status || 'open')
+      setAssignmentValue(response.ticket.assignedToStaffId?._id || '')
+      setActionSuccess('Ticket re-opened successfully.')
+    } catch (err) {
+      setActionError(err.message || 'Unable to re-open ticket.')
+    } finally {
+      setIsSavingChanges(false)
+    }
+  }
+
+  async function handleAdminAssign(staffId) {
+    setIsAssigning(true)
+    setAssignError('')
+    try {
+      const response = await assignTicket(ticket._id, staffId)
+      setTicket(response.ticket)
+      setSelectedDept('')
+      setPendingStaffId('')
+    } catch (err) {
+      setAssignError(err.message || 'Unable to assign ticket.')
+    } finally {
+      setIsAssigning(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <Main>
@@ -202,6 +289,7 @@ export default function ViewTicket() {
     studentEmail: ticket.studentId?.email || 'Unknown',
     resolvedAt: ticket.resolvedAt ? formatDateTime(ticket.resolvedAt) : '',
     internalNotes: Array.isArray(ticket.internalNotes) ? ticket.internalNotes : [],
+    studentNotes: Array.isArray(ticket.studentNotes) ? ticket.studentNotes : [],
   }
 
   return (
@@ -218,14 +306,38 @@ export default function ViewTicket() {
           <p className="page-eyebrow">Ticket #{displayTicket.ticketNumber}</p>
           {isStaff ? (
             <p className="ticket-supporting-copy">
-              Student: {displayTicket.studentName} ({displayTicket.studentEmail}) | Assigned: {displayTicket.assignedTo}
+              Student: {displayTicket.studentName} ({displayTicket.studentEmail})
             </p>
           ) : null}
         </div>
       </section>
 
       <section className="ticket-detail-grid">
+        {ticket.status === 'resolved' ? (
+          <section className="resolved-ticket-info">
+            <div>
+              <h2>This ticket was resolved</h2>
+              <p>
+                {displayTicket.resolvedAt
+                  ? `Resolved at ${displayTicket.resolvedAt}.`
+                  : 'The support team has marked this ticket as resolved.'}
+              </p>
+            </div>
+            {isStaff ? (
+              <button
+                className="button button-ghost resolved-ticket-action"
+                type="button"
+                disabled={isSavingChanges}
+                onClick={handleReopenTicket}
+              >
+                {isSavingChanges ? 'Re-opening...' : 'Re-open ticket'}
+              </button>
+            ) : null}
+          </section>
+        ) : null}
+
         <article className="panel">
+
           <div className="panel-header">
             <h2>Details</h2>
             <span>Updated {displayTicket.updated}</span>
@@ -278,83 +390,225 @@ export default function ViewTicket() {
               </div>
               <p>{displayTicket.description}</p>
             </article>
+
+            {displayTicket.studentNotes
+              .slice()
+              .sort((left, right) => new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime())
+              .map((note, index) => (
+                <article className="thread-message thread-message-staff" key={`${note._id || note.createdAt || index}`}>
+                  <div>
+                    <strong>
+                      {note.isResolvingComment ? 'Resolving comment' : 'Staff note'}
+                    </strong>
+                    <span>{formatDateTime(note.createdAt)}</span>
+                  </div>
+                  <p>{note.content}</p>
+                </article>
+              ))}
           </div>
 
           {isStaff ? (
-            <section className="ticket-workspace">
-              <div className="panel-header">
-                <h2>Staff actions</h2>
-                <span>Manage assignment and progress</span>
-              </div>
-
-              <form className="ticket-action-form" onSubmit={handleSaveChanges}>
-                <label className="field">
-                  <span>Status</span>
-                  <select className="ticket-select" value={statusValue} onChange={(event) => setStatusValue(event.target.value)}>
-                    <option value="open">Open</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="resolved">Resolved</option>
-                  </select>
-                </label>
-
-                <label className="field">
-                  <span>Assigned staff member</span>
-                  <select
-                    className="ticket-select"
-                    value={assignmentValue}
-                    onChange={(event) => setAssignmentValue(event.target.value)}
-                  >
-                    <option value="">Unassigned</option>
-                    {staffUsers.map((staffMember) => (
-                      <option key={staffMember._id} value={staffMember._id}>
-                        {formatStaffOption(staffMember)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <div className="ticket-action-buttons">
-                  <button
-                    className="button button-ghost"
-                    type="button"
-                    onClick={() => setAssignmentValue(user?._id || '')}
-                  >
-                    Assign to me
-                  </button>
-                  <button className="button button-primary" type="submit" disabled={isSavingChanges}>
-                    {isSavingChanges ? 'Saving...' : 'Save changes'}
-                  </button>
+            <>
+              <section className="staff-note-history staff-note-history-mobile">
+                <div className="panel-header">
+                  <h2>Internal notes</h2>
+                  <span className="note-count-badge">{displayTicket.internalNotes.length}</span>
                 </div>
-              </form>
 
-              <form className="ticket-note-form" onSubmit={handleAddNote}>
-                <label className="field create-ticket-description">
-                  <span>Internal note</span>
-                  <textarea
-                    value={noteContent}
-                    onChange={(event) => setNoteContent(event.target.value)}
-                    placeholder="Add context for other staff members."
-                    rows="4"
-                  />
-                </label>
+                {displayTicket.internalNotes.length === 0 ? (
+                  <p className="ticket-supporting-copy">No internal notes have been added yet.</p>
+                ) : (
+                  <div className="ticket-thread">
+                    {displayTicket.internalNotes
+                      .slice()
+                      .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
+                      .map((note, index) => (
+                        <article className="thread-message thread-message-staff" key={`${note._id || note.createdAt || index}`}>
+                          <div>
+                            <strong>{getPersonName(note.staffId, 'Staff')}</strong>
+                            <span>{formatDateTime(note.createdAt)}</span>
+                          </div>
+                          <p>{note.content}</p>
+                        </article>
+                      ))}
+                  </div>
+                )}
+              </section>
 
-                <button className="button button-primary" type="submit" disabled={isSavingNote}>
-                  {isSavingNote ? 'Saving note...' : 'Add internal note'}
-                </button>
-              </form>
+              <section className="ticket-workspace">
+                <div className="panel-header">
+                  <h2>Staff actions</h2>
+                </div>
 
-              {actionError ? <p className="form-error" role="alert">{actionError}</p> : null}
-              {actionSuccess ? <p className="form-success">{actionSuccess}</p> : null}
-            </section>
+                <form className="ticket-note-form" onSubmit={handleAddNote}>
+                  <label className="field create-ticket-description">
+                    <span>Internal note</span>
+                    <textarea
+                      value={noteContent}
+                      onChange={(event) => setNoteContent(event.target.value)}
+                      placeholder="Add context for other staff members."
+                      rows="4"
+                    />
+                  </label>
+
+                  <button className="button button-primary" type="submit" disabled={isSavingNote}>
+                    {isSavingNote ? 'Saving note...' : 'Add internal note'}
+                  </button>
+                </form>
+
+                <form className="ticket-note-form" onSubmit={handleAddStudentNote}>
+                  <label className="field create-ticket-description">
+                    <span>Student note</span>
+                    <textarea
+                      value={studentNoteContent}
+                      onChange={(event) => setStudentNoteContent(event.target.value)}
+                      placeholder="Add an update the student can see."
+                      rows="4"
+                    />
+                  </label>
+
+                  <label className="ticket-checkbox-field">
+                    <input
+                      type="checkbox"
+                      checked={isResolvingComment}
+                      onChange={(event) => setIsResolvingComment(event.target.checked)}
+                    />
+                    <span>Is this the Resolving Comment?</span>
+                  </label>
+
+                  <button className="button button-primary" type="submit" disabled={isSavingStudentNote}>
+                    {isSavingStudentNote ? 'Saving note...' : 'Add Student note'}
+                  </button>
+                </form>
+
+                <section className="ticket-status-controls">
+                  <div className="panel-header">
+                    <h2>Status</h2>
+                  </div>
+
+                  <form className="ticket-action-form" onSubmit={handleSaveChanges}>
+                    <label className="field">
+                      <span>Status</span>
+                      <select className="ticket-select" value={statusValue} onChange={(event) => setStatusValue(event.target.value)}>
+                        <option value="open">Open</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                      </select>
+                    </label>
+
+                    <div className="ticket-action-buttons">
+                      <button className="button button-primary" type="submit" disabled={isSavingChanges}>
+                        {isSavingChanges ? 'Saving...' : 'Save changes'}
+                      </button>
+                    </div>
+                  </form>
+                </section>
+
+                {actionError ? <p className="form-error" role="alert">{actionError}</p> : null}
+                {actionSuccess ? <p className="form-success">{actionSuccess}</p> : null}
+              </section>
+
+              {isAdmin ? (
+                <section className="ticket-workspace">
+                  <div className="panel-header">
+                    <h2>Assign ticket</h2>
+                  </div>
+
+                  <div className="admin-assign-widget">
+                    <p className="ticket-supporting-copy">
+                      Current assignee: <strong>{displayTicket.assignedTo}</strong>
+                    </p>
+
+                    {staffUsers.length === 0 ? (
+                      <p className="ticket-supporting-copy">No active staff available.</p>
+                    ) : (() => {
+                      const deptMap = staffUsers.reduce((acc, m) => {
+                        const dept = m.department || 'Other'
+                        ;(acc[dept] = acc[dept] || []).push(m)
+                        return acc
+                      }, {})
+                      const depts = Object.keys(deptMap).sort()
+                      const deptMembers = selectedDept ? (deptMap[selectedDept] || []) : []
+                      return (
+                        <>
+                          <label className="field">
+                            <span>Department</span>
+                            <select
+                              className="ticket-select"
+                              value={selectedDept}
+                              onChange={(e) => { setSelectedDept(e.target.value); setPendingStaffId('') }}
+                            >
+                              <option value="">Select a department</option>
+                              {depts.map((d) => (
+                                <option key={d} value={d}>{d}</option>
+                              ))}
+                            </select>
+                          </label>
+
+                          {selectedDept && (
+                            <label className="field">
+                              <span>Staff member</span>
+                              <select
+                                className="ticket-select"
+                                value={pendingStaffId}
+                                disabled={isAssigning}
+                                onChange={(e) => setPendingStaffId(e.target.value)}
+                              >
+                                <option value="">Select staff member</option>
+                                {deptMembers.map((member) => (
+                                  <option key={member._id} value={member._id}>
+                                    {getPersonName(member, member.email)}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          )}
+
+                        </>
+                      )
+                    })()}
+
+                    {(pendingStaffId || ticket.assignedToStaffId) ? (
+                      <div className="assign-action-row">
+                        {pendingStaffId ? (
+                          <button
+                            type="button"
+                            className="button button-primary"
+                            disabled={isAssigning}
+                            onClick={() => handleAdminAssign(pendingStaffId)}
+                          >
+                            {isAssigning ? 'Assigning...' : 'Assign'}
+                          </button>
+                        ) : null}
+                        {ticket.assignedToStaffId ? (
+                          <button
+                            type="button"
+                            className="button button-ghost"
+                            disabled={isAssigning}
+                            onClick={() => handleAdminAssign(null)}
+                          >
+                            Unassign
+                          </button>
+                        ) : null}
+                      </div>
+                    ) : null}
+
+                    {assignError ? <p className="form-error" role="alert">{assignError}</p> : null}
+                  </div>
+                </section>
+              ) : null}
+            </>
           ) : (
             <div className="ticket-thread staff-response">
-              <article className="thread-message thread-message-staff">
-                <div>
-                  <strong>Staff response</strong>
-                  <span>{displayTicket.updated}</span>
-                </div>
-                <p>{getStudentFacingStatusMessage(ticket)}</p>
-              </article>
+              {displayTicket.studentNotes.length === 0 ? (
+                <article className="thread-message thread-message-staff">
+                  <div>
+                    <strong>Staff response</strong>
+                    <span>{displayTicket.updated}</span>
+                  </div>
+                  <p>{getStudentFacingStatusMessage(ticket)}</p>
+                </article>
+              ) : null}
             </div>
           )}
         </article>
@@ -378,7 +632,7 @@ export default function ViewTicket() {
           ) : null}
 
           {isStaff ? (
-            <section className="staff-note-history">
+            <section className="staff-note-history staff-note-history-desktop">
               <div className="panel-header">
                 <h2>Internal notes</h2>
                 <span className="note-count-badge">{displayTicket.internalNotes.length}</span>
@@ -407,8 +661,8 @@ export default function ViewTicket() {
         </aside>
       </section>
 
-      <Link className="button button-primary" to="/dashboard">
-        Back to dashboard
+      <Link className="button button-primary" to={isAdmin ? '/admin/tickets' : '/dashboard'}>
+        {isAdmin ? 'Back to tickets' : 'Back to dashboard'}
       </Link>
     </Main>
   )
@@ -472,9 +726,10 @@ function formatDateTime(value) {
   }).format(new Date(value))
 }
 
-function formatStaffOption(staffMember) {
-  const label = getPersonName(staffMember, staffMember.email)
-  return staffMember.department ? `${label} (${staffMember.department})` : label
+
+function hasResolvingStudentNote(ticket) {
+  return Array.isArray(ticket?.studentNotes)
+    && ticket.studentNotes.some((note) => note?.isResolvingComment)
 }
 
 function getStudentFacingStatusMessage(ticket) {

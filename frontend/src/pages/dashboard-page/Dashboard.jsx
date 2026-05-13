@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import { CheckCheck, CircleAlert, Ellipsis, Square } from 'lucide-react'
 
 import {
@@ -27,21 +28,13 @@ import { formatTicket, ticketCategories } from '../../services/ticket-mappers.js
 import './Dashboard.css'
 
 const summaryCards = [
-  { key: 'openTickets', label: 'Open Tickets', detail: 'Waiting for review', tone: 'critical' },
-  { key: 'inProgressTickets', label: 'In Progress', detail: 'Currently being handled', tone: 'medium' },
-  { key: 'resolvedToday', label: 'Resolved Today', detail: 'Closed since midnight', tone: 'low' },
+  { key: 'resolvedToday', label: 'Resolved Today', detail: 'Closed by you since midnight', tone: 'low' },
   { key: 'highPriorityTickets', label: 'High Priority', detail: 'Needs same-day response', tone: 'high' },
   { key: 'assignedToMe', label: 'Assigned to Me', detail: 'Active personal queue', tone: 'steel' },
-  { key: 'averageResponseTime', label: 'Avg Response Time', detail: 'Resolved ticket average', tone: 'teal' },
+  { key: 'averageResponseTime', label: 'Your Avg Response Time', detail: 'Your resolved ticket average', tone: 'teal' },
 ]
 
-const filterChips = [
-  { label: 'All', params: {} },
-  { label: 'Open', params: { status: 'open' } },
-  { label: 'In Progress', params: { status: 'in_progress' } },
-  { label: 'High Priority', params: { priority: 'high' } },
-  { label: 'Assigned to Me', params: { assignedTo: 'me' } },
-]
+const filterChips = [{ label: 'Assigned to Me', params: { assignedTo: 'me' } }]
 
 const categoryLabels = {
   IT: 'IT',
@@ -56,9 +49,17 @@ const statusLabels = {
   resolved: 'Resolved',
 }
 
+const STUDENT_TICKETS_PER_PAGE = 5
+const studentStatusSortOrder = {
+  Open: 0,
+  'In Progress': 1,
+  Resolved: 2,
+}
+
 export default function DashBoard() {
   const user = getStoredUser()
 
+  if (user?.role === 'admin') return <Navigate to="/admin" replace />
   return user?.role === 'staff' ? <StaffDashboard user={user} /> : <StudentDashboard />
 }
 
@@ -139,10 +140,10 @@ function StaffDashboard({ user }) {
     [analyticsState.data.ticketsByCategory],
   )
   const statusStats = analyticsState.data.ticketsByStatus || []
-  const activeTicketCount = (summaryState.data?.openTickets || 0) + (summaryState.data?.inProgressTickets || 0)
+  const assignedTicketCount = summaryState.data?.assignedToMe || 0
   const operationalSummary = summaryState.isLoading
-    ? 'Loading active ticket summary.'
-    : `${activeTicketCount} active tickets require attention today.`
+    ? 'Loading assigned ticket summary.'
+    : `${assignedTicketCount} tickets are currently assigned to you.`
 
   return (
     <Main className="staff-dashboard">
@@ -200,6 +201,7 @@ function StudentDashboard() {
   const [tickets, setTickets] = useState([])
   const [statusFilter, setStatusFilter] = useState('All')
   const [categoryFilter, setCategoryFilter] = useState('All')
+  const [currentPage, setCurrentPage] = useState(1)
   const [query] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(true)
@@ -238,16 +240,37 @@ function StudentDashboard() {
   const filteredTickets = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
 
-    return tickets.filter((ticket) => {
-      const matchesStatus = statusFilter === 'All' || ticket.status === statusFilter
-      const matchesCategory = categoryFilter === 'All' || ticket.category === categoryFilter
-      const matchesQuery =
-        !normalizedQuery ||
-        [ticket.title, ticket.category, ticket.description].join(' ').toLowerCase().includes(normalizedQuery)
+    return tickets
+      .filter((ticket) => {
+        const matchesStatus = statusFilter === 'All' || ticket.status === statusFilter
+        const matchesCategory = categoryFilter === 'All' || ticket.category === categoryFilter
+        const matchesQuery =
+          !normalizedQuery ||
+          [ticket.title, ticket.category, ticket.description].join(' ').toLowerCase().includes(normalizedQuery)
 
-      return matchesStatus && matchesCategory && matchesQuery
-    })
+        return matchesStatus && matchesCategory && matchesQuery
+      })
+      .sort((left, right) => {
+        const statusDifference =
+          (studentStatusSortOrder[left.status] ?? Number.MAX_SAFE_INTEGER) -
+          (studentStatusSortOrder[right.status] ?? Number.MAX_SAFE_INTEGER)
+
+        if (statusDifference !== 0) {
+          return statusDifference
+        }
+
+        return (right.createdAtValue || 0) - (left.createdAtValue || 0)
+      })
   }, [categoryFilter, query, statusFilter, tickets])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [statusFilter, categoryFilter, query, tickets.length])
+
+  const totalPages = Math.max(1, Math.ceil(filteredTickets.length / STUDENT_TICKETS_PER_PAGE))
+  const safeCurrentPage = Math.min(currentPage, totalPages)
+  const pageStartIndex = filteredTickets.length === 0 ? 0 : (safeCurrentPage - 1) * STUDENT_TICKETS_PER_PAGE
+  const paginatedTickets = filteredTickets.slice(pageStartIndex, pageStartIndex + STUDENT_TICKETS_PER_PAGE)
 
   const summary = [
     {
@@ -281,14 +304,18 @@ function StudentDashboard() {
       <StudentWelcomeBanner />
       <StudentMetricGrid metrics={summary} />
       <StudentTicketList
-        tickets={filteredTickets}
+        tickets={paginatedTickets}
         statusFilter={statusFilter}
         categoryFilter={categoryFilter}
         categories={ticketCategories}
+        totalTickets={filteredTickets.length}
+        currentPage={safeCurrentPage}
+        totalPages={totalPages}
         isLoading={isLoading}
         error={error}
         onStatusChange={setStatusFilter}
         onCategoryChange={setCategoryFilter}
+        onPageChange={setCurrentPage}
       />
     </Main>
   )

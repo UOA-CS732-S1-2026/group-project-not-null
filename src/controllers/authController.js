@@ -25,7 +25,7 @@ const register = async (req, res) => {
       });
     }
 
-    const validRoles = ['student', 'staff'];
+    const validRoles = ['student', 'staff', 'admin'];
     const userRole = role || 'student';
     if (!validRoles.includes(userRole)) {
       return res.status(400).json({
@@ -39,10 +39,18 @@ const register = async (req, res) => {
       firstName,
       lastName,
       role: userRole,
-      department: userRole === 'staff' ? department : undefined
+      department: userRole === 'staff' ? department : undefined,
+      staffStatus: userRole === 'staff' ? 'pending' : undefined
     });
 
     await user.save();
+
+    if (userRole === 'staff') {
+      return res.status(201).json({
+        message: 'Registration submitted. Your account is pending admin approval.',
+        pendingApproval: true
+      });
+    }
 
     const tokens = generateTokenPair(user);
 
@@ -81,6 +89,19 @@ const login = async (req, res) => {
     if (!user.isActive) {
       return res.status(401).json({
         error: 'This account has been deactivated'
+      });
+    }
+
+    if (user.role === 'staff' && user.staffStatus === 'pending') {
+      return res.status(403).json({
+        error: 'Your account is pending admin approval',
+        pendingApproval: true
+      });
+    }
+
+    if (user.role === 'staff' && user.staffStatus === 'inactive') {
+      return res.status(403).json({
+        error: 'Your account has been deactivated'
       });
     }
 

@@ -15,6 +15,7 @@ function getStoredUser() {
 export function AppSidebar() {
   const [isExpanded, setIsExpanded] = useState(false)
   const storedUser = getStoredUser()
+  const role = storedUser?.role || storedUser?.user_role
   const user = storedUser
     ? {
         name: `${storedUser.firstName || ''} ${storedUser.lastName || ''}`.trim() || storedUser.email,
@@ -64,7 +65,7 @@ export function AppSidebar() {
           <NavGroup
             key={group.title}
             {...group}
-            role={storedUser?.role}
+            role={role}
             onNavigate={() => setIsExpanded(false)}
           />
         ))}

@@ -1,10 +1,9 @@
 import {
-  BookOpen,
   CircleHelp,
   LayoutDashboard,
   Settings,
+  ShieldCheck,
   TicketCheck,
-  Users,
 } from 'lucide-react'
 
 export const sidebarData = {
@@ -23,16 +22,21 @@ export const sidebarData = {
       title: 'General',
       items: [
         { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-        { title: 'Tickets', url: '/tickets', icon: TicketCheck, badge: '12' },
-        { title: 'Students', url: '/students', icon: Users },
+        { title: 'Staff Tickets', url: '/staff/tickets', icon: TicketCheck, staffOnly: true },
       ],
     },
     {
       title: 'Other',
       items: [
-        { title: 'Knowledge Base', url: '/knowledge-base', icon: BookOpen },
         { title: 'Help', url: '/help', icon: CircleHelp },
         { title: 'Settings', url: '/settings', icon: Settings },
+      ],
+    },
+    {
+      title: 'Admin',
+      items: [
+        { title: 'Admin Panel', url: '/admin', icon: ShieldCheck },
+        { title: 'Tickets', url: '/admin/tickets', icon: TicketCheck },
       ],
     },
   ],
