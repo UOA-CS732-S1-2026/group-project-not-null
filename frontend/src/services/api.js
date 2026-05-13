@@ -157,6 +157,13 @@ export function addStaffTicketNote(ticketId, { content }) {
   })
 }
 
+export function addStaffTicketStudentNote(ticketId, { content, isResolvingComment }) {
+  return request(`/staff/tickets/${ticketId}/student-notes`, {
+    method: 'POST',
+    body: JSON.stringify({ content, isResolvingComment }),
+  })
+}
+
 export function getStaffUsers() {
   return request('/staff/users')
 }

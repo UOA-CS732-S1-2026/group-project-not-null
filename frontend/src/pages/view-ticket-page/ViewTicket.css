@@ -245,6 +245,21 @@
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary), transparent 78%);
 }
 
+.ticket-checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.ticket-checkbox-field input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--primary);
+}
+
 .ticket-action-buttons {
   display: flex;
   flex-wrap: wrap;

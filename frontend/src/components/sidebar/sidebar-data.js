@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   Settings,
   TicketCheck,
-  Users,
 } from 'lucide-react'
 
 export const sidebarData = {
@@ -24,7 +23,6 @@ export const sidebarData = {
       items: [
         { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
         { title: 'Staff Tickets', url: '/staff/tickets', icon: TicketCheck, staffOnly: true },
-        { title: 'Students', url: '/students', icon: Users },
       ],
     },
     {

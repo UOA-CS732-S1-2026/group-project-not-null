@@ -231,7 +231,8 @@ router.get('/tickets/:id', verifyAuth, async (req, res) => {
     const ticket = await Ticket.findById(req.params.id)
       .populate('studentId', 'email firstName lastName')
       .populate('assignedToStaffId', 'email firstName lastName department')
-      .populate('internalNotes.staffId', 'email firstName lastName department');
+      .populate('internalNotes.staffId', 'email firstName lastName department')
+      .populate('studentNotes.staffId', 'email firstName lastName department');
 
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket not found' });
@@ -436,6 +437,24 @@ router.patch('/tickets/:id', verifyAuth, async (req, res) => {
       });
     }
 
+    if (hasStatusUpdate && status === 'resolved') {
+      const existingTicket = await Ticket.findById(req.params.id).select('studentNotes');
+
+      if (!existingTicket) {
+        return res.status(404).json({ error: 'Ticket not found' });
+      }
+
+      const hasResolvingComment = existingTicket.studentNotes?.some((note) => (
+        note.isResolvingComment
+      ));
+
+      if (!hasResolvingComment) {
+        return res.status(400).json({
+          error: 'Add a student note marked as the resolving comment before resolving this ticket.'
+        });
+      }
+    }
+
     const updateData = {};
 
     if (hasStatusUpdate) {
@@ -473,7 +492,8 @@ router.patch('/tickets/:id', verifyAuth, async (req, res) => {
     )
       .populate('studentId', 'email firstName lastName')
       .populate('assignedToStaffId', 'email firstName lastName department')
-      .populate('internalNotes.staffId', 'email firstName lastName department');
+      .populate('internalNotes.staffId', 'email firstName lastName department')
+      .populate('studentNotes.staffId', 'email firstName lastName department');
 
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket not found' });
@@ -515,7 +535,8 @@ router.post('/tickets/:id/notes', verifyAuth, async (req, res) => {
     )
       .populate('studentId', 'email firstName lastName')
       .populate('assignedToStaffId', 'email firstName lastName department')
-      .populate('internalNotes.staffId', 'email firstName lastName department');
+      .populate('internalNotes.staffId', 'email firstName lastName department')
+      .populate('studentNotes.staffId', 'email firstName lastName department');
 
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket not found' });
@@ -527,6 +548,59 @@ router.post('/tickets/:id/notes', verifyAuth, async (req, res) => {
     });
   } catch (error) {
     console.error('Add note error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/tickets/:id/student-notes', verifyAuth, async (req, res) => {
+  try {
+    const user = await requireStaff(req, res);
+    if (!user) return;
+
+    const content = req.body.content?.trim();
+    const isResolvingComment = Boolean(req.body.isResolvingComment);
+
+    if (!content) {
+      return res.status(400).json({ error: 'Student note content required' });
+    }
+
+    const updateData = {
+      $push: {
+        studentNotes: {
+          staffId: req.user.userId,
+          content,
+          isResolvingComment,
+          createdAt: new Date()
+        }
+      },
+      updatedAt: new Date()
+    };
+
+    if (isResolvingComment) {
+      updateData.status = 'resolved';
+      updateData.resolvedAt = new Date();
+    }
+
+    const ticket = await Ticket.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { returnDocument: 'after', runValidators: true }
+    )
+      .populate('studentId', 'email firstName lastName')
+      .populate('assignedToStaffId', 'email firstName lastName department')
+      .populate('internalNotes.staffId', 'email firstName lastName department')
+      .populate('studentNotes.staffId', 'email firstName lastName department');
+
+    if (!ticket) {
+      return res.status(404).json({ error: 'Ticket not found' });
+    }
+
+    res.status(200).json({
+      message: 'Student note added successfully',
+      ticket
+    });
+  } catch (error) {
+    console.error('Add student note error:', error);
     res.status(500).json({ error: error.message });
   }
 });
