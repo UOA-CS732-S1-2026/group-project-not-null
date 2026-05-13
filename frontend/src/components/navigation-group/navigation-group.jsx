@@ -4,7 +4,7 @@ import './navigation-group.css'
 
 const STUDENT_NAV_ITEMS = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Create Ticket', url: '/tickets/new', icon: PlusIcon },
+  { title: 'Create a Querry Ticket', url: '/tickets/new', icon: PlusIcon },
 ]
 
 function getVisibleItems({ title, items, role }) {
