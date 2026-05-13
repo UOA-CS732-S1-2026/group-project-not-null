@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import {LayoutDashboard, PlusIcon } from 'lucide-react'
+import { LayoutDashboard, PlusIcon } from 'lucide-react'
 import './navigation-group.css'
 
 const STUDENT_NAV_ITEMS = [
@@ -8,8 +8,13 @@ const STUDENT_NAV_ITEMS = [
 ]
 
 function getVisibleItems({ title, items, role }) {
+  if (role === 'admin') {
+    if (title === 'Admin') return items
+    return []
+  }
+
   if (role !== 'student') {
-    return items
+    return title === 'Admin' ? [] : items
   }
 
   if (title !== 'General') {
