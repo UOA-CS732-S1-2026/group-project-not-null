@@ -68,32 +68,25 @@ function formatAverageResponseTime(hours) {
   return minutes > 0 ? `${wholeHours}h ${minutes}m` : `${wholeHours}h`;
 }
 
-async function requireStaff(req, res) {
-  const user = await User.findById(req.user.userId);
-
-  if (!user || (user.role !== 'staff' && user.role !== 'admin')) {
-    res.status(403).json({ error: 'Only staff can access this resource' });
-    return null;
+function requireActiveStaff(req, res, next) {
+  if (req.user.role !== 'staff') {
+    return res.status(403).json({ error: 'Only staff can access this resource' });
   }
-
-  return user;
+  // null = pre-existing staff without staffStatus (treat as active)
+  if (req.user.staffStatus === 'pending' || req.user.staffStatus === 'inactive') {
+    return res.status(403).json({ error: 'Active staff account required' });
+  }
+  next();
 }
 
 async function findAssignableStaff(staffId) {
   if (!staffId) return null;
-
-  return User.findOne({
-    _id: staffId,
-    role: 'staff',
-    isActive: true
-  }).select('email firstName lastName department');
+  return User.findOne({ _id: staffId, role: 'staff', isActive: true })
+    .select('email firstName lastName department');
 }
 
-router.get('/tickets', verifyAuth, async (req, res) => {
+router.get('/tickets', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const {
       status,
       priority,
@@ -159,11 +152,8 @@ router.get('/tickets', verifyAuth, async (req, res) => {
   }
 });
 
-router.get('/tickets/urgent', verifyAuth, async (req, res) => {
+router.get('/tickets/urgent', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const agingThreshold = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     const tickets = await Ticket.find({
@@ -186,18 +176,11 @@ router.get('/tickets/urgent', verifyAuth, async (req, res) => {
   }
 });
 
-router.get('/users', verifyAuth, async (req, res) => {
+router.get('/users', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
-    const staffUsers = await User.find({
-      role: 'staff',
-      isActive: true
-    })
+    const staffUsers = await User.find({ role: 'staff', isActive: true })
       .select('email firstName lastName department')
       .sort({ firstName: 1, lastName: 1, email: 1 });
-
     res.status(200).json({ users: staffUsers });
   } catch (error) {
     console.error('Get staff users error:', error);
@@ -225,9 +208,6 @@ router.get('/my-tickets', verifyAuth, async (req, res) => {
 
 router.get('/tickets/:id', verifyAuth, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const ticket = await Ticket.findById(req.params.id)
       .populate('studentId', 'email firstName lastName')
       .populate('assignedToStaffId', 'email firstName lastName department')
@@ -245,11 +225,8 @@ router.get('/tickets/:id', verifyAuth, async (req, res) => {
   }
 });
 
-router.get('/dashboard/summary', verifyAuth, async (req, res) => {
+router.get('/dashboard/summary', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const today = startOfToday();
 
     const [
@@ -305,7 +282,7 @@ router.get('/dashboard/summary', verifyAuth, async (req, res) => {
   }
 });
 
-router.get('/dashboard/analytics', verifyAuth, async (req, res) => {
+router.get('/dashboard/analytics', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
     const user = await requireStaff(req, res);
     if (!user) return;
@@ -341,11 +318,8 @@ router.get('/dashboard/analytics', verifyAuth, async (req, res) => {
   }
 });
 
-router.get('/activity', verifyAuth, async (req, res) => {
+router.get('/activity', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const tickets = await Ticket.find()
       .populate('studentId', 'email firstName lastName')
       .populate('assignedToStaffId', 'email firstName lastName')
@@ -388,11 +362,8 @@ router.get('/activity', verifyAuth, async (req, res) => {
   }
 });
 
-router.get('/notifications', verifyAuth, async (req, res) => {
+router.get('/notifications', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const tickets = await Ticket.find({
       status: { $ne: 'resolved' },
       $or: [{ priority: 1 }, { urgencyLevel: 'high' }]
@@ -418,11 +389,8 @@ router.get('/notifications', verifyAuth, async (req, res) => {
   }
 });
 
-router.patch('/tickets/:id', verifyAuth, async (req, res) => {
+router.patch('/tickets/:id', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const { status, assignedToStaffId } = req.body;
     const hasStatusUpdate = status !== undefined;
     const hasAssignmentUpdate = assignedToStaffId !== undefined;
@@ -509,11 +477,8 @@ router.patch('/tickets/:id', verifyAuth, async (req, res) => {
   }
 });
 
-router.post('/tickets/:id/notes', verifyAuth, async (req, res) => {
+router.post('/tickets/:id/notes', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const user = await requireStaff(req, res);
-    if (!user) return;
-
     const content = req.body.content?.trim();
     if (!content) {
       return res.status(400).json({ error: 'Note content required' });
@@ -607,11 +572,6 @@ router.post('/tickets/:id/student-notes', verifyAuth, async (req, res) => {
 
 router.get('/analytics/summary', verifyAuth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId);
-    if (user.role !== 'staff') {
-      return res.status(403).json({ error: 'Only staff can view analytics' });
-    }
-
     const tickets = await Ticket.find();
     const openTickets = await Ticket.countDocuments({ status: 'open' });
     const resolvedTickets = await Ticket.countDocuments({ status: 'resolved' });

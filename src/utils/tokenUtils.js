@@ -86,7 +86,8 @@ const generateTokenPair = (user) => {
   const payload = {
     userId: user._id,
     email: user.email,
-    role: user.role
+    role: user.role,
+    staffStatus: user.staffStatus ?? null
   };
  
   return {

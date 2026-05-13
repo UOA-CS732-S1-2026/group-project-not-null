@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import { CheckCheck, CircleAlert, Ellipsis, Square } from 'lucide-react'
 
 import {
@@ -51,6 +52,7 @@ const statusLabels = {
 export default function DashBoard() {
   const user = getStoredUser()
 
+  if (user?.role === 'admin') return <Navigate to="/admin" replace />
   return user?.role === 'staff' ? <StaffDashboard user={user} /> : <StudentDashboard />
 }
 

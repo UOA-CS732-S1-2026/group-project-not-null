@@ -3,6 +3,7 @@ import {
   CircleHelp,
   LayoutDashboard,
   Settings,
+  ShieldCheck,
   TicketCheck,
 } from 'lucide-react'
 
@@ -31,6 +32,13 @@ export const sidebarData = {
         { title: 'Knowledge Base', url: '/knowledge-base', icon: BookOpen },
         { title: 'Help', url: '/help', icon: CircleHelp },
         { title: 'Settings', url: '/settings', icon: Settings },
+      ],
+    },
+    {
+      title: 'Admin',
+      items: [
+        { title: 'Admin Panel', url: '/admin', icon: ShieldCheck },
+        { title: 'Tickets', url: '/admin/tickets', icon: TicketCheck },
       ],
     },
   ],
