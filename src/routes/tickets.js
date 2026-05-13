@@ -11,18 +11,31 @@ router.get('/archived', verifyAuth, async (req, res) => {
       return res.status(403).json({ error: 'Only staff or admin users can view archived tickets' });
     }
 
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 15));
+    const skip = (page - 1) * limit;
     const filter = { status: 'archived' };
 
     if (req.user.role === 'staff') {
       filter.assignedToStaffId = req.user.userId;
     }
 
-    const tickets = await Ticket.find(filter)
-      .populate('studentId', 'firstName lastName email')
-      .populate('assignedToStaffId', 'firstName lastName email')
-      .sort({ resolvedAt: -1, updatedAt: -1 });
+    const [tickets, totalCount] = await Promise.all([
+      Ticket.find(filter)
+        .populate('studentId', 'firstName lastName email')
+        .populate('assignedToStaffId', 'firstName lastName email')
+        .sort({ resolvedAt: -1, updatedAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Ticket.countDocuments(filter)
+    ]);
 
-    res.status(200).json({ tickets });
+    res.status(200).json({
+      tickets,
+      totalCount,
+      page,
+      limit
+    });
   } catch (error) {
     console.error('Get archived tickets error:', error);
     res.status(500).json({ error: error.message || 'Failed to fetch archived tickets' });
