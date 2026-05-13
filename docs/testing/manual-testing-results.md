@@ -107,6 +107,9 @@ Category and urgency missing-input validation could not be tested through the fr
 | AT11 | Sign In | Sign In page renders | Run `npm run test:run` inside frontend | Sign In page should render without crashing | Sign In automated test passed | Passed |
 | AT12 | Sign In | Email and password fields render | Run `npm run test:run` inside frontend | Email and password fields should be visible | Email and password fields rendered successfully | Passed |
 | AT13 | Sign In | Sign In button renders | Run `npm run test:run` inside frontend | Sign In button should be visible | Sign In button rendered successfully | Passed |
+| AT14 | Sign Up | Sign Up page renders | Run `npm run test:run` inside frontend | Sign Up page should render without crashing | Sign Up automated test passed | Passed |
+| AT15 | Sign Up | Registration fields render | Run `npm run test:run` inside frontend | First name, last name, email, password, and confirm password fields should be visible | Registration fields rendered successfully | Passed |
+| AT16 | Sign Up | Account type options render | Run `npm run test:run` inside frontend | Student and staff account type options should be visible | Account type options rendered successfully | Passed |
 
 ---
 
