@@ -1,0 +1,27 @@
+.department-selector {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.department-selector span {
+  color: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.department-selector select {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 18px 14px 6px;
+  color: var(--primary);
+  background: var(--background);
+  font: inherit;
+}
+
+.department-selector select:focus {
+  border-color: var(--ring);
+  outline: 3px solid oklch(from var(--ring) l c h / 0.28);
+}

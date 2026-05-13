@@ -1,6 +1,4 @@
 
-// server.js
-
 require('dotenv').config();
 //require('./src/utils/sendEmail')
 const app = require('./app');
@@ -8,6 +6,8 @@ const connectDB = require('./src/config/database');
 const cron = require('node-cron');
 const { archiveResolvedTickets } = require('./src/services/archiveService');
 
+const { escalateStagnantTickets } = require('./src/services/escalationService');
+require('dotenv').config();
  
 const PORT = process.env.PORT || 5000;
  
@@ -22,6 +22,11 @@ const startServer = async () => {
         await archiveResolvedTickets();
       } catch (error) {
         console.error('Ticket archive job failed:', error);
+    cron.schedule('0 * * * *', async () => {
+      try {
+        await escalateStagnantTickets();
+      } catch (error) {
+        console.error('Ticket escalation job failed:', error);
       }
     });
     

@@ -251,6 +251,24 @@ export default function ViewTicket() {
     }
   }
 
+  async function handleStaffAssign(staffId) {
+    setIsAssigning(true)
+    setAssignError('')
+    try {
+      const response = await updateStaffTicket(ticket._id, { assignedToStaffId: staffId || null })
+      setTicket(response.ticket)
+      setPendingStaffId('')
+    } catch (err) {
+      setAssignError(err.message || 'Unable to assign ticket.')
+    } finally {
+      setIsAssigning(false)
+    }
+  }
+
+  const deptStaffUsers = isStaff && !isAdmin
+    ? staffUsers.filter((m) => m.department === user?.department && m._id !== user?._id)
+    : []
+
   if (isLoading) {
     return (
       <Main>
@@ -508,6 +526,65 @@ export default function ViewTicket() {
                 {actionError ? <p className="form-error" role="alert">{actionError}</p> : null}
                 {actionSuccess ? <p className="form-success">{actionSuccess}</p> : null}
               </section>
+
+              {isStaff && !isAdmin ? (
+                <section className="ticket-workspace">
+                  <div className="panel-header">
+                    <h2>Assign ticket</h2>
+                  </div>
+                  <div className="admin-assign-widget">
+                    <p className="ticket-supporting-copy">
+                      Current assignee: <strong>{displayTicket.assignedTo}</strong>
+                    </p>
+                    {deptStaffUsers.length === 0 ? (
+                      <p className="ticket-supporting-copy">No staff in your department.</p>
+                    ) : (
+                      <label className="field">
+                        <span>Staff member</span>
+                        <select
+                          className="ticket-select"
+                          value={pendingStaffId}
+                          disabled={isAssigning}
+                          onChange={(e) => setPendingStaffId(e.target.value)}
+                        >
+                          <option value="">Select staff member</option>
+                          <option value="me">Assign to me</option>
+                          {deptStaffUsers.map((member) => (
+                            <option key={member._id} value={member._id}>
+                              {getPersonName(member, member.email)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
+                    {(pendingStaffId || ticket.assignedToStaffId) ? (
+                      <div className="assign-action-row">
+                        {pendingStaffId ? (
+                          <button
+                            type="button"
+                            className="button button-primary"
+                            disabled={isAssigning}
+                            onClick={() => handleStaffAssign(pendingStaffId)}
+                          >
+                            {isAssigning ? 'Assigning...' : 'Assign'}
+                          </button>
+                        ) : null}
+                        {ticket.assignedToStaffId ? (
+                          <button
+                            type="button"
+                            className="button button-ghost"
+                            disabled={isAssigning}
+                            onClick={() => handleStaffAssign(null)}
+                          >
+                            Unassign
+                          </button>
+                        ) : null}
+                      </div>
+                    ) : null}
+                    {assignError ? <p className="form-error" role="alert">{assignError}</p> : null}
+                  </div>
+                </section>
+              ) : null}
 
               {isAdmin ? (
                 <section className="ticket-workspace">

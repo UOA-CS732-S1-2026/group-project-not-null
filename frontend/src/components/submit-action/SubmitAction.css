@@ -1,0 +1,27 @@
+.submit-action {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+
+.submit-action .form-error {
+  margin: 0;
+  border: 1px solid oklch(from var(--destructive) l c h / 0.36);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 10px 12px;
+  color: var(--destructive);
+  background: oklch(from var(--destructive) l c h / 0.08);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.submit-action .button {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .submit-action .button {
+    width: max-content;
+  }
+}

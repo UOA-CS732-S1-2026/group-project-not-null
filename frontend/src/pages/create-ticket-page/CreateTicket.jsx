@@ -1,9 +1,18 @@
 import { useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { Button, Main } from '../../components'
+import {
+  AITriageCard,
+  Button,
+  DepartmentSelector,
+  DescriptionArea,
+  FormInput,
+  Main,
+  SubmitAction,
+  TicketFormHeader,
+} from '../../components'
 import { createTicket } from '../../services/api.js'
 import {
-  assignPriority,
+  fallbackPriorityFromUrgency,
   ticketCategories,
   urgencyLevels,
 } from '../../services/ticket-mappers.js'
@@ -19,7 +28,7 @@ export default function CreateTicket() {
 
   const [form, setForm] = useState({
     title: '',
-    category: 'IT',
+    category: '',
     urgencyLevel: 'medium',
     description: '',
   })
@@ -27,11 +36,7 @@ export default function CreateTicket() {
   const [createdTicketId, setCreatedTicketId] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const priority = useMemo(
-    () => assignPriority(form.category, form.urgencyLevel),
-    [form.category, form.urgencyLevel]
-  )
+  const [aiPriority, setAiPriority] = useState(() => fallbackPriorityFromUrgency('medium'))
 
   function updateField(event) {
     const { name, value } = event.target
@@ -49,6 +54,7 @@ export default function CreateTicket() {
         description: form.description,
         category: form.category,
         urgencyLevel: form.urgencyLevel,
+        priority: aiPriority,
       })
 
       setCreatedTicketId(data.ticket._id)
@@ -62,12 +68,7 @@ export default function CreateTicket() {
 
   return (
     <Main className="home-main">
-        <section className="home-title-row">
-          <div>
-            <h1>Create a Query Ticket</h1>
-            <p>Tell us what happened so the right team can help.</p>
-          </div>
-        </section>
+        <TicketFormHeader />
 
         {submitted ? (
           <section className="panel confirmation-panel">
@@ -86,27 +87,20 @@ export default function CreateTicket() {
           <form className="panel create-ticket-form" onSubmit={handleSubmit}>
             <fieldset className="form-section">
               <legend>Request details</legend>
-              <label className="field">
-                <span>Title</span>
-                <input
-                  name="title"
-                  value={form.title}
-                  onChange={updateField}
-                  placeholder="E.g. Unable to access student email"
-                  required
-                />
-              </label>
+              <FormInput
+                label="Title"
+                name="title"
+                value={form.title}
+                onChange={updateField}
+                placeholder="E.g. Unable to access student email"
+                required
+              />
 
-              <label className="field">
-                <span>Category</span>
-                <select name="category" value={form.category} onChange={updateField}>
-                  {ticketCategories.map((category) => (
-                    <option key={category.value} value={category.value}>
-                      {category.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <DepartmentSelector
+                value={form.category}
+                options={ticketCategories}
+                onChange={updateField}
+              />
             </fieldset>
 
             <fieldset className="form-section">
@@ -129,33 +123,17 @@ export default function CreateTicket() {
 
             <fieldset className="form-section">
               <legend>Description</legend>
-              <label className="field create-ticket-description">
-                <span>Description</span>
-                <textarea
-                  name="description"
-                  value={form.description}
-                  onChange={updateField}
-                  placeholder="What happened? When did it happen? Have you tried anything already?"
-                  rows="7"
-                  required
-                />
-              </label>
+              <DescriptionArea
+                value={form.description}
+                onChange={updateField}
+                placeholder="What happened? When did it happen? Have you tried anything already?"
+                required
+              />
             </fieldset>
 
-            <p className="priority-note">
-              Priority is automatically assigned based on your category and
-              urgency. Current priority: <strong>{priority}</strong>.
-            </p>
+            <AITriageCard formData={form} onPriorityChange={setAiPriority} />
 
-            {error && (
-              <p className="form-error" role="alert">
-                {error}
-              </p>
-            )}
-
-            <Button className="button-primary auth-submit" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Submitting...' : 'Submit ticket'}
-            </Button>
+            <SubmitAction error={error} isSubmitting={isSubmitting} />
           </form>
         )}
       </Main>
