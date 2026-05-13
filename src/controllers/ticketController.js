@@ -145,8 +145,9 @@ const getTicketDetails = async (req, res) => {
       });
     }
  
-    // Student can only see their own tickets
-    if (ticket.studentId._id.toString() !== req.user.userId) {
+    const isOwner = ticket.studentId._id.toString() === req.user.userId;
+    const isStaffOrAdmin = req.user.role === 'staff' || req.user.role === 'admin';
+    if (!isOwner && !isStaffOrAdmin) {
       return res.status(403).json({
         error: 'You do not have permission to view this ticket'
       });

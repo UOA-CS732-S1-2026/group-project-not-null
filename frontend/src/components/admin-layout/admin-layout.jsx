@@ -1,5 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom'
+import { Monitor } from 'lucide-react'
 import { AppSidebar } from '../../components'
+import './admin-layout.css'
 
 function getStoredUser() {
   try {
@@ -25,6 +27,10 @@ export function AdminLayout() {
     <div className="authenticated-layout">
       <AppSidebar />
       <div className="authenticated-content">
+        <div className="admin-mobile-banner">
+          <Monitor size={16} />
+          <span>Admin panel is best viewed on a desktop screen.</span>
+        </div>
         <Outlet />
       </div>
     </div>

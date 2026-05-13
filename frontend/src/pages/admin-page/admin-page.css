@@ -34,6 +34,7 @@
 
 .admin-table {
   width: 100%;
+  min-width: 540px;
   table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.88rem;
@@ -156,6 +157,18 @@
   font-size: inherit;
   text-decoration: underline;
   padding: 0;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 640px) {
+  .admin-page {
+    padding: 16px;
+  }
 }
 
 /* Column widths — 5-column tables (Pending + All Staff) */
