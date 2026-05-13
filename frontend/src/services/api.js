@@ -131,6 +131,10 @@ export function getStaffTickets(params = {}) {
   return request(`/staff/tickets${buildQuery(params)}`)
 }
 
+export function getMyStaffTickets() {
+  return request('/staff/my-tickets')
+}
+
 export function getStaffUrgentTickets() {
   return request('/staff/tickets/urgent')
 }

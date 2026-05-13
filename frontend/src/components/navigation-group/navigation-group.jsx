@@ -9,7 +9,7 @@ const STUDENT_NAV_ITEMS = [
 
 function getVisibleItems({ title, items, role }) {
   if (role !== 'student') {
-    return items
+    return items.filter((item) => !item.staffOnly || role === 'staff')
   }
 
   if (title !== 'General') {
@@ -46,8 +46,6 @@ export function NavGroup({ title, items, role, onNavigate }) {
               <span className="sidebar-link-icon" aria-hidden="true">
                 {isGlyph ? <span className="sidebar-link-glyph">{Icon}</span> : <Icon />}
               </span>
-              <span>{item.title}</span>
-              {item.badge ? <span className="nav-badge">{item.badge}</span> : null}
             </NavLink>
           )
         })}

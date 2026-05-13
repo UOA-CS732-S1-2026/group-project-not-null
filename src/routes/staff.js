@@ -3,6 +3,7 @@ const router = express.Router();
 const { verifyAuth } = require('../middleware/auth');
 const Ticket = require('../models/Ticket');
 const User = require('../models/user');
+const { getTicketsAssignedToStaff } = require('../services/staffTicketService');
 
 const CATEGORY_LABELS = {
   IT: 'IT',
@@ -48,7 +49,8 @@ function getPersonName(user, fallback = 'Unassigned') {
 function getPriorityLabel(priority) {
   if (priority === 1) return 'Critical';
   if (priority === 2) return 'High';
-  if (priority === 3) return 'Low';
+  if (priority === 3) return 'Medium';
+  if (priority === 4) return 'Low';
   return 'Medium';
 }
 
@@ -69,7 +71,7 @@ function formatAverageResponseTime(hours) {
 async function requireStaff(req, res) {
   const user = await User.findById(req.user.userId);
 
-  if (!user || user.role !== 'staff') {
+  if (!user || (user.role !== 'staff' && user.role !== 'admin')) {
     res.status(403).json({ error: 'Only staff can access this resource' });
     return null;
   }
@@ -200,6 +202,24 @@ router.get('/users', verifyAuth, async (req, res) => {
   } catch (error) {
     console.error('Get staff users error:', error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/my-tickets', verifyAuth, async (req, res) => {
+  try {
+    const user = await requireStaff(req, res);
+    if (!user) return;
+
+    const { tickets, summary } = await getTicketsAssignedToStaff(req.user.userId);
+
+    res.status(200).json({
+      message: 'Assigned tickets retrieved',
+      tickets,
+      summary
+    });
+  } catch (error) {
+    console.error('Get my tickets error:', error);
+    res.status(500).json({ error: error.message || 'Failed to fetch assigned tickets' });
   }
 });
 

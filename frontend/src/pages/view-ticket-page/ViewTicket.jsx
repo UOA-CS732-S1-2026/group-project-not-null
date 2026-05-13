@@ -38,7 +38,8 @@ const priorityLabels = {
 export default function ViewTicket() {
   const { ticketId } = useParams()
   const user = getStoredUser()
-  const isStaff = user?.role === 'staff'
+  const role = user?.role || user?.user_role
+  const isStaff = role === 'staff' || role === 'admin'
 
   const [ticket, setTicket] = useState(null)
   const [staffUsers, setStaffUsers] = useState([])
