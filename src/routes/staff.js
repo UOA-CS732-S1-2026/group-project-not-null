@@ -5,6 +5,7 @@ const Ticket = require('../models/Ticket');
 const User = require('../models/user');
 const { getPriorityLabel } = require('../services/priorityUtils');
 const { getTicketsAssignedToStaff } = require('../services/staffTicketService');
+const { serializeTicketWithAttachment } = require('../services/ticketAttachmentService');
 
 const CATEGORY_LABELS = {
   IT: 'IT',
@@ -106,6 +107,14 @@ async function findAssignableStaff(staffId) {
   if (!staffId) return null;
   return User.findOne({ _id: staffId, role: 'staff', isActive: true })
     .select('email firstName lastName department');
+}
+
+function requireStaffOrAdmin(req, res, next) {
+  if (req.user.role !== 'staff' && req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Staff access required' });
+  }
+
+  next();
 }
 
 router.get('/tickets', verifyAuth, requireActiveStaff, async (req, res) => {
@@ -241,7 +250,7 @@ router.get('/my-tickets', verifyAuth, async (req, res) => {
   }
 });
 
-router.get('/tickets/:id', verifyAuth, async (req, res) => {
+router.get('/tickets/:id', verifyAuth, requireStaffOrAdmin, async (req, res) => {
   try {
     const ticket = await Ticket.findById(req.params.id)
       .populate('studentId', 'email firstName lastName')
@@ -253,7 +262,7 @@ router.get('/tickets/:id', verifyAuth, async (req, res) => {
       return res.status(404).json({ error: 'Ticket not found' });
     }
 
-    res.status(200).json({ ticket });
+    res.status(200).json({ ticket: serializeTicketWithAttachment(ticket) });
   } catch (error) {
     console.error('Get staff ticket error:', error);
     res.status(500).json({ error: error.message });
@@ -504,7 +513,7 @@ router.patch('/tickets/:id', verifyAuth, requireActiveStaff, async (req, res) =>
 
     res.status(200).json({
       message: 'Ticket updated successfully',
-      ticket
+      ticket: serializeTicketWithAttachment(ticket)
     });
   } catch (error) {
     console.error('Update ticket error:', error);
@@ -544,7 +553,7 @@ router.post('/tickets/:id/notes', verifyAuth, requireActiveStaff, async (req, re
 
     res.status(200).json({
       message: 'Note added successfully',
-      ticket
+      ticket: serializeTicketWithAttachment(ticket)
     });
   } catch (error) {
     console.error('Add note error:', error);
@@ -597,7 +606,7 @@ router.post('/tickets/:id/student-notes', verifyAuth, async (req, res) => {
 
     res.status(200).json({
       message: 'Student note added successfully',
-      ticket
+      ticket: serializeTicketWithAttachment(ticket)
     });
   } catch (error) {
     console.error('Add student note error:', error);

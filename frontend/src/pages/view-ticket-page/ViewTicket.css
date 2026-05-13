@@ -202,6 +202,104 @@
   margin: 0;
 }
 
+.ticket-attachment-card {
+  display: grid;
+  gap: 12px;
+  margin-top: 4px;
+  border: 1px solid color-mix(in srgb, var(--border), transparent 4%);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 14px;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.9), rgb(243 247 252 / 0.92));
+}
+
+.ticket-attachment-summary {
+  display: grid;
+  gap: 12px;
+}
+
+.ticket-attachment-trigger {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+}
+
+.ticket-attachment-thumb,
+.ticket-attachment-icon {
+  width: 84px;
+  height: 84px;
+  border: 1px solid color-mix(in srgb, var(--border), transparent 8%);
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.ticket-attachment-thumb {
+  object-fit: cover;
+}
+
+.ticket-attachment-icon {
+  position: relative;
+  background:
+    radial-gradient(circle at top, rgb(253 197 0 / 0.18), transparent 40%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.96), rgb(243 247 252 / 0.96));
+}
+
+.ticket-attachment-icon::before,
+.ticket-attachment-icon::after {
+  content: '';
+  position: absolute;
+}
+
+.ticket-attachment-icon::before {
+  inset: 16px 18px 18px;
+  border: 2px solid color-mix(in srgb, var(--primary), transparent 35%);
+  border-radius: 10px;
+}
+
+.ticket-attachment-icon::after {
+  left: 29px;
+  right: 29px;
+  bottom: 30px;
+  height: 14px;
+  border-radius: 10px 10px 0 0;
+  background: color-mix(in srgb, var(--gold-500), white 18%);
+  clip-path: polygon(0 100%, 28% 45%, 52% 72%, 74% 30%, 100% 100%);
+}
+
+.ticket-attachment-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.ticket-attachment-copy strong {
+  color: var(--primary);
+}
+
+.ticket-attachment-copy span,
+.ticket-attachment-copy small {
+  overflow-wrap: anywhere;
+}
+
+.ticket-attachment-copy small {
+  color: var(--muted-foreground);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.ticket-attachment-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .ticket-workspace,
 .staff-note-history,
 .ticket-status-controls {
@@ -434,6 +532,22 @@
   .ticket-action-buttons .button,
   .ticket-note-form .button {
     width: 100%;
+  }
+
+  .ticket-attachment-trigger {
+    grid-template-columns: 1fr;
+  }
+
+  .ticket-attachment-thumb,
+  .ticket-attachment-icon {
+    width: 100%;
+    max-width: 220px;
+    height: 160px;
+  }
+
+  .ticket-attachment-actions .button {
+    width: 100%;
+    max-width: none;
   }
 }
 

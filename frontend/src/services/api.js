@@ -122,11 +122,26 @@ export function getTicket(ticketId) {
   return request(`/tickets/${ticketId}`)
 }
 
-export function createTicket({ title, description, category, urgencyLevel, priority }) {
+export function createTicket({ title, description, category, urgencyLevel, priority, attachment = null }) {
   return request('/tickets', {
     method: 'POST',
-    body: JSON.stringify({ title, description, category, urgencyLevel, priority }),
+    body: JSON.stringify({ title, description, category, urgencyLevel, priority, attachment }),
   })
+}
+
+export async function getTicketAttachmentBlob(ticketId) {
+  const accessToken = localStorage.getItem('accessToken')
+
+  const response = await fetch(`${API_BASE_URL}/tickets/${ticketId}/attachment`, {
+    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+  })
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}))
+    throw new Error(data.error || 'Unable to load the attachment.')
+  }
+
+  return response.blob()
 }
 
 export function analyzeTicketPriority({ description, department, urgencyLevel }) {

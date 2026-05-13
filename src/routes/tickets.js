@@ -55,6 +55,12 @@ router.post('/', verifyAuth, ticketController.createTicket);
 router.get('/', verifyAuth, ticketController.getStudentTickets);
 
 /**
+ * GET /api/tickets/:id/attachment
+ * Stream a ticket attachment for an authorized user
+ */
+router.get('/:id/attachment', verifyAuth, ticketController.getTicketAttachment);
+
+/**
  * GET /api/tickets/:id
  * Get details of a specific ticket
  */
