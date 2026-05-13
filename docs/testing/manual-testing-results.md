@@ -88,6 +88,16 @@ Category and urgency missing-input validation could not be tested through the fr
 
 ---
 
+## 7. Automated Component Testing
+
+| Test ID | Component | Test Case | Steps | Expected Result | Actual Result | Status |
+|---|---|---|---|---|---|---|
+| AT1 | Student Dashboard | Dashboard renders successfully | Run `npm run test:run` inside the frontend folder | Student dashboard component should render without crashing | Test passed. Student dashboard rendered successfully. | Passed |
+| AT2 | Student Dashboard | Summary cards render | Run `npm run test:run` inside the frontend folder | Open tickets, In Progress, and Resolved summary information should be visible | Test passed. Dashboard summary section rendered correctly. | Passed |
+| AT3 | Student Dashboard | Filters render | Run `npm run test:run` inside the frontend folder | Status and category filters should be visible | Test passed. Status and category filters were found. | Passed |
+
+---
+
 ## Overall Result for Student Side
 
 The student dashboard and create ticket flow are mostly working. The main student user journey is functional: the user can view their dashboard, filter tickets, open ticket details, create a ticket, view the submitted ticket, return to the dashboard, and see updated ticket counts. The issues found are mostly UI polish and frontend code-quality warnings rather than blocking functional failures.
