@@ -1,4 +1,4 @@
-import { Filter, MoreHorizontal } from 'lucide-react'
+import { Filter } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { EmptyState, SectionError, SectionSkeleton } from '../dashboard-section-state'
 import './StaffTicketQueue.css'
@@ -73,7 +73,6 @@ export default function StaffTicketQueue({
               <span>Status</span>
               <span>Assigned</span>
               <span>Updated</span>
-              <span>Actions</span>
             </div>
             {tickets.map((ticket) => (
               <TicketRow key={ticket.id} ticket={ticket} onSelect={() => navigate(`/tickets/${ticket.id}`)} />
@@ -101,11 +100,6 @@ function TicketRow({ ticket, onSelect }) {
       <span><StatusPill status={ticket.status} /></span>
       <span>{ticket.assigned}</span>
       <span>{ticket.updated}</span>
-      <span className="ticket-actions" aria-label="Quick actions">
-        <i>Assign</i>
-        <i>Status</i>
-        <MoreHorizontal size={18} aria-hidden="true" />
-      </span>
     </button>
   )
 }

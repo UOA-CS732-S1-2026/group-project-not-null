@@ -126,7 +126,8 @@
 }
 
 .ticket-table {
-  overflow: hidden;
+  overflow: auto;
+  max-height: 520px;
   border: 1px solid var(--staff-line);
   border-radius: 16px;
 }
@@ -134,12 +135,15 @@
 .ticket-table-head,
 .ticket-row {
   display: grid;
-  grid-template-columns: 96px minmax(220px, 1.3fr) minmax(130px, 0.8fr) minmax(130px, 0.8fr) 112px minmax(115px, 0.75fr) 90px 126px;
+  grid-template-columns: 80px 1.4fr 0.85fr 0.85fr 96px 0.85fr 72px;
   align-items: center;
   gap: 12px;
 }
 
 .ticket-table-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   padding: 12px 14px;
   color: var(--staff-steel);
   background: var(--staff-soft);
