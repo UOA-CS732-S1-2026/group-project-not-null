@@ -127,6 +127,13 @@
   margin-top: 18px;
 }
 
+.ticket-supporting-copy {
+  margin: 12px 0 0;
+  color: var(--muted-foreground);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
 .thread-message {
   display: grid;
   gap: 8px;
@@ -161,8 +168,135 @@
   margin: 0;
 }
 
+.ticket-workspace,
+.staff-note-history {
+  margin-top: 18px;
+}
+
+.ticket-action-form,
+.ticket-note-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.ticket-action-form .field,
+.ticket-note-form .field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ticket-action-form .field span:first-child,
+.ticket-note-form .field span:first-child {
+  position: static;
+  display: block;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--muted-foreground);
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  white-space: normal;
+  pointer-events: auto;
+}
+
+.ticket-action-form select,
+.ticket-note-form textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 14px 16px;
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+}
+
+.ticket-action-form select {
+  appearance: none;
+  line-height: 1.4;
+}
+
+.ticket-select {
+  padding-right: 48px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%2300296b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-position: right 14px center;
+  background-repeat: no-repeat;
+  background-size: 18px 18px;
+}
+
+.ticket-select::-ms-expand {
+  display: none;
+}
+
+.ticket-note-form textarea {
+  min-height: 144px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.ticket-action-form select:focus,
+.ticket-note-form textarea:focus {
+  outline: 2px solid transparent;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary), transparent 78%);
+}
+
+.ticket-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.ticket-action-buttons .button,
+.ticket-note-form .button {
+  width: 100%;
+  max-width: none;
+  min-height: 48px;
+}
+
+.form-success {
+  margin: 12px 0 0;
+  color: #1f6f43;
+  font-weight: 700;
+}
+
+.staff-note-history .panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.staff-note-history .panel-header h2 {
+  margin: 0;
+}
+
+.note-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 34px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 0 12px;
+  color: var(--primary);
+  background: var(--muted);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.65);
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
 .ticket-detail-main > .button {
   width: 100%;
+  max-width: none;
 }
 
 @media (min-width: 640px) {
@@ -170,8 +304,52 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .ticket-action-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .ticket-action-buttons,
+  .ticket-note-form,
+  .staff-note-history {
+    grid-column: 1 / -1;
+  }
+
+  .ticket-action-buttons .button {
+    width: auto;
+    min-width: 180px;
+  }
+
+  .ticket-note-form .button {
+    width: max-content;
+    min-width: 220px;
+  }
+
   .ticket-detail-main > .button {
     width: max-content;
+  }
+}
+
+@media (max-width: 639px) {
+  .ticket-workspace .panel-header,
+  .thread-message div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .staff-note-history .panel-header {
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .note-count-badge {
+    min-width: 36px;
+  }
+
+  .ticket-action-buttons .button,
+  .ticket-note-form .button {
+    width: 100%;
   }
 }
 

@@ -51,6 +51,15 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
  * @property {boolean} read
  */
 
+/**
+ * @typedef {Object} StaffUser
+ * @property {string} _id
+ * @property {string} email
+ * @property {string} firstName
+ * @property {string} lastName
+ * @property {string | null} department
+ */
+
 async function request(path, options = {}) {
   const accessToken = localStorage.getItem('accessToken')
 
@@ -128,6 +137,28 @@ export function getStaffUrgentTickets() {
   return request('/staff/tickets/urgent')
 }
 
+export function getStaffTicket(ticketId) {
+  return request(`/staff/tickets/${ticketId}`)
+}
+
+export function updateStaffTicket(ticketId, updates) {
+  return request(`/staff/tickets/${ticketId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(updates),
+  })
+}
+
+export function addStaffTicketNote(ticketId, { content }) {
+  return request(`/staff/tickets/${ticketId}/notes`, {
+    method: 'POST',
+    body: JSON.stringify({ content }),
+  })
+}
+
+export function getStaffUsers() {
+  return request('/staff/users')
+}
+
 export function getStaffDashboardAnalytics() {
   return request('/staff/dashboard/analytics')
 }
@@ -169,4 +200,15 @@ export function promoteStaff(id) {
 
 export function getAdminUsers(params = {}) {
   return request(`/admin/users${buildQuery(params)}`)
+}
+
+export function getAdminTickets(params = {}) {
+  return request(`/admin/tickets${buildQuery(params)}`)
+}
+
+export function assignTicket(ticketId, staffId) {
+  return request(`/admin/tickets/${ticketId}/assign`, {
+    method: 'PATCH',
+    body: JSON.stringify({ staffId: staffId || null }),
+  })
 }

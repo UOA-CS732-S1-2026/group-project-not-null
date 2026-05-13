@@ -1,3 +1,4 @@
+const { sendEmail } = require('../utils/sendEmail');
 // src/controllers/ticketController.js
 const Ticket = require('../models/Ticket');
 const User = require('../models/user');
@@ -45,6 +46,23 @@ const createTicket = async (req, res) => {
  
     // Populate student info before returning
     await ticket.populate('studentId', 'firstName lastName email');
+
+    //Email sending
+    await sendEmail({
+      to: ticket.studentId.email,
+      subject: 'UniDesk Ticket Created',
+      text: `Hello ${ticket.studentId.firstName},
+
+    Your support ticket has been created successfully.
+
+    Title: ${ticket.title}
+    Category: ${ticket.category}
+    Urgency: ${ticket.urgencyLevel}
+
+    We will update you once the ticket status changes.
+
+    - UniDesk Support Team`,
+    });
  
     res.status(201).json({
       message: 'Ticket created successfully',

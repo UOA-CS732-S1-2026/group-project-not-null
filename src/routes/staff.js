@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyAuth } = require('../middleware/auth');
 const Ticket = require('../models/Ticket');
+const User = require('../models/user');
 
 const CATEGORY_LABELS = {
   IT: 'IT',
@@ -15,6 +16,8 @@ const STATUS_LABELS = {
   in_progress: 'In Progress',
   resolved: 'Resolved'
 };
+
+const VALID_STATUSES = ['open', 'in_progress', 'resolved'];
 
 function startOfToday() {
   const date = new Date();
@@ -72,6 +75,12 @@ function requireActiveStaff(req, res, next) {
     return res.status(403).json({ error: 'Active staff account required' });
   }
   next();
+}
+
+async function findAssignableStaff(staffId) {
+  if (!staffId) return null;
+  return User.findOne({ _id: staffId, role: 'staff', isActive: true })
+    .select('email firstName lastName department');
 }
 
 router.get('/tickets', verifyAuth, requireActiveStaff, async (req, res) => {
@@ -161,6 +170,32 @@ router.get('/tickets/urgent', verifyAuth, requireActiveStaff, async (req, res) =
     res.status(200).json({ tickets });
   } catch (error) {
     console.error('Get urgent tickets error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/users', verifyAuth, requireActiveStaff, async (req, res) => {
+  try {
+    const staffUsers = await User.find({ role: 'staff', isActive: true })
+      .select('email firstName lastName department')
+      .sort({ firstName: 1, lastName: 1, email: 1 });
+    res.status(200).json({ users: staffUsers });
+  } catch (error) {
+    console.error('Get staff users error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/tickets/:id', verifyAuth, requireActiveStaff, async (req, res) => {
+  try {
+    const ticket = await Ticket.findById(req.params.id)
+      .populate('studentId', 'email firstName lastName')
+      .populate('assignedToStaffId', 'email firstName lastName department')
+      .populate('internalNotes.staffId', 'email firstName lastName department');
+    if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
+    res.status(200).json({ ticket });
+  } catch (error) {
+    console.error('Get staff ticket error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -306,19 +341,57 @@ router.get('/notifications', verifyAuth, requireActiveStaff, async (req, res) =>
 router.patch('/tickets/:id', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
     const { status, assignedToStaffId } = req.body;
+    const hasStatusUpdate = status !== undefined;
+    const hasAssignmentUpdate = assignedToStaffId !== undefined;
+
+    if (!hasStatusUpdate && !hasAssignmentUpdate) {
+      return res.status(400).json({ error: 'Provide a status or assignment update' });
+    }
+
+    if (hasStatusUpdate && !VALID_STATUSES.includes(status)) {
+      return res.status(400).json({
+        error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`
+      });
+    }
 
     const updateData = {};
-    if (status) updateData.status = status;
-    if (assignedToStaffId) updateData.assignedToStaffId = assignedToStaffId;
+
+    if (hasStatusUpdate) {
+      updateData.status = status;
+      updateData.resolvedAt = status === 'resolved' ? new Date() : null;
+    }
+
+    if (hasAssignmentUpdate) {
+      if (assignedToStaffId === null || assignedToStaffId === '') {
+        updateData.assignedToStaffId = null;
+      } else {
+        const normalizedStaffId = assignedToStaffId === 'me'
+          ? req.user.userId
+          : assignedToStaffId;
+
+        const assignableStaff = await findAssignableStaff(normalizedStaffId);
+
+        if (!assignableStaff) {
+          return res.status(400).json({ error: 'Assigned staff member not found' });
+        }
+
+        updateData.assignedToStaffId = assignableStaff._id;
+      }
+    }
+
     updateData.updatedAt = new Date();
 
     const ticket = await Ticket.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { returnDocument: 'after' }
+      {
+        new: true,
+        runValidators: true
+      }
     )
       .populate('studentId', 'email firstName lastName')
-      .populate('assignedToStaffId', 'email firstName lastName');
+      .populate('assignedToStaffId', 'email firstName lastName department')
+      .populate('internalNotes.staffId', 'email firstName lastName department');
 
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket not found' });
@@ -336,7 +409,7 @@ router.patch('/tickets/:id', verifyAuth, requireActiveStaff, async (req, res) =>
 
 router.post('/tickets/:id/notes', verifyAuth, requireActiveStaff, async (req, res) => {
   try {
-    const { content } = req.body;
+    const content = req.body.content?.trim();
     if (!content) {
       return res.status(400).json({ error: 'Note content required' });
     }
@@ -356,8 +429,8 @@ router.post('/tickets/:id/notes', verifyAuth, requireActiveStaff, async (req, re
       { returnDocument: 'after' }
     )
       .populate('studentId', 'email firstName lastName')
-      .populate('assignedToStaffId', 'email firstName lastName')
-      .populate('internalNotes.staffId', 'email firstName lastName');
+      .populate('assignedToStaffId', 'email firstName lastName department')
+      .populate('internalNotes.staffId', 'email firstName lastName department');
 
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket not found' });
