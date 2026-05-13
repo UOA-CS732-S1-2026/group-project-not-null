@@ -46,6 +46,7 @@ export function NavGroup({ title, items, role, onNavigate }) {
               <span className="sidebar-link-icon" aria-hidden="true">
                 {isGlyph ? <span className="sidebar-link-glyph">{Icon}</span> : <Icon />}
               </span>
+              <span className="sidebar-link-label">{item.title}</span>
             </NavLink>
           )
         })}
