@@ -18,6 +18,7 @@ export { AuthenticatedLayout } from './authenticated-layout';
 export { AdminLayout } from './admin-layout/admin-layout';
 export { Header } from './header';
 export { Main } from './main';
+export { default as ArchiveList } from './ArchiveList';
 export {
   DashboardSkeleton,
   EmptyState,

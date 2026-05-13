@@ -5,6 +5,8 @@ require('dotenv').config();
 //require('./src/utils/sendEmail')
 const app = require('./app');
 const connectDB = require('./src/config/database');
+const cron = require('node-cron');
+const { archiveResolvedTickets } = require('./src/services/archiveService');
 
  
 const PORT = process.env.PORT || 5000;
@@ -14,6 +16,14 @@ const startServer = async () => {
   try {
     // Connect to database
     await connectDB();
+
+    cron.schedule('0 0 * * *', async () => {
+      try {
+        await archiveResolvedTickets();
+      } catch (error) {
+        console.error('Ticket archive job failed:', error);
+      }
+    });
     
     // Start listening
     const server = app.listen(PORT, () => {

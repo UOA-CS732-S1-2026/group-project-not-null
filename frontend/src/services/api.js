@@ -114,6 +114,10 @@ export function getTickets(params = {}) {
   return request(`/tickets${buildQuery(params)}`)
 }
 
+export function getArchivedTickets() {
+  return request('/tickets/archived')
+}
+
 export function getTicket(ticketId) {
   return request(`/tickets/${ticketId}`)
 }
