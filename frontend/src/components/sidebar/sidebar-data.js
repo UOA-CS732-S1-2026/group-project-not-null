@@ -23,7 +23,7 @@ export const sidebarData = {
       title: 'General',
       items: [
         { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-        { title: 'Staff Portal', url: '/staff/tickets', icon: TicketCheck, staffOnly: true },
+        { title: 'Staff Tickets', url: '/staff/tickets', icon: TicketCheck, staffOnly: true },
         { title: 'Students', url: '/students', icon: Users },
       ],
     },
