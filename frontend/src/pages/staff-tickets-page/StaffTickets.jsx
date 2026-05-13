@@ -199,7 +199,7 @@ export default function StaffTickets() {
                 </div>
 
                 <Link className="button button-primary staff-ticket-action" to={`/tickets/${ticket.id}`}>
-                  Update Status
+                  View Details
                 </Link>
               </article>
             ))}
