@@ -10,7 +10,10 @@ export default function DepartmentSelector({
   return (
     <label className="department-selector">
       <span>{label}</span>
-      <select name={name} value={value} onChange={onChange}>
+
+      <select name={name} value={value} onChange={onChange} required>
+        <option value="">Please select a department</option>
+
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
