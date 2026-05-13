@@ -37,6 +37,7 @@
 .archive-history-button {
   width: 100%;
   justify-self: stretch;
+  background: var(--gold-400);
 }
 
 .archive-empty,

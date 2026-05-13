@@ -146,8 +146,9 @@ router.patch('/staff/:id/promote', verifyAuth, verifyAdmin, async (req, res) => 
 // GET /api/admin/tickets — list all tickets with optional filters
 router.get('/tickets', verifyAuth, verifyAdmin, async (req, res) => {
   try {
-    const { status, category, search, page = 1, limit = 50 } = req.query;
-    const filter = {};
+    const { status, category, search, includeArchived, page = 1, limit = 50 } = req.query;
+    const filter = includeArchived === 'true' ? {} : { status: { $ne: 'archived' } };
+
     if (status) filter.status = status;
     if (category) filter.category = category;
     if (search) {

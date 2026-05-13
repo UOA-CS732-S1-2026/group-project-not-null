@@ -82,7 +82,6 @@ export default function ArchivePage() {
       <section className="archive-panel panel">
         <div className="archive-panel-header">
           <div>
-            <p className="page-eyebrow">Archived Tickets</p>
             <h2>Resolved History</h2>
           </div>
           <span>{isLoading ? 'Loading...' : `${archivedTickets.length} records`}</span>

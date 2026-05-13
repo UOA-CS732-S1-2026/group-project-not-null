@@ -8,7 +8,11 @@ async function archiveResolvedTickets() {
   const result = await Ticket.updateMany(
     {
       status: 'resolved',
-      updatedAt: { $lt: cutoff }
+      $or: [
+        { resolvedAt: { $lt: cutoff } },
+        { resolvedAt: null, updatedAt: { $lt: cutoff } },
+        { resolvedAt: { $exists: false }, updatedAt: { $lt: cutoff } }
+      ]
     },
     {
       $set: {
