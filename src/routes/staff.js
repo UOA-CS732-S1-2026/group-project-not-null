@@ -253,6 +253,7 @@ router.get('/dashboard/summary', verifyAuth, async (req, res) => {
 
     const [
       openTickets,
+      inProgressTickets,
       resolvedToday,
       highPriorityTickets,
       assignedToMe,
@@ -265,7 +266,11 @@ router.get('/dashboard/summary', verifyAuth, async (req, res) => {
         resolvedAt: { $gte: today },
         assignedToStaffId: req.user.userId
       }),
-      Ticket.countDocuments({ priority: { $in: [1, 2] }, status: { $ne: 'resolved' } }),
+      Ticket.countDocuments({
+        priority: { $in: [1, 2] },
+        status: { $ne: 'resolved' },
+        assignedToStaffId: req.user.userId
+      }),
       Ticket.countDocuments({ assignedToStaffId: req.user.userId, status: { $ne: 'resolved' } }),
       Ticket.find({
         status: 'resolved',
@@ -283,6 +288,8 @@ router.get('/dashboard/summary', verifyAuth, async (req, res) => {
     res.status(200).json({
       summary: {
         openTickets,
+        openTickets,
+        inProgressTickets,
         resolvedToday,
         highPriorityTickets,
         assignedToMe,
@@ -302,9 +309,19 @@ router.get('/dashboard/analytics', verifyAuth, async (req, res) => {
     const user = await requireStaff(req, res);
     if (!user) return;
 
+    const matchAssigned = { $match: { assignedToStaffId: req.user.userId } };
+
     const [byCategory, byStatus] = await Promise.all([
-      Ticket.aggregate([{ $group: { _id: '$category', value: { $sum: 1 } } }, { $sort: { value: -1 } }]),
-      Ticket.aggregate([{ $group: { _id: '$status', value: { $sum: 1 } } }, { $sort: { value: -1 } }])
+      Ticket.aggregate([
+        matchAssigned,
+        { $group: { _id: '$category', value: { $sum: 1 } } },
+        { $sort: { value: -1 } }
+      ]),
+      Ticket.aggregate([
+        matchAssigned,
+        { $group: { _id: '$status', value: { $sum: 1 } } },
+        { $sort: { value: -1 } }
+      ])
     ]);
 
     res.status(200).json({
