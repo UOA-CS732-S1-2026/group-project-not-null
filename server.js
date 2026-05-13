@@ -22,6 +22,9 @@ const startServer = async () => {
         await archiveResolvedTickets();
       } catch (error) {
         console.error('Ticket archive job failed:', error);
+      }
+    });
+
     cron.schedule('0 * * * *', async () => {
       try {
         await escalateStagnantTickets();
