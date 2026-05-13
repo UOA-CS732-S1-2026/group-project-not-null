@@ -85,6 +85,40 @@
   font-weight: 800;
 }
 
+.resolved-ticket-info {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+  border: 1px solid color-mix(in srgb, var(--dates-foreground), transparent 64%);
+  border-radius: var(--radius);
+  padding: 14px;
+  background: color-mix(in srgb, var(--dates-foreground), transparent 80%);
+}
+
+.resolved-ticket-info h2,
+.resolved-ticket-info p {
+  margin: 0;
+}
+
+.resolved-ticket-info h2 {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.resolved-ticket-info p {
+  color: var(--muted-foreground);
+  line-height: 1.45;
+}
+
+.resolved-ticket-info .button {
+  width: 100%;
+}
+
+.resolved-ticket-action {
+  color: #dbeafe;
+  background: #00509d;
+}
+
 .ticket-timeline {
   display: grid;
   gap: 12px;
@@ -169,7 +203,8 @@
 }
 
 .ticket-workspace,
-.staff-note-history {
+.staff-note-history,
+.ticket-status-controls {
   margin-top: 18px;
 }
 
@@ -292,6 +327,14 @@
   margin: 0;
 }
 
+.staff-note-history-mobile {
+  display: block;
+}
+
+.staff-note-history-desktop {
+  display: none;
+}
+
 .note-count-badge {
   display: inline-flex;
   align-items: center;
@@ -315,6 +358,15 @@
 }
 
 @media (min-width: 640px) {
+  .resolved-ticket-info {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .resolved-ticket-info .button {
+    width: max-content;
+  }
+
   .ticket-detail-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -328,6 +380,14 @@
   .ticket-note-form,
   .staff-note-history {
     grid-column: 1 / -1;
+  }
+
+  .staff-note-history-mobile {
+    display: none;
+  }
+
+  .staff-note-history-desktop {
+    display: block;
   }
 
   .ticket-action-buttons .button {
@@ -348,6 +408,11 @@
 @media (max-width: 639px) {
   .ticket-workspace .panel-header,
   .thread-message div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ticket-status-controls .panel-header {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -376,5 +441,9 @@
 
   .ticket-detail-grid {
     grid-template-columns: minmax(0, 1fr) minmax(280px, 0.45fr);
+  }
+
+  .resolved-ticket-info {
+    grid-column: 1 / -1;
   }
 }

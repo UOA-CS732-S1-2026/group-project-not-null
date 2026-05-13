@@ -206,6 +206,28 @@ export default function ViewTicket() {
     }
   }
 
+  async function handleReopenTicket() {
+    if (!ticket) {
+      return
+    }
+
+    setActionError('')
+    setActionSuccess('')
+    setIsSavingChanges(true)
+
+    try {
+      const response = await updateStaffTicket(ticket._id, { status: 'open' })
+      setTicket(response.ticket)
+      setStatusValue(response.ticket.status || 'open')
+      setAssignmentValue(response.ticket.assignedToStaffId?._id || '')
+      setActionSuccess('Ticket re-opened successfully.')
+    } catch (err) {
+      setActionError(err.message || 'Unable to re-open ticket.')
+    } finally {
+      setIsSavingChanges(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <Main>
@@ -262,14 +284,38 @@ export default function ViewTicket() {
           <p className="page-eyebrow">Ticket #{displayTicket.ticketNumber}</p>
           {isStaff ? (
             <p className="ticket-supporting-copy">
-              Student: {displayTicket.studentName} ({displayTicket.studentEmail}) | Assigned: {displayTicket.assignedTo}
+              Student: {displayTicket.studentName} ({displayTicket.studentEmail})
             </p>
           ) : null}
         </div>
       </section>
 
       <section className="ticket-detail-grid">
+        {ticket.status === 'resolved' ? (
+          <section className="resolved-ticket-info">
+            <div>
+              <h2>This ticket was resolved</h2>
+              <p>
+                {displayTicket.resolvedAt
+                  ? `Resolved at ${displayTicket.resolvedAt}.`
+                  : 'The support team has marked this ticket as resolved.'}
+              </p>
+            </div>
+            {isStaff ? (
+              <button
+                className="button button-ghost resolved-ticket-action"
+                type="button"
+                disabled={isSavingChanges}
+                onClick={handleReopenTicket}
+              >
+                {isSavingChanges ? 'Re-opening...' : 'Re-open ticket'}
+              </button>
+            ) : null}
+          </section>
+        ) : null}
+
         <article className="panel">
+
           <div className="panel-header">
             <h2>Details</h2>
             <span>Updated {displayTicket.updated}</span>
@@ -340,73 +386,106 @@ export default function ViewTicket() {
           </div>
 
           {isStaff ? (
-            <section className="ticket-workspace">
-              <div className="panel-header">
-                <h2>Staff actions</h2>
-              </div>
-
-              <form className="ticket-note-form" onSubmit={handleAddNote}>
-                <label className="field create-ticket-description">
-                  <span>Internal note</span>
-                  <textarea
-                    value={noteContent}
-                    onChange={(event) => setNoteContent(event.target.value)}
-                    placeholder="Add context for other staff members."
-                    rows="4"
-                  />
-                </label>
-
-                <button className="button button-primary" type="submit" disabled={isSavingNote}>
-                  {isSavingNote ? 'Saving note...' : 'Add internal note'}
-                </button>
-              </form>
-
-              <form className="ticket-note-form" onSubmit={handleAddStudentNote}>
-                <label className="field create-ticket-description">
-                  <span>Student note</span>
-                  <textarea
-                    value={studentNoteContent}
-                    onChange={(event) => setStudentNoteContent(event.target.value)}
-                    placeholder="Add an update the student can see."
-                    rows="4"
-                  />
-                </label>
-
-                <label className="ticket-checkbox-field">
-                  <input
-                    type="checkbox"
-                    checked={isResolvingComment}
-                    onChange={(event) => setIsResolvingComment(event.target.checked)}
-                  />
-                  <span>Is this the Resolving Comment?</span>
-                </label>
-
-                <button className="button button-primary" type="submit" disabled={isSavingStudentNote}>
-                  {isSavingStudentNote ? 'Saving note...' : 'Add Student note'}
-                </button>
-              </form>
-
-              <form className="ticket-action-form" onSubmit={handleSaveChanges}>
-                <label className="field">
-                  <span>Status</span>
-                  <select className="ticket-select" value={statusValue} onChange={(event) => setStatusValue(event.target.value)}>
-                    <option value="open">Open</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="resolved">Resolved</option>
-                  </select>
-                </label>
-
-
-                <div className="ticket-action-buttons">
-                  <button className="button button-primary" type="submit" disabled={isSavingChanges}>
-                    {isSavingChanges ? 'Saving...' : 'Save changes'}
-                  </button>
+            <>
+              <section className="staff-note-history staff-note-history-mobile">
+                <div className="panel-header">
+                  <h2>Internal notes</h2>
+                  <span className="note-count-badge">{displayTicket.internalNotes.length}</span>
                 </div>
-              </form>
 
-              {actionError ? <p className="form-error" role="alert">{actionError}</p> : null}
-              {actionSuccess ? <p className="form-success">{actionSuccess}</p> : null}
-            </section>
+                {displayTicket.internalNotes.length === 0 ? (
+                  <p className="ticket-supporting-copy">No internal notes have been added yet.</p>
+                ) : (
+                  <div className="ticket-thread">
+                    {displayTicket.internalNotes
+                      .slice()
+                      .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
+                      .map((note, index) => (
+                        <article className="thread-message thread-message-staff" key={`${note._id || note.createdAt || index}`}>
+                          <div>
+                            <strong>{getPersonName(note.staffId, 'Staff')}</strong>
+                            <span>{formatDateTime(note.createdAt)}</span>
+                          </div>
+                          <p>{note.content}</p>
+                        </article>
+                      ))}
+                  </div>
+                )}
+              </section>
+
+              <section className="ticket-workspace">
+                <div className="panel-header">
+                  <h2>Staff actions</h2>
+                </div>
+
+                <form className="ticket-note-form" onSubmit={handleAddNote}>
+                  <label className="field create-ticket-description">
+                    <span>Internal note</span>
+                    <textarea
+                      value={noteContent}
+                      onChange={(event) => setNoteContent(event.target.value)}
+                      placeholder="Add context for other staff members."
+                      rows="4"
+                    />
+                  </label>
+
+                  <button className="button button-primary" type="submit" disabled={isSavingNote}>
+                    {isSavingNote ? 'Saving note...' : 'Add internal note'}
+                  </button>
+                </form>
+
+                <form className="ticket-note-form" onSubmit={handleAddStudentNote}>
+                  <label className="field create-ticket-description">
+                    <span>Student note</span>
+                    <textarea
+                      value={studentNoteContent}
+                      onChange={(event) => setStudentNoteContent(event.target.value)}
+                      placeholder="Add an update the student can see."
+                      rows="4"
+                    />
+                  </label>
+
+                  <label className="ticket-checkbox-field">
+                    <input
+                      type="checkbox"
+                      checked={isResolvingComment}
+                      onChange={(event) => setIsResolvingComment(event.target.checked)}
+                    />
+                    <span>Is this the Resolving Comment?</span>
+                  </label>
+
+                  <button className="button button-primary" type="submit" disabled={isSavingStudentNote}>
+                    {isSavingStudentNote ? 'Saving note...' : 'Add Student note'}
+                  </button>
+                </form>
+
+                <section className="ticket-status-controls">
+                  <div className="panel-header">
+                    <h2>Status</h2>
+                  </div>
+
+                  <form className="ticket-action-form" onSubmit={handleSaveChanges}>
+                    <label className="field">
+                      <span>Status</span>
+                      <select className="ticket-select" value={statusValue} onChange={(event) => setStatusValue(event.target.value)}>
+                        <option value="open">Open</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                      </select>
+                    </label>
+
+                    <div className="ticket-action-buttons">
+                      <button className="button button-primary" type="submit" disabled={isSavingChanges}>
+                        {isSavingChanges ? 'Saving...' : 'Save changes'}
+                      </button>
+                    </div>
+                  </form>
+                </section>
+
+                {actionError ? <p className="form-error" role="alert">{actionError}</p> : null}
+                {actionSuccess ? <p className="form-success">{actionSuccess}</p> : null}
+              </section>
+            </>
           ) : (
             <div className="ticket-thread staff-response">
               {displayTicket.studentNotes.length === 0 ? (
@@ -441,7 +520,7 @@ export default function ViewTicket() {
           ) : null}
 
           {isStaff ? (
-            <section className="staff-note-history">
+            <section className="staff-note-history staff-note-history-desktop">
               <div className="panel-header">
                 <h2>Internal notes</h2>
                 <span className="note-count-badge">{displayTicket.internalNotes.length}</span>
