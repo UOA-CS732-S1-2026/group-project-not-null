@@ -47,7 +47,7 @@
 }
 
 .admin-table th {
-  text-align: center;
+  text-align: left;
   padding: 8px 12px;
   color: var(--background);
   font-weight: 700;
