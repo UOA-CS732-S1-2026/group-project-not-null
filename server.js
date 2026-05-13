@@ -1,0 +1,65 @@
+require('dotenv').config();
+
+const app = require('./app');
+const connectDB = require('./src/config/database');
+const cron = require('node-cron');
+
+const { archiveResolvedTickets } = require('./src/services/archiveService');
+const { escalateStagnantTickets } = require('./src/services/escalationService');
+
+const PORT = process.env.PORT || 5000;
+
+// Connect to MongoDB and start server
+const startServer = async () => {
+  try {
+    // Connect to database
+    await connectDB();
+
+    // Archive resolved tickets every day at midnight
+    cron.schedule('0 0 * * *', async () => {
+      try {
+        await archiveResolvedTickets();
+      } catch (error) {
+        console.error('Ticket archive job failed:', error);
+      }
+    });
+
+    // Escalate stagnant tickets every hour
+    cron.schedule('0 * * * *', async () => {
+      try {
+        await escalateStagnantTickets();
+      } catch (error) {
+        console.error('Ticket escalation job failed:', error);
+      }
+    });
+
+    // Start listening
+    const server = app.listen(PORT, () => {
+      console.log(`
+╔════════════════════════════════════════╗
+║   UniDesk Backend Server Started       ║
+╠════════════════════════════════════════╣
+║  Environment: ${process.env.NODE_ENV || 'development'}
+║  Port: ${PORT}
+║  URL: http://localhost:${PORT}
+║  Status: Ready
+╚════════════════════════════════════════╝
+      `);
+    });
+
+    // Handle graceful shutdown
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM signal received: closing HTTP server');
+      server.close(() => {
+        console.log('HTTP server closed');
+        process.exit(0);
+      });
+    });
+
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();

@@ -1,0 +1,82 @@
+.admin-page-wide {
+  max-width: 1400px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.admin-tickets-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-filter-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.admin-filter-chip {
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+}
+
+.admin-filter-chip:hover {
+  background: var(--muted);
+}
+
+.admin-filter-chip-active {
+  background: var(--foreground);
+  color: var(--background);
+  border-color: var(--foreground);
+}
+
+.admin-tickets-search {
+  flex: 1;
+  min-width: 200px;
+  max-width: 300px;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  font: inherit;
+  font-size: 0.88rem;
+  background: transparent;
+  color: var(--foreground);
+  outline: none;
+}
+
+.admin-tickets-search:focus {
+  border-color: var(--primary);
+}
+
+/* Assign dropdown */
+.admin-assign-select {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  font: inherit;
+  font-size: 0.82rem;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  outline: none;
+}
+
+.admin-assign-select:focus {
+  border-color: var(--primary);
+}
+
+.admin-assign-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

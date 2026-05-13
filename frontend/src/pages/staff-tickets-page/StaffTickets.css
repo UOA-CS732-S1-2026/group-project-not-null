@@ -1,0 +1,259 @@
+.staff-tickets-page {
+  display: grid;
+  gap: 24px;
+}
+
+.staff-ticket-summary {
+  display: grid;
+  gap: 12px;
+}
+
+.staff-ticket-metric {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  color: var(--accent-foreground);
+  background: var(--muted);
+}
+
+.staff-ticket-metric div {
+  display: grid;
+  gap: 6px;
+}
+
+.staff-ticket-metric span,
+.staff-ticket-metric small {
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.staff-ticket-metric strong {
+  color: var(--primary);
+  font-family: var(--font-landing);
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.staff-ticket-board {
+  display: grid;
+  gap: 18px;
+}
+
+.staff-ticket-board-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.staff-ticket-board-header h2,
+.staff-ticket-empty h3,
+.staff-ticket-card h3,
+.staff-access-denied h1 {
+  margin: 0;
+  color: var(--primary);
+  font-family: var(--font-landing);
+}
+
+.staff-ticket-board-header span {
+  color: var(--muted-foreground);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.staff-ticket-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.staff-ticket-card {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  background: var(--card);
+}
+
+.staff-ticket-card-topline,
+.staff-ticket-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.staff-ticket-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.staff-ticket-card-topline > span:first-child {
+  color: var(--blue-500);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.staff-ticket-card h3 {
+  font-size: 1.1rem;
+  line-height: 1.25;
+}
+
+.staff-ticket-timestamp {
+  color: #00509d85;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.staff-ticket-card-foot {
+  display: grid;
+  padding-top: 2px;
+}
+
+.staff-ticket-department-label {
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.staff-ticket-department {
+  color: var(--primary);
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.staff-ticket-card p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.92rem;
+}
+
+.staff-priority-pill,
+.staff-status-badge {
+  width: max-content;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.74rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.priority-critical {
+  color: #991b1b;
+  border-color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.priority-high {
+  color: #9a3412;
+  border-color: #fb923c;
+  background: #ffedd5;
+}
+
+.priority-medium {
+  color: #854d0e;
+  border-color: #facc15;
+  background: #fef3c7;
+}
+
+.priority-low {
+  color: var(--muted-foreground);
+  border-color: var(--border);
+  background: var(--muted);
+}
+
+.staff-status-badge {
+  color: var(--primary);
+  background: var(--muted);
+}
+
+.status-open {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.status-in_progress {
+  color: #7c2d12;
+  background: #ffedd5;
+}
+
+.status-resolved {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.staff-ticket-action {
+  width: 100%;
+  justify-self: stretch;
+}
+
+.staff-ticket-empty,
+.staff-access-denied {
+  display: grid;
+  gap: 12px;
+}
+
+.staff-ticket-empty {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  background: var(--muted);
+}
+
+.staff-ticket-card-loading span,
+.staff-ticket-card-loading strong,
+.staff-ticket-card-loading p {
+  min-height: 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--border), transparent 35%);
+}
+
+.staff-ticket-card-loading strong {
+  min-height: 24px;
+}
+
+@media (min-width: 640px) {
+  .staff-ticket-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .staff-ticket-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .staff-ticket-action {
+    width: max-content;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 639px) {
+  .staff-ticket-card-topline {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .staff-ticket-card h3 {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1180px) {
+  .staff-ticket-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
