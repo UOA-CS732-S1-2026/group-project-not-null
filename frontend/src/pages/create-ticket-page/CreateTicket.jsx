@@ -57,7 +57,7 @@ export default function CreateTicket() {
     <Main className="home-main">
         <section className="home-title-row">
           <div>
-            <h1>Create Ticket</h1>
+            <h1>Create a Querry Ticket</h1>
             <p>Tell us what happened so the right team can help.</p>
           </div>
         </section>
