@@ -6,6 +6,11 @@
   min-width: 0;
 }
 
+.student-ticket-panel .panel-header {
+  align-items: flex-start;
+  gap: 12px;
+}
+
 .student-ticket-filters {
   display: grid;
   gap: 10px;
@@ -33,6 +38,10 @@
 .student-ticket-card-list {
   display: grid;
   gap: 12px;
+}
+
+.student-ticket-card-list > p {
+  margin: 0;
 }
 
 .student-ticket-card {
@@ -108,4 +117,63 @@
 
 .ticket-detail-link:hover {
   background: var(--border);
+}
+
+.student-ticket-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid color-mix(in srgb, var(--border), transparent 16%);
+}
+
+.ticket-pagination-pages {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.ticket-pagination-button {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 0 14px;
+  color: var(--primary);
+  background: var(--card);
+  font: inherit;
+  font-weight: 700;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.ticket-pagination-button:hover:not(:disabled) {
+  background: var(--muted);
+}
+
+.ticket-pagination-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.ticket-pagination-button-active {
+  border-color: transparent;
+  background: var(--gold-500);
+}
+
+@media (max-width: 767px) {
+  .student-ticket-pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ticket-pagination-pages {
+    order: -1;
+  }
 }

@@ -46,6 +46,8 @@ export function formatTicket(apiTicket) {
     urgency: urgencyLabels[apiTicket.urgencyLevel] || apiTicket.urgencyLevel,
     urgencyValue: apiTicket.urgencyLevel,
     priority: priorityLabels[apiTicket.priority] || apiTicket.priority,
+    createdAtValue: createdAt?.getTime() || 0,
+    updatedAtValue: updatedAt?.getTime() || 0,
     submitted: formatDate(createdAt),
     updated: formatDate(updatedAt),
     description: apiTicket.description,
