@@ -433,6 +433,18 @@
   }
 }
 
+.admin-assign-widget {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.assign-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 @media (min-width: 900px) {
   .ticket-detail-header {
     grid-template-columns: minmax(0, 1fr) auto;

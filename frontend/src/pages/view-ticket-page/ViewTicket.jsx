@@ -4,6 +4,8 @@ import { Main } from '../../components'
 import {
   addStaffTicketNote,
   addStaffTicketStudentNote,
+  assignTicket,
+  getAdminAllStaff,
   getStaffTicket,
   getStaffUsers,
   getTicket,
@@ -40,6 +42,7 @@ export default function ViewTicket() {
   const { ticketId } = useParams()
   const user = getStoredUser()
   const role = user?.role || user?.user_role
+  const isAdmin = role === 'admin'
   const isStaff = role === 'staff' || role === 'admin'
 
   const [ticket, setTicket] = useState(null)
@@ -57,6 +60,10 @@ export default function ViewTicket() {
   const [isSavingChanges, setIsSavingChanges] = useState(false)
   const [isSavingNote, setIsSavingNote] = useState(false)
   const [isSavingStudentNote, setIsSavingStudentNote] = useState(false)
+  const [selectedDept, setSelectedDept] = useState('')
+  const [pendingStaffId, setPendingStaffId] = useState('')
+  const [isAssigning, setIsAssigning] = useState(false)
+  const [assignError, setAssignError] = useState('')
 
   useEffect(() => {
     let isMounted = true
@@ -68,7 +75,7 @@ export default function ViewTicket() {
       try {
         const [ticketResponse, staffUsersResponse] = await Promise.all([
           isStaff ? getStaffTicket(ticketId) : getTicket(ticketId),
-          isStaff ? getStaffUsers() : Promise.resolve(null),
+          isAdmin ? getAdminAllStaff({ status: 'active' }) : isStaff ? getStaffUsers() : Promise.resolve(null),
         ])
 
         if (!isMounted) {
@@ -76,7 +83,7 @@ export default function ViewTicket() {
         }
 
         hydrateTicketState(ticketResponse.ticket)
-        setStaffUsers(staffUsersResponse?.users || [])
+        setStaffUsers(staffUsersResponse?.users || staffUsersResponse?.staff || [])
       } catch (err) {
         if (isMounted) {
           setError(err.message || 'Unable to load ticket.')
@@ -99,7 +106,7 @@ export default function ViewTicket() {
     return () => {
       isMounted = false
     }
-  }, [isStaff, ticketId])
+  }, [isAdmin, isStaff, ticketId])
 
   async function handleSaveChanges(event) {
     event.preventDefault()
@@ -225,6 +232,21 @@ export default function ViewTicket() {
       setActionError(err.message || 'Unable to re-open ticket.')
     } finally {
       setIsSavingChanges(false)
+    }
+  }
+
+  async function handleAdminAssign(staffId) {
+    setIsAssigning(true)
+    setAssignError('')
+    try {
+      const response = await assignTicket(ticket._id, staffId)
+      setTicket(response.ticket)
+      setSelectedDept('')
+      setPendingStaffId('')
+    } catch (err) {
+      setAssignError(err.message || 'Unable to assign ticket.')
+    } finally {
+      setIsAssigning(false)
     }
   }
 
@@ -485,6 +507,96 @@ export default function ViewTicket() {
                 {actionError ? <p className="form-error" role="alert">{actionError}</p> : null}
                 {actionSuccess ? <p className="form-success">{actionSuccess}</p> : null}
               </section>
+
+              {isAdmin ? (
+                <section className="ticket-workspace">
+                  <div className="panel-header">
+                    <h2>Assign ticket</h2>
+                  </div>
+
+                  <div className="admin-assign-widget">
+                    <p className="ticket-supporting-copy">
+                      Current assignee: <strong>{displayTicket.assignedTo}</strong>
+                    </p>
+
+                    {staffUsers.length === 0 ? (
+                      <p className="ticket-supporting-copy">No active staff available.</p>
+                    ) : (() => {
+                      const deptMap = staffUsers.reduce((acc, m) => {
+                        const dept = m.department || 'Other'
+                        ;(acc[dept] = acc[dept] || []).push(m)
+                        return acc
+                      }, {})
+                      const depts = Object.keys(deptMap).sort()
+                      const deptMembers = selectedDept ? (deptMap[selectedDept] || []) : []
+                      return (
+                        <>
+                          <label className="field">
+                            <span>Department</span>
+                            <select
+                              className="ticket-select"
+                              value={selectedDept}
+                              onChange={(e) => { setSelectedDept(e.target.value); setPendingStaffId('') }}
+                            >
+                              <option value="">Select a department</option>
+                              {depts.map((d) => (
+                                <option key={d} value={d}>{d}</option>
+                              ))}
+                            </select>
+                          </label>
+
+                          {selectedDept && (
+                            <label className="field">
+                              <span>Staff member</span>
+                              <select
+                                className="ticket-select"
+                                value={pendingStaffId}
+                                disabled={isAssigning}
+                                onChange={(e) => setPendingStaffId(e.target.value)}
+                              >
+                                <option value="">Select staff member</option>
+                                {deptMembers.map((member) => (
+                                  <option key={member._id} value={member._id}>
+                                    {getPersonName(member, member.email)}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          )}
+
+                        </>
+                      )
+                    })()}
+
+                    {(pendingStaffId || ticket.assignedToStaffId) ? (
+                      <div className="assign-action-row">
+                        {pendingStaffId ? (
+                          <button
+                            type="button"
+                            className="button button-primary"
+                            disabled={isAssigning}
+                            onClick={() => handleAdminAssign(pendingStaffId)}
+                          >
+                            {isAssigning ? 'Assigning...' : 'Assign'}
+                          </button>
+                        ) : null}
+                        {ticket.assignedToStaffId ? (
+                          <button
+                            type="button"
+                            className="button button-ghost"
+                            disabled={isAssigning}
+                            onClick={() => handleAdminAssign(null)}
+                          >
+                            Unassign
+                          </button>
+                        ) : null}
+                      </div>
+                    ) : null}
+
+                    {assignError ? <p className="form-error" role="alert">{assignError}</p> : null}
+                  </div>
+                </section>
+              ) : null}
             </>
           ) : (
             <div className="ticket-thread staff-response">
@@ -549,8 +661,8 @@ export default function ViewTicket() {
         </aside>
       </section>
 
-      <Link className="button button-primary" to="/dashboard">
-        Back to dashboard
+      <Link className="button button-primary" to={isAdmin ? '/admin/tickets' : '/dashboard'}>
+        {isAdmin ? 'Back to tickets' : 'Back to dashboard'}
       </Link>
     </Main>
   )
@@ -614,10 +726,6 @@ function formatDateTime(value) {
   }).format(new Date(value))
 }
 
-function formatStaffOption(staffMember) {
-  const label = getPersonName(staffMember, staffMember.email)
-  return staffMember.department ? `${label} (${staffMember.department})` : label
-}
 
 function hasResolvingStudentNote(ticket) {
   return Array.isArray(ticket?.studentNotes)

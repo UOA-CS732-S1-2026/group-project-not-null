@@ -140,7 +140,7 @@ export default function AdminPage() {
         )}
 
         {!pendingLoading && pending.length > 0 && (
-          <table className="admin-table">
+          <div className="admin-table-wrap"><table className="admin-table">
             <thead>
               <tr>
                 <th>Name</th>
@@ -178,7 +178,7 @@ export default function AdminPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </section>
 
@@ -201,7 +201,7 @@ export default function AdminPage() {
         )}
 
         {!staffLoading && allStaff.length > 0 && (
-          <table className="admin-table">
+          <div className="admin-table-wrap"><table className="admin-table">
             <thead>
               <tr>
                 <th>Name</th>
@@ -245,7 +245,7 @@ export default function AdminPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </section>
       {/* Admins */}
@@ -265,7 +265,7 @@ export default function AdminPage() {
         )}
 
         {!adminsLoading && admins.length > 0 && (
-          <table className="admin-table">
+          <div className="admin-table-wrap"><table className="admin-table">
             <thead>
               <tr>
                 <th>Name</th>
@@ -282,7 +282,7 @@ export default function AdminPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </section>
     </div>

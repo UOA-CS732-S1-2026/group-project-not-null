@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getAdminTickets, getAdminAllStaff, assignTicket } from '../../services/api'
+import { getAdminTickets } from '../../services/api'
 import './AdminTicketsPage.css'
 
 const STATUS_FILTERS = [
@@ -20,8 +20,8 @@ const CATEGORY_LABEL = {
 const STATUS_LABEL = { open: 'Open', in_progress: 'In Progress', resolved: 'Resolved' }
 
 function personName(user) {
-  if (!user) return '—'
-  return `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || '—'
+  if (!user) return 'Unassigned'
+  return `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Unassigned'
 }
 
 function timeAgo(value) {
@@ -35,13 +35,10 @@ function timeAgo(value) {
 
 export default function AdminTicketsPage() {
   const [tickets, setTickets] = useState([])
-  const [staff, setStaff] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [search, setSearch] = useState('')
-  const [assigning, setAssigning] = useState({})
-  const [assignError, setAssignError] = useState('')
   const navigate = useNavigate()
   const debounceRef = useRef(null)
 
@@ -59,41 +56,16 @@ export default function AdminTicketsPage() {
   }, [])
 
   useEffect(() => {
-    getAdminAllStaff({ status: 'active' })
-      .then((data) => setStaff(data.staff || []))
-      .catch(() => {})
-  }, [])
-
-  useEffect(() => {
     clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => loadTickets(statusFilter, search), 250)
     return () => clearTimeout(debounceRef.current)
   }, [statusFilter, search, loadTickets])
 
-  async function handleAssign(ticketId, staffId) {
-    setAssigning((prev) => ({ ...prev, [ticketId]: true }))
-    setAssignError('')
-    try {
-      await assignTicket(ticketId, staffId || null)
-      setTickets((prev) =>
-        prev.map((t) =>
-          t._id === ticketId
-            ? { ...t, assignedToStaffId: staff.find((s) => s._id === staffId) || null }
-            : t
-        )
-      )
-    } catch (err) {
-      setAssignError(err.message)
-    } finally {
-      setAssigning((prev) => ({ ...prev, [ticketId]: false }))
-    }
-  }
-
   return (
-    <div className="admin-page">
+    <div className="admin-page admin-page-wide">
       <div className="admin-page-header">
         <h1>Tickets</h1>
-        <p>View all tickets and assign them to active staff members.</p>
+        <p>View all tickets. Open a ticket to assign it to a staff member.</p>
       </div>
 
       <div className="admin-tickets-toolbar">
@@ -118,8 +90,6 @@ export default function AdminTicketsPage() {
         />
       </div>
 
-      {assignError && <p className="admin-action-error">{assignError}</p>}
-
       {isLoading ? (
         <p className="admin-loading">Loading tickets…</p>
       ) : error ? (
@@ -143,7 +113,7 @@ export default function AdminTicketsPage() {
                 <th>Category</th>
                 <th>Status</th>
                 <th>Updated</th>
-                <th>Assign To</th>
+                <th>Assigned To</th>
               </tr>
             </thead>
             <tbody>
@@ -164,24 +134,7 @@ export default function AdminTicketsPage() {
                     </span>
                   </td>
                   <td>{timeAgo(ticket.updatedAt)}</td>
-                  <td>
-                    <select
-                      className="admin-assign-select"
-                      value={ticket.assignedToStaffId?._id || ''}
-                      disabled={assigning[ticket._id]}
-                      onClick={(e) => e.stopPropagation()}
-                      onChange={(e) => handleAssign(ticket._id, e.target.value)}
-                    >
-                      <option value="">
-                        {ticket.assignedToStaffId ? 'Remove' : 'Unassigned'}
-                      </option>
-                      {staff.map((s) => (
-                        <option key={s._id} value={s._id}>
-                          {personName(s)}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
+                  <td>{personName(ticket.assignedToStaffId)}</td>
                 </tr>
               ))}
             </tbody>
