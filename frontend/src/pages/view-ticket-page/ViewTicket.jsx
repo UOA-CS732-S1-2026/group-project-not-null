@@ -17,6 +17,7 @@ const statusLabels = {
   open: 'Open',
   in_progress: 'In Progress',
   resolved: 'Resolved',
+  archived: 'Archived',
 }
 
 const categoryLabels = {

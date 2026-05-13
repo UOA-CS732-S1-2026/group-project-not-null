@@ -23,10 +23,11 @@ const DEPT_TO_CATEGORY = {
 const STATUS_LABELS = {
   open: 'Open',
   in_progress: 'In Progress',
-  resolved: 'Resolved'
+  resolved: 'Resolved',
+  archived: 'Archived'
 };
 
-const VALID_STATUSES = ['open', 'in_progress', 'resolved'];
+const VALID_STATUSES = ['open', 'in_progress', 'resolved', 'archived'];
 
 function startOfToday() {
   const date = new Date();

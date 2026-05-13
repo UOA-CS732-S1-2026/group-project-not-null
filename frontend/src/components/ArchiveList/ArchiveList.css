@@ -1,0 +1,78 @@
+.archive-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.archive-card {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  background: var(--muted);
+}
+
+.archive-ticket-id {
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.archive-card h2,
+.archive-empty h2 {
+  margin: 0;
+  color: var(--primary);
+  font-family: var(--font-landing);
+  font-size: 1.08rem;
+}
+
+.archive-card p,
+.archive-empty p {
+  margin: 0;
+  color: var(--muted-foreground);
+}
+
+.archive-history-button {
+  width: 100%;
+  justify-self: stretch;
+  background: var(--gold-400);
+}
+
+.archive-empty,
+.archive-error {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  background: var(--muted);
+}
+
+.archive-error {
+  margin: 0;
+  color: var(--destructive);
+  font-weight: 800;
+}
+
+.archive-card-loading span,
+.archive-card-loading strong,
+.archive-card-loading p {
+  min-height: 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--border), transparent 25%);
+}
+
+.archive-card-loading strong {
+  min-height: 24px;
+}
+
+@media (min-width: 760px) {
+  .archive-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .archive-history-button {
+    width: max-content;
+    justify-self: start;
+  }
+}

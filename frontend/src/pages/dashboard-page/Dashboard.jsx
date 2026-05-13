@@ -45,6 +45,7 @@ const statusLabels = {
   open: 'Open',
   in_progress: 'In Progress',
   resolved: 'Resolved',
+  archived: 'Archived',
 }
 
 const STUDENT_TICKETS_PER_PAGE = 5

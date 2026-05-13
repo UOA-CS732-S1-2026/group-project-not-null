@@ -16,6 +16,7 @@ const statusLabels = {
   open: 'Open',
   in_progress: 'Pending',
   resolved: 'Resolved',
+  archived: 'Archived',
 }
 
 function getStoredUser() {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { TicketTable } from '../../components'
 import { getAdminTickets } from '../../services/api'
 import './AdminTicketsPage.css'
 
@@ -10,36 +10,12 @@ const STATUS_FILTERS = [
   { label: 'Resolved', value: 'resolved' },
 ]
 
-const PRIORITY_LABEL = { 1: 'Critical', 2: 'High', 3: 'Low' }
-const CATEGORY_LABEL = {
-  IT: 'IT',
-  enrolment: 'Enrolment',
-  academic: 'Academic',
-  'accommodation/finance': 'Accommodation/Finance',
-}
-const STATUS_LABEL = { open: 'Open', in_progress: 'In Progress', resolved: 'Resolved' }
-
-function personName(user) {
-  if (!user) return 'Unassigned'
-  return `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Unassigned'
-}
-
-function timeAgo(value) {
-  if (!value) return '—'
-  const mins = Math.max(1, Math.floor((Date.now() - new Date(value).getTime()) / 60000))
-  if (mins < 60) return `${mins}m ago`
-  const hrs = Math.floor(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
-  return `${Math.floor(hrs / 24)}d ago`
-}
-
 export default function AdminTicketsPage() {
   const [tickets, setTickets] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [search, setSearch] = useState('')
-  const navigate = useNavigate()
   const debounceRef = useRef(null)
 
   const loadTickets = useCallback(async (status, q) => {
@@ -99,47 +75,8 @@ export default function AdminTicketsPage() {
             Retry
           </button>
         </p>
-      ) : tickets.length === 0 ? (
-        <p className="admin-empty">No tickets found.</p>
       ) : (
-        <div className="admin-tickets-table-wrap">
-          <table className="admin-table admin-tickets-table">
-            <thead>
-              <tr>
-                <th>Priority</th>
-                <th>Ticket #</th>
-                <th>Title</th>
-                <th>Student</th>
-                <th>Category</th>
-                <th>Status</th>
-                <th>Updated</th>
-                <th>Assigned To</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tickets.map((ticket) => (
-                <tr key={ticket._id} className="admin-ticket-row" onClick={() => navigate(`/tickets/${ticket._id}`)}>
-                  <td>
-                    <span className={`admin-priority-badge admin-priority-${(PRIORITY_LABEL[ticket.priority] || 'low').toLowerCase()}`}>
-                      {PRIORITY_LABEL[ticket.priority] || '—'}
-                    </span>
-                  </td>
-                  <td className="admin-ticket-number">{ticket.ticketNumber}</td>
-                  <td className="admin-ticket-title" title={ticket.title}>{ticket.title}</td>
-                  <td>{personName(ticket.studentId)}</td>
-                  <td>{CATEGORY_LABEL[ticket.category] || ticket.category}</td>
-                  <td>
-                    <span className={`admin-status-badge admin-ticket-status-${ticket.status}`}>
-                      {STATUS_LABEL[ticket.status] || ticket.status}
-                    </span>
-                  </td>
-                  <td>{timeAgo(ticket.updatedAt)}</td>
-                  <td>{personName(ticket.assignedToStaffId)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <TicketTable tickets={tickets} mode="active" emptyMessage="No tickets found." />
       )}
     </div>
   )

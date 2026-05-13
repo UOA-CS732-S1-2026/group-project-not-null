@@ -7,3 +7,4 @@ export { default as ViewTicket } from './view-ticket-page';
 export { default as AdminPage } from './admin-page/AdminPage';
 export { default as AdminTicketsPage } from './admin-tickets-page/AdminTicketsPage';
 export { default as StaffTickets } from './staff-tickets-page';
+export { default as ArchivePage } from './archive-page';

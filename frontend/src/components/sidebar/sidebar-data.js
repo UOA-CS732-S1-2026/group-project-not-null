@@ -1,4 +1,5 @@
 import {
+  Archive,
   CircleHelp,
   LayoutDashboard,
   Settings,
@@ -23,6 +24,7 @@ export const sidebarData = {
       items: [
         { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
         { title: 'Staff Tickets', url: '/staff/tickets', icon: TicketCheck, staffOnly: true },
+        { title: 'Archive', url: '/archive', icon: Archive, staffOnly: true },
       ],
     },
     {
@@ -37,6 +39,7 @@ export const sidebarData = {
       items: [
         { title: 'Admin Panel', url: '/admin', icon: ShieldCheck },
         { title: 'Tickets', url: '/admin/tickets', icon: TicketCheck },
+        { title: 'Archive', url: '/admin/archive', icon: Archive },
       ],
     },
   ],
