@@ -98,7 +98,9 @@ describe('Staff Dashboard', () => {
     );
 
     expect(await screen.findByText(/staff dashboard/i)).toBeInTheDocument();
-    expect(await screen.findByText(/good afternoon, test staff/i)).toBeInTheDocument();
+    expect(
+  await screen.findByRole('heading', { name: /test staff/i })
+).toBeInTheDocument();
     expect(await screen.findByRole('heading', { name: /ticket queue/i })).toBeInTheDocument();
 
     const ticketTitles = await screen.findAllByText(/staff dashboard test ticket/i);

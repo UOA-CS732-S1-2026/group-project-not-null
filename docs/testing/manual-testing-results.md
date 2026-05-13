@@ -102,6 +102,11 @@ Category and urgency missing-input validation could not be tested through the fr
 | AT6 | Admin Tickets | Admin Tickets page renders | Run `npm run test:run` inside frontend | Admin Tickets page should render without crashing | Admin Tickets page automated test passed | Passed |
 | AT7 | Admin Tickets | Ticket data renders | Run `npm run test:run` inside frontend | Admin should be able to see ticket data | Admin ticket data test passed | Passed |
 | AT8 | Admin Tickets | Ticket controls render | Run `npm run test:run` inside frontend | Search and assignment controls should be visible | Admin ticket controls test passed | Passed |
+| AT9 | Staff Dashboard | Staff dashboard renders for staff user | Run `npm run test:run` inside frontend | Staff dashboard should render without crashing | Staff Dashboard automated test passed | Passed |
+| AT10 | Staff Dashboard | Staff ticket information renders | Run `npm run test:run` inside frontend | Staff should see assigned ticket information | Staff ticket information rendered successfully in automated test | Passed |     
+| AT11 | Sign In | Sign In page renders | Run `npm run test:run` inside frontend | Sign In page should render without crashing | Sign In automated test passed | Passed |
+| AT12 | Sign In | Email and password fields render | Run `npm run test:run` inside frontend | Email and password fields should be visible | Email and password fields rendered successfully | Passed |
+| AT13 | Sign In | Sign In button renders | Run `npm run test:run` inside frontend | Sign In button should be visible | Sign In button rendered successfully | Passed |
 
 ---
 
