@@ -90,11 +90,18 @@ Category and urgency missing-input validation could not be tested through the fr
 
 ## 7. Automated Component Testing
 
+## Automated Component Testing
+
 | Test ID | Component | Test Case | Steps | Expected Result | Actual Result | Status |
 |---|---|---|---|---|---|---|
-| AT1 | Student Dashboard | Dashboard renders successfully | Run `npm run test:run` inside the frontend folder | Student dashboard component should render without crashing | Test passed. Student dashboard rendered successfully. | Passed |
-| AT2 | Student Dashboard | Summary cards render | Run `npm run test:run` inside the frontend folder | Open tickets, In Progress, and Resolved summary information should be visible | Test passed. Dashboard summary section rendered correctly. | Passed |
-| AT3 | Student Dashboard | Filters render | Run `npm run test:run` inside the frontend folder | Status and category filters should be visible | Test passed. Status and category filters were found. | Passed |
+| AT1 | Student Dashboard | Dashboard renders successfully | Run `npm run test:run` inside frontend | Dashboard should render without crashing | Student Dashboard automated test passed | Passed |
+| AT2 | Student Dashboard | Summary cards render | Run `npm run test:run` inside frontend | Summary cards should be visible | Summary cards automated test passed | Passed |
+| AT3 | Student Dashboard | Filters render | Run `npm run test:run` inside frontend | Status and category filters should be visible | Filters automated test passed | Passed |
+| AT4 | Create Ticket | Create Ticket page renders | Run `npm run test:run` inside frontend | Create Ticket page should render | Create Ticket page automated test passed | Passed |
+| AT5 | Create Ticket | Form fields render | Run `npm run test:run` inside frontend | Title, description, category, and urgency fields should be visible | Create Ticket form field tests passed | Passed |
+| AT6 | Admin Tickets | Admin Tickets page renders | Run `npm run test:run` inside frontend | Admin Tickets page should render without crashing | Admin Tickets page automated test passed | Passed |
+| AT7 | Admin Tickets | Ticket data renders | Run `npm run test:run` inside frontend | Admin should be able to see ticket data | Admin ticket data test passed | Passed |
+| AT8 | Admin Tickets | Ticket controls render | Run `npm run test:run` inside frontend | Search and assignment controls should be visible | Admin ticket controls test passed | Passed |
 
 ---
 
