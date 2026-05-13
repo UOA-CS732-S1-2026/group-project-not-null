@@ -8,6 +8,7 @@ export function SignInForm() {
   const navigate = useNavigate()
   const [accountType, setAccountType] = useState('student')
   const [error, setError] = useState('')
+  const [pendingMessage, setPendingMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(event) {
@@ -18,6 +19,7 @@ export function SignInForm() {
     const password = formData.get('password')
 
     setError('')
+    setPendingMessage('')
     setIsSubmitting(true)
 
     try {
@@ -31,9 +33,13 @@ export function SignInForm() {
       localStorage.setItem('refreshToken', data.refreshToken)
       localStorage.setItem('user', JSON.stringify(data.user))
 
-      navigate('/dashboard')
+      navigate(data.user.role === 'admin' ? '/admin' : '/dashboard')
     } catch (err) {
-      setError(err.message)
+      if (err.pendingApproval) {
+        setPendingMessage(err.message)
+      } else {
+        setError(err.message)
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -62,6 +68,16 @@ export function SignInForm() {
             onChange={(event) => setAccountType(event.target.value)}
           />
           <span>Staff</span>
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="accountType"
+            value="admin"
+            checked={accountType === 'admin'}
+            onChange={(event) => setAccountType(event.target.value)}
+          />
+          <span>Admin</span>
         </label>
       </fieldset>
 
@@ -102,10 +118,16 @@ export function SignInForm() {
         </p>
       )}
 
+      {pendingMessage && (
+        <p className="form-info" role="status">
+          {pendingMessage}
+        </p>
+      )}
+
       <Button className="button-primary auth-submit" type="submit" disabled={isSubmitting}>
         {isSubmitting
           ? 'Signing in...'
-          : `Sign in as ${accountType === 'student' ? 'Student' : 'Staff'}`}
+          : `Sign in as ${accountType === 'student' ? 'Student' : accountType === 'staff' ? 'Staff' : 'Admin'}`}
       </Button>
     </form>
   )

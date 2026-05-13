@@ -100,10 +100,13 @@ export function SignUpForm() {
       department: values.accountType === 'staff' ? values.department.trim() : undefined,
     })
       .then((data) => {
+        if (data.pendingApproval) {
+          setSuccessMessage('Your account has been submitted for approval. You can log in once an admin approves it.')
+          return
+        }
         localStorage.setItem('accessToken', data.accessToken)
         localStorage.setItem('refreshToken', data.refreshToken)
         localStorage.setItem('user', JSON.stringify(data.user))
-        setSuccessMessage(`Account created for ${data.user.email}.`)
         navigate('/dashboard')
       })
       .catch((error) => {
