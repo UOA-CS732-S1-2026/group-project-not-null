@@ -110,6 +110,9 @@ Category and urgency missing-input validation could not be tested through the fr
 | AT14 | Sign Up | Sign Up page renders | Run `npm run test:run` inside frontend | Sign Up page should render without crashing | Sign Up automated test passed | Passed |
 | AT15 | Sign Up | Registration fields render | Run `npm run test:run` inside frontend | First name, last name, email, password, and confirm password fields should be visible | Registration fields rendered successfully | Passed |
 | AT16 | Sign Up | Account type options render | Run `npm run test:run` inside frontend | Student and staff account type options should be visible | Account type options rendered successfully | Passed |
+| AT17 | View Ticket | Ticket detail page renders | Run `npm run test:run` inside frontend | Ticket detail page should render without crashing | View Ticket automated test passed | Passed |
+| AT18 | View Ticket | Ticket information renders | Run `npm run test:run` inside frontend | Ticket status, category, urgency, and priority should be visible | Ticket information rendered successfully | Passed |
+| AT19 | View Ticket | Ticket description renders | Run `npm run test:run` inside frontend | Ticket description should be visible | Ticket description rendered successfully | Passed |
 
 ---
 
