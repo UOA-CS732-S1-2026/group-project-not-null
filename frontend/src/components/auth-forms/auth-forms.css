@@ -121,7 +121,8 @@
   pointer-events: none;
 }
 
-.field input {
+.field input,
+.field select {
   width: 100%;
   min-height: 52px;
   border: 1px solid var(--border);
@@ -130,6 +131,19 @@
   color: var(--primary);
   background: var(--background);
   font: inherit;
+}
+
+.field select {
+  cursor: pointer;
+  appearance: auto;
+}
+
+.field select:has(option[value=""]:checked) {
+  color: color-mix(in srgb, var(--muted-foreground), transparent 26%);
+}
+
+.field select option {
+  color: var(--primary);
 }
 
 @media (min-width: 720px) {
@@ -146,12 +160,14 @@
   color: color-mix(in srgb, var(--muted-foreground), transparent 26%);
 }
 
-.field input:focus {
+.field input:focus,
+.field select:focus {
   border-color: var(--ring);
   outline: 3px solid oklch(from var(--ring) l c h / 0.28);
 }
 
-.field input[aria-invalid='true'] {
+.field input[aria-invalid='true'],
+.field select[aria-invalid='true'] {
   border-color: var(--destructive);
 }
 

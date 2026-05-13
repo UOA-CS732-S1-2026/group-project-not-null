@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { Button, Main } from '../../components'
 import { createTicket } from '../../services/api.js'
 import {
@@ -9,7 +9,14 @@ import {
 } from '../../services/ticket-mappers.js'
 import './CreateTicket.css'
 
+function getStoredUser() {
+  try { return JSON.parse(localStorage.getItem('user')) } catch { return null }
+}
+
 export default function CreateTicket() {
+  const user = getStoredUser()
+  if (user?.role === 'admin') return <Navigate to="/admin" replace />
+
   const [form, setForm] = useState({
     title: '',
     category: 'IT',
