@@ -1,0 +1,8 @@
+# Testing Evidence Screenshots
+
+| Screenshot | Description |
+|---|---|
+| student-dashboard-loaded.png | Student dashboard loaded with summary cards, filters, and ticket list |
+| ticket-detail-page.png | Ticket detail page showing ticket details, status, category, urgency, priority, timeline, and staff response section |
+| student-dashboard-empty-filter.png | Student dashboard showing the empty state when no tickets match the selected filter |
+| react-key-warning.png | Browser console warning about `key` prop being spread into JSX |
