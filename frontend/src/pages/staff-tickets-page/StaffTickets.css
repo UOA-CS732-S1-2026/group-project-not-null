@@ -241,6 +241,17 @@
   }
 }
 
+@media (max-width: 639px) {
+  .staff-ticket-card-topline {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .staff-ticket-card h3 {
+    width: 100%;
+  }
+}
+
 @media (min-width: 1180px) {
   .staff-ticket-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
