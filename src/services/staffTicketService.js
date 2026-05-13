@@ -6,10 +6,12 @@ async function getTicketsAssignedToStaff(staffUserId) {
     .populate('assignedToStaffId', 'email firstName lastName department')
     .sort({ priority: 1, updatedAt: -1 });
 
+  const unresolvedTickets = tickets.filter((ticket) => ticket.status !== 'resolved');
+
   const summary = {
-    assignedToMe: tickets.length,
-    inProgress: tickets.filter((ticket) => ticket.status === 'in_progress').length,
-    highPriority: tickets.filter((ticket) => [1, 2].includes(ticket.priority)).length
+    assignedToMe: unresolvedTickets.length,
+    inProgress: unresolvedTickets.filter((ticket) => ticket.status === 'in_progress').length,
+    highPriority: unresolvedTickets.filter((ticket) => [1, 2].includes(ticket.priority)).length
   };
 
   return { tickets, summary };
