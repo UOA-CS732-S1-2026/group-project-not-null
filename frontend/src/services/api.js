@@ -118,10 +118,17 @@ export function getTicket(ticketId) {
   return request(`/tickets/${ticketId}`)
 }
 
-export function createTicket({ title, description, category, urgencyLevel }) {
+export function createTicket({ title, description, category, urgencyLevel, priority }) {
   return request('/tickets', {
     method: 'POST',
-    body: JSON.stringify({ title, description, category, urgencyLevel }),
+    body: JSON.stringify({ title, description, category, urgencyLevel, priority }),
+  })
+}
+
+export function analyzeTicketPriority({ description, department, urgencyLevel }) {
+  return request('/triage-priority', {
+    method: 'POST',
+    body: JSON.stringify({ description, department, urgencyLevel }),
   })
 }
 

@@ -1,0 +1,41 @@
+.form-input-field {
+  position: relative;
+  display: grid;
+  width: 100%;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.form-input-field span {
+  position: absolute;
+  top: 9px;
+  left: 12px;
+  z-index: 1;
+  padding: 0 6px;
+  color: var(--muted-foreground);
+  font-size: 0.74rem;
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.form-input-field input {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 18px 14px 6px;
+  color: var(--primary);
+  background: var(--background);
+  font: inherit;
+}
+
+.form-input-field input::placeholder {
+  color: color-mix(in srgb, var(--muted-foreground), transparent 26%);
+}
+
+.form-input-field input:focus {
+  border-color: var(--ring);
+  outline: 3px solid oklch(from var(--ring) l c h / 0.28);
+}

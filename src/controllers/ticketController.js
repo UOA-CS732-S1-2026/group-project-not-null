@@ -2,6 +2,11 @@ const { sendEmail } = require('../utils/sendEmail');
 // src/controllers/ticketController.js
 const Ticket = require('../models/Ticket');
 const User = require('../models/user');
+const {
+  getFallbackPriorityTier,
+  getPriorityValue,
+  normalizePriorityTier
+} = require('../services/priorityUtils');
  
 /**
  * Create a new ticket (Student)
@@ -9,7 +14,7 @@ const User = require('../models/user');
  */
 const createTicket = async (req, res) => {
   try {
-    const { title, description, category, urgencyLevel } = req.body;
+    const { title, description, category, urgencyLevel, priority } = req.body;
  
     // Validation
     if (!title || !description || !category) {
@@ -32,6 +37,8 @@ const createTicket = async (req, res) => {
         error: `Invalid urgency level. Must be one of: ${validUrgencies.join(', ')}`
       });
     }
+
+    const priorityTier = normalizePriorityTier(priority) || getFallbackPriorityTier(urgency);
  
     // Create ticket
     const ticket = new Ticket({
@@ -39,7 +46,8 @@ const createTicket = async (req, res) => {
       title,
       description,
       category,
-      urgencyLevel: urgency
+      urgencyLevel: urgency,
+      priority: getPriorityValue(priorityTier)
     });
  
     await ticket.save();

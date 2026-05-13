@@ -3,6 +3,7 @@ const router = express.Router();
 const { verifyAuth } = require('../middleware/auth');
 const Ticket = require('../models/Ticket');
 const User = require('../models/user');
+const { getPriorityLabel } = require('../services/priorityUtils');
 const { getTicketsAssignedToStaff } = require('../services/staffTicketService');
 
 const CATEGORY_LABELS = {
@@ -44,14 +45,6 @@ function getTimeAgo(date) {
 function getPersonName(user, fallback = 'Unassigned') {
   if (!user) return fallback;
   return `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || fallback;
-}
-
-function getPriorityLabel(priority) {
-  if (priority === 1) return 'Critical';
-  if (priority === 2) return 'High';
-  if (priority === 3) return 'Medium';
-  if (priority === 4) return 'Low';
-  return 'Medium';
 }
 
 function formatAverageResponseTime(hours) {

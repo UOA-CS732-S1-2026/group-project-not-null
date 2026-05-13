@@ -40,8 +40,8 @@ const ticketSchema = new mongoose.Schema({
   },
   priority: {
     type: Number,
-    enum: [1, 2, 3],
-    default: 3
+    enum: [1, 2, 3, 4],
+    default: 4
   },
   status: {
     type: String,
@@ -108,14 +108,16 @@ ticketSchema.pre('save', async function() {
       'enrolment_medium': 2,
       'academic_medium': 2,
       'accommodation/finance_medium': 2,
-      'IT_low': 3,
-      'enrolment_low': 3,
-      'academic_low': 3,
-      'accommodation/finance_low': 3
+      'IT_low': 4,
+      'enrolment_low': 4,
+      'academic_low': 4,
+      'accommodation/finance_low': 4
     };
 
-    const key = `${this.category}_${this.urgencyLevel}`;
-    this.priority = priorityMap[key] || 3;
+    if (!this.priority) {
+      const key = `${this.category}_${this.urgencyLevel}`;
+      this.priority = priorityMap[key] || 4;
+    }
     this.updatedAt = new Date();
   } catch (error) {
     throw error;

@@ -1,0 +1,37 @@
+.ticket-form-header {
+  display: grid;
+  gap: 10px;
+}
+
+.ticket-form-header h1 {
+  margin: 0;
+  font-family: var(--font-landing);
+}
+
+.ticket-form-header p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-family: var(--font-landing);
+}
+
+.ticket-form-breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted-foreground);
+  font-family: var(--font-landing);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ticket-form-breadcrumbs a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.ticket-form-breadcrumbs a:hover {
+  text-decoration: underline;
+}

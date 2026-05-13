@@ -19,32 +19,6 @@
   font-weight: 900;
 }
 
-.create-ticket-form select,
-.create-ticket-form textarea {
-  width: 100%;
-  min-height: 52px;
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) - 2px);
-  padding: 18px 14px 6px;
-  color: var(--primary);
-  background: var(--background);
-  font: inherit;
-}
-
-.create-ticket-form textarea {
-  min-height: 164px;
-  padding-block: 24px 12px;
-  resize: vertical;
-}
-
-.create-ticket-form select:focus,
-.create-ticket-form textarea:focus {
-  border-color: var(--ring);
-  outline: 3px solid oklch(from var(--ring) l c h / 0.28);
-}
-
-.create-ticket-description,
-.priority-note,
 .confirmation-panel {
   max-width: 760px;
 }
@@ -82,14 +56,6 @@
 .urgency-options label:has(input:focus-visible) {
   outline: 3px solid oklch(from var(--ring) l c h / 0.28);
   outline-offset: 2px;
-}
-
-.priority-note {
-  margin: 0;
-  border-radius: calc(var(--radius) - 2px);
-  padding: 12px 14px;
-  color: var(--muted-foreground);
-  background: var(--muted);
 }
 
 .confirmation-panel {

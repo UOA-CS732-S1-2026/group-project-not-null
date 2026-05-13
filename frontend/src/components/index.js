@@ -18,6 +18,12 @@ export { AuthenticatedLayout } from './authenticated-layout';
 export { AdminLayout } from './admin-layout/admin-layout';
 export { Header } from './header';
 export { Main } from './main';
+export { default as AITriageCard } from './ai-triage-card';
+export { default as DepartmentSelector } from './department-selector';
+export { default as DescriptionArea } from './description-area';
+export { default as FormInput } from './form-input';
+export { default as SubmitAction } from './submit-action';
+export { default as TicketFormHeader } from './ticket-form-header';
 export {
   DashboardSkeleton,
   EmptyState,

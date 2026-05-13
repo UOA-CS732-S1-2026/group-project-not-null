@@ -20,7 +20,8 @@ const statusLabels = {
 const priorityLabels = {
   1: 'Critical',
   2: 'High',
-  3: 'Low',
+  3: 'Medium',
+  4: 'Low',
 }
 
 const categoryLabels = Object.fromEntries(
@@ -67,6 +68,12 @@ export function assignPriority(category, urgencyLevel) {
     return 'High'
   }
 
+  return 'Low'
+}
+
+export function fallbackPriorityFromUrgency(urgencyLevel) {
+  if (urgencyLevel === 'high') return 'High'
+  if (urgencyLevel === 'medium') return 'Medium'
   return 'Low'
 }
 
