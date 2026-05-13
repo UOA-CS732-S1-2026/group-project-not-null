@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
-import { LandingPage, SignIn, SignUp, Dashboard, CreateTicket, ViewTicket, AdminPage, AdminTicketsPage } from '../pages'
+import { LandingPage, SignIn, SignUp, Dashboard, CreateTicket, ViewTicket, AdminPage, AdminTicketsPage, StaffTickets } from '../pages'
 import { AuthenticatedLayout, AdminLayout } from '../components'
 
 function Main() {

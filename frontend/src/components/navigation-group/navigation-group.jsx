@@ -23,9 +23,10 @@ function getVisibleItems({ title, items, role }) {
   }
 
   return STUDENT_NAV_ITEMS
+}
 
 export function NavGroup({ title, items, role, onNavigate }) {
-  const visibleItems = getVisibleItems({ items, role })
+  const visibleItems = getVisibleItems({ title, items, role })
 
   if (visibleItems.length === 0) {
     return null

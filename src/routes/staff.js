@@ -79,6 +79,28 @@ function requireActiveStaff(req, res, next) {
   next();
 }
 
+async function requireStaff(req, res) {
+  if (req.user.role !== 'staff') {
+    res.status(403).json({ error: 'Only staff can access this resource' });
+    return null;
+  }
+
+  const user = await User.findById(req.user.userId)
+    .select('email firstName lastName department role staffStatus isActive');
+
+  if (!user || !user.isActive) {
+    res.status(403).json({ error: 'Active staff account required' });
+    return null;
+  }
+
+  if (user.staffStatus === 'pending' || user.staffStatus === 'inactive') {
+    res.status(403).json({ error: 'Active staff account required' });
+    return null;
+  }
+
+  return user;
+}
+
 async function findAssignableStaff(staffId) {
   if (!staffId) return null;
   return User.findOne({ _id: staffId, role: 'staff', isActive: true })

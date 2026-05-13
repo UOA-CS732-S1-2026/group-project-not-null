@@ -1,5 +1,4 @@
 import {
-  BookOpen,
   CircleHelp,
   LayoutDashboard,
   Settings,
@@ -29,7 +28,6 @@ export const sidebarData = {
     {
       title: 'Other',
       items: [
-        { title: 'Knowledge Base', url: '/knowledge-base', icon: BookOpen },
         { title: 'Help', url: '/help', icon: CircleHelp },
         { title: 'Settings', url: '/settings', icon: Settings },
       ],
