@@ -2,6 +2,13 @@
 
 UniDesk is a full-stack student support ticketing system built for a university helpdesk workflow. It allows students to raise support queries, staff to manage and resolve tickets, and admins to approve staff accounts and oversee ticket operations.
 
+## Deployment
+
+- **Frontend:** [https://group-project-not-null-xrw8.vercel.app](https://group-project-not-null-xrw8.vercel.app)
+- **Backend:** [https://group-project-not-null.onrender.com/api](https://group-project-not-null.onrender.com/api)
+
+
+
 ## Project Overview
 
 UniDesk supports three user roles:
