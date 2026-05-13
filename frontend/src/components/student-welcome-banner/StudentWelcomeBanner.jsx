@@ -10,7 +10,7 @@ export default function StudentWelcomeBanner() {
       </div>
       <div className="home-title-actions">
         <Link className="button button-primary" to="/tickets/new">
-          Raise Querry!
+          Raise Query
         </Link>
       </div>
     </section>
