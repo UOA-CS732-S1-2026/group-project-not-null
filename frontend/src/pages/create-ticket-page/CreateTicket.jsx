@@ -28,7 +28,7 @@ export default function CreateTicket() {
 
   const [form, setForm] = useState({
     title: '',
-    category: 'IT',
+    category: '',
     urgencyLevel: 'medium',
     description: '',
   })
