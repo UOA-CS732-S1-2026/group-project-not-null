@@ -6,7 +6,7 @@ export {
 	CardAction, 
 	CardDescription, 
 	CardContent 
-} from './card/Card.jsx';
+} from './card/card.jsx';
 export { Button } from './button';
 export { SignInForm } from './auth-forms/sign-in-form.jsx';
 export { SignUpForm } from './auth-forms/sign-up-form.jsx';
